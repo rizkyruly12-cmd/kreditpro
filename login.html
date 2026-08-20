@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — KreditPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-dark: #1e3a8a;
+    --accent: #0ea5e9;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0c4a6e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Background decoration */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: rgba(59,130,246,.08);
+    top: -200px; right: -150px;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(14,165,233,.08);
+    bottom: -100px; left: -100px;
+    pointer-events: none;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Brand header */
+  .brand {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .brand-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(37,99,235,.4);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  .brand h1 {
+    font-size: 24px; font-weight: 700;
+    color: white; margin-bottom: 4px;
+  }
+
+  .brand p {
+    font-size: 13px; color: rgba(255,255,255,.55);
+  }
+
+  /* Card */
+  .login-card {
+    background: rgba(255,255,255,.97);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.1);
+  }
+
+  .login-card h2 {
+    font-size: 18px; font-weight: 700;
+    color: var(--gray-800); margin-bottom: 4px;
+  }
+
+  .login-card .subtitle {
+    font-size: 13px; color: var(--gray-400);
+    margin-bottom: 24px;
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 18px; }
+
+  .form-label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--gray-600); margin-bottom: 7px;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-icon {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px; pointer-events: none;
+    user-select: none;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 11px 12px 11px 40px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--gray-800);
+    background: white;
+    outline: none;
+    transition: border .2s, box-shadow .2s;
+    font-family: inherit;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+  }
+
+  .form-control.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px rgba(220,38,38,.1);
+  }
+
+  .toggle-pw {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer; font-size: 16px;
+    color: var(--gray-400); padding: 4px;
+    transition: color .15s;
+  }
+  .toggle-pw:hover { color: var(--gray-600); }
+
+  /* Alert */
+  .alert {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    animation: shake .3s ease;
+  }
+  .alert-danger  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+  .alert-warning { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+  .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .alert-info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+  }
+
+  /* Submit button */
+  .btn-login {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+    box-shadow: 0 4px 16px rgba(59,130,246,.35);
+  }
+
+  .btn-login:hover:not(:disabled) { opacity: .92; transform: translateY(-1px); }
+  .btn-login:active:not(:disabled) { transform: translateY(0); }
+  .btn-login:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* Spinner */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Attempts */
+  .attempts-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 12px 0;
+  }
+
+  .attempt-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    transition: background .3s;
+  }
+  .attempt-dot.used { background: var(--danger); }
+
+  /* Lockout timer */
+  #lockout-bar {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  #lockout-bar .lock-icon { font-size: 28px; margin-bottom: 6px; }
+  #lockout-bar p { font-size: 13px; color: #b91c1c; }
+  #lockout-bar .timer {
+    font-size: 28px; font-weight: 700;
+    color: #dc2626; font-variant-numeric: tabular-nums;
+    margin: 4px 0;
+  }
+
+  /* Footer */
+  .login-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,.35);
+  }
+
+  /* Default info */
+  .default-info {
+    background: var(--gray-100);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--gray-500);
+    text-align: center;
+  }
+  .default-info strong { color: var(--gray-700); }
+
+</style>
+</head>
+<body>
+
+<div class="login-container">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="42" height="42" fill="none">
+        <rect width="32" height="32" rx="8" fill="url(#lg1)"/>
+        <defs><linearGradient id="lg1" x1="0" y1="0" x2="32" y2="32"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+        <rect x="5" y="10" width="22" height="14" rx="2.5" stroke="white" stroke-width="1.5" fill="none"/>
+        <line x1="5" y1="15" x2="27" y2="15" stroke="white" stroke-width="1.5"/>
+        <rect x="8" y="18" width="5" height="2" rx="1" fill="white"/>
+        <rect x="15" y="18" width="4" height="2" rx="1" fill="rgba(255,255,255,.5)"/>
+      </svg>
+    </div>
+    <h1>KreditPro</h1>
+    <p>Ruli Rizki Ariyanto — Sistem Manajemen Kredit</p>
+  </div>
+
+  <!-- Card -->
+  <div class="login-card">
+    <h2>Selamat Datang 👋</h2>
+    <p class="subtitle">Masuk untuk melanjutkan ke sistem</p>
+
+    <!-- Lockout bar -->
+    <div id="lockout-bar">
+      <div class="lock-icon">🔒</div>
+      <p>Terlalu banyak percobaan salah. Akun dikunci selama:</p>
+      <div class="timer" id="lockout-timer">15:00</div>
+      <p style="font-size:11px;margin-top:4px;">Silakan coba lagi setelah timer habis</p>
+    </div>
+
+    <!-- Alert -->
+    <div id="login-alert" style="display:none;" class="alert"></div>
+
+    <!-- Form -->
+    <form id="login-form" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" class="form-control" id="username"
+            placeholder="Masukkan username" autocomplete="username"
+            autofocus required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" class="form-control" id="password"
+            placeholder="Masukkan password" autocomplete="current-password"
+            required>
+          <button type="button" class="toggle-pw" onclick="togglePw()" id="pw-eye" title="Tampilkan password">👁</button>
+        </div>
+      </div>
+
+      <!-- Attempt dots -->
+      <div class="attempts-row" id="attempts-row" style="display:none;">
+        <div class="attempt-dot" id="dot-1"></div>
+        <div class="attempt-dot" id="dot-2"></div>
+        <div class="attempt-dot" id="dot-3"></div>
+        <div class="attempt-dot" id="dot-4"></div>
+        <div class="attempt-dot" id="dot-5"></div>
+      </div>
+
+      <button type="submit" class="btn-login" id="login-btn">
+        <div class="spinner" id="login-spinner"></div>
+        <span id="login-btn-text">🚀 Masuk</span>
+      </button>
+    </form>
+
+    <!-- Default credentials hint (only shown on first visit) -->
+    <div class="default-info" id="default-info">
+      Login pertama: <strong>admin</strong> / <strong>admin123</strong>
+      &nbsp;·&nbsp; <a href="#" onclick="useDefault()" style="color:#1d4ed8;text-decoration:none;">Gunakan →</a>
+    </div>
+  </div>
+
+  <div class="login-footer">
+    &copy; 2024 Bisnis Kredit · Sistem Manajemen Kredit Barang
+  </div>
+</div>
+
+<script src="db.js"></script>
+<script src="auth.js"></script>
+<script>
+  let lockoutInterval = null;
+
+  // On load — check if already logged in
+  window.addEventListener('DOMContentLoaded', async () => {
+    // If already have valid session → go to app
+    if (DB.auth.isLoggedIn()) {
+      const user = await DB.auth.me();
+      if (user) { window.location.href = 'index.html'; return; }
+    }
+
+    // Hide default info after first login
+    checkLockout();
+  });
+
+  function checkLockout() {
+    if (isLocked()) {
+      showLockout();
+    } else {
+      hideLockout();
+    }
+  }
+
+  function showLockout() {
+    document.getElementById('lockout-bar').style.display = 'block';
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('default-info').style.display = 'none';
+
+    if (lockoutInterval) clearInterval(lockoutInterval);
+    lockoutInterval = setInterval(() => {
+      const secs = getLockRemaining();
+      if (secs <= 0) {
+        clearInterval(lockoutInterval);
+        hideLockout();
+        return;
+      }
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      document.getElementById('lockout-timer').textContent = `${m}:${s}`;
+    }, 1000);
+
+    // Initial render
+    const secs = getLockRemaining();
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    document.getElementById('lockout-timer').textContent = `${m}:${s}`;
+  }
+
+  function hideLockout() {
+    document.getElementById('lockout-bar').style.display = 'none';
+    document.getElementById('login-form').style.display = 'block';
+    hideAlert();
+    updateDots(getRemainingAttempts());
+  }
+
+  function updateDots(remaining) {
+    const used = 5 - remaining;
+    if (used === 0) {
+      document.getElementById('attempts-row').style.display = 'none';
+      return;
+    }
+    document.getElementById('attempts-row').style.display = 'flex';
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.getElementById('dot-' + i);
+      dot.classList.toggle('used', i <= used);
+    }
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('login-alert');
+    const icons = { danger:'❌', warning:'⚠️', success:'✅', info:'ℹ️' };
+    el.className = 'alert alert-' + type;
+    el.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
+    el.style.display = 'flex';
+  }
+
+  function hideAlert() {
+    document.getElementById('login-alert').style.display = 'none';
+  }
+
+  function setLoading(on) {
+    document.getElementById('login-btn').disabled = on;
+    document.getElementById('login-spinner').style.display = on ? 'block' : 'none';
+    document.getElementById('login-btn-text').textContent = on ? 'Memproses...' : '🚀 Masuk';
+  }
+
+  async function doLogin(e) {
+    e.preventDefault();
+    hideAlert();
+
+    if (isLocked()) { showLockout(); return; }
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      showAlert('Username dan password wajib diisi.', 'warning'); return;
+    }
+
+    setLoading(true);
+
+    const result = await login(username, password);
+    setLoading(false);
+
+    if (result.ok) {
+      resetAttempts();
+      showAlert('Login berhasil! Mengalihkan...', 'success');
+      document.getElementById('username').classList.remove('error');
+      document.getElementById('password').classList.remove('error');
+      setTimeout(() => { window.location.href = 'index.html'; }, 700);
+    } else if (result.reason === 'locked' || result.reason?.includes('kunci')) {
+      showLockout();
+    } else {
+      recordFailedAttempt();
+      document.getElementById('username').classList.add('error');
+      document.getElementById('password').classList.add('error');
+      document.getElementById('password').value = '';
+
+      const rem = getRemainingAttempts();
+      if (rem <= 2 && rem > 0) {
+        showAlert(`Username atau password salah. Sisa percobaan: <strong>${rem}</strong>.`, 'danger');
+      } else if (rem === 0) {
+        showLockout();
+      } else {
+        showAlert('Username atau password salah.', 'danger');
+      }
+      updateDots(rem);
+    }
+  }
+
+  function togglePw() {
+    const inp = document.getElementById('password');
+    const btn = document.getElementById('pw-eye');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      btn.textContent = '🙈';
+      btn.title = 'Sembunyikan password';
+    } else {
+      inp.type = 'password';
+      btn.textContent = '👁';
+      btn.title = 'Tampilkan password';
+    }
+  }
+
+  function useDefault() {
+    document.getElementById('username').value = 'admin';
+    document.getElementById('password').value = 'admin123';
+    document.getElementById('username').classList.remove('error');
+    document.getElementById('password').classList.remove('error');
+    hideAlert();
+  }
+
+  // Enter key on username → focus password
+  document.getElementById('username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('password').focus();
+    }
+  });
+
+  // Clear error state when typing
+  ['username','password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById(id).classList.remove('error');
+      hideAlert();
+    });
+  });
+</script>
+</body>
+</html>

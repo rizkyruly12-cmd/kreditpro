@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KreditPro — Import Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:#f1f5f9; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .card { background:white; border-radius:16px; padding:32px; max-width:600px; width:100%; box-shadow:0 4px 24px rgba(0,0,0,.1); }
+  h1 { font-size:20px; font-weight:700; color:#1e293b; margin-bottom:6px; }
+  p { font-size:13px; color:#64748b; margin-bottom:20px; }
+  .step { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:12px; border:1px solid #e2e8f0; }
+  .step-num { width:24px;height:24px;background:#2563eb;color:white;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0; }
+  .step-title { font-size:13px; font-weight:600; color:#334155; display:flex; align-items:center; }
+  .step-body { font-size:12px; color:#64748b; margin-top:6px; padding-left:32px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; font-family:inherit; }
+  .btn-primary { background:#2563eb; color:white; }
+  .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-outline { background:white; color:#475569; border:1px solid #e2e8f0; }
+  .log { background:#0f172a; color:#94a3b8; border-radius:8px; padding:14px; font-family:monospace; font-size:12px; max-height:240px; overflow-y:auto; margin-top:16px; white-space:pre-wrap; display:none; }
+  .log.show { display:block; }
+  .log .ok  { color:#4ade80; }
+  .log .err { color:#f87171; }
+  .log .info{ color:#60a5fa; }
+  .progress-bar { height:6px; background:#e2e8f0; border-radius:3px; margin:12px 0; }
+  .progress-fill { height:100%; background:#2563eb; border-radius:3px; transition:width .3s; }
+  .status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:100px; font-size:12px; font-weight:600; }
+  .badge-waiting  { background:#f1f5f9; color:#64748b; }
+  .badge-running  { background:#dbeafe; color:#1d4ed8; }
+  .badge-done     { background:#dcfce7; color:#15803d; }
+  .badge-error    { background:#fee2e2; color:#b91c1c; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <h1>🗄️ Import Data ke Supabase</h1>
+      <p style="margin-bottom:0;">Jalankan sekali setelah deploy pertama untuk pindahkan semua data dari browser ke database.</p>
+    </div>
+    <span id="status-badge" class="status-badge badge-waiting">Menunggu</span>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span class="step-num">1</span> Pastikan sudah login</div>
+    <div class="step-body">Harus login sebagai Owner sebelum import. <a href="login.html" style="color:#2563eb;">Login →</a></div>
+  </div>
+  <div class="step">
+    <div class="step-title"><span class="step-num">2</span> Buka di browser yang punya data localStorage</div>
+    <div class="step-body">Buka halaman ini di browser/komputer yang sebelumnya dipakai untuk mencatat data. Data akan dibaca dari localStorage browser tersebut.</div>
+  </div>
+  <div class="step">
+    <div class="step-title"><span class="step-num">3</span> Klik Import</div>
+    <div class="step-body">Proses import akan berjalan otomatis. Jangan tutup halaman sampai selesai.</div>
+  </div>
+
+  <div id="summary" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;">
+    <div style="font-weight:600;color:#15803d;margin-bottom:8px;">📦 Data yang akan diimport:</div>
+    <div id="summary-content"></div>
+  </div>
+
+  <div class="progress-bar" id="progress-bar" style="display:none;">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:4px;">
+    <button class="btn btn-outline" onclick="scanData()" id="btn-scan">🔍 Scan Data</button>
+    <button class="btn btn-primary" onclick="startImport()" id="btn-import" disabled>🚀 Mulai Import</button>
+  </div>
+
+  <div class="log" id="log"></div>
+</div>
+
+<script src="db.js"></script>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script>
+
+let scannedData = null;
+
+function log(msg, type = 'info') {
+  const el = document.getElementById('log');
+  el.classList.add('show');
+  el.innerHTML += `<span class="${type}">${msg}</span>\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(label, type) {
+  const el = document.getElementById('status-badge');
+  el.textContent = label;
+  el.className = 'status-badge badge-' + type;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-bar').style.display = 'block';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+async function scanData() {
+  document.getElementById('btn-scan').disabled = true;
+  log('Membaca data dari localStorage...', 'info');
+
+  // Read from localStorage (original keys)
+  const custRaw  = localStorage.getItem('bk_customers');
+  const payRaw   = localStorage.getItem('bk_payments');
+  const photoRaw = localStorage.getItem('bk_photos');
+  const waRaw    = localStorage.getItem('bk_wa_log');
+
+  let customers = [];
+  let payments  = [];
+  let photos    = {};
+  let waLogs    = [];
+
+  if (custRaw) {
+    try { customers = JSON.parse(custRaw); } catch(e) {}
+  } else {
+    // Use seed data from data.js
+    customers = typeof CUSTOMERS_DATA !== 'undefined' ? CUSTOMERS_DATA : [];
+    log('Tidak ada data localStorage, menggunakan data seed default.', 'info');
+  }
+
+  if (payRaw) {
+    try { payments = JSON.parse(payRaw); } catch(e) {}
+  } else {
+    payments = typeof PAYMENTS_DATA !== 'undefined' ? PAYMENTS_DATA : [];
+  }
+
+  if (photoRaw) {
+    try { photos = JSON.parse(photoRaw); } catch(e) {}
+  }
+
+  if (waRaw) {
+    try { waLogs = JSON.parse(waRaw); } catch(e) {}
+  }
+
+  scannedData = { customers, payments, photos, waLogs };
+
+  log(`✓ Pelanggan: ${customers.length}`, 'ok');
+  log(`✓ Pembayaran: ${payments.length}`, 'ok');
+  log(`✓ Foto: ${Object.keys(photos).length} item`, 'ok');
+  log(`✓ WA Log: ${waLogs.length}`, 'ok');
+
+  document.getElementById('summary').style.display = 'block';
+  document.getElementById('summary-content').innerHTML = `
+    <div>👥 <strong>${customers.length}</strong> pelanggan</div>
+    <div>💰 <strong>${payments.length}</strong> pembayaran</div>
+    <div>📷 <strong>${Object.keys(photos).length}</strong> foto</div>
+    <div>📨 <strong>${waLogs.length}</strong> WA log</div>`;
+
+  document.getElementById('btn-import').disabled = false;
+  document.getElementById('btn-scan').disabled = false;
+}
+
+async function startImport() {
+  if (!scannedData) { alert('Scan data dulu!'); return; }
+
+  // Check login
+  const user = DB.auth.getSessionUser();
+  if (!user) {
+    alert('Harus login dulu sebagai Owner!');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  document.getElementById('btn-import').disabled = true;
+  document.getElementById('btn-scan').disabled  = true;
+  setStatus('Proses...', 'running');
+  setProgress(10);
+
+  log('\n🚀 Memulai import...', 'info');
+
+  // Add admin password hash to seed
+  const { hashPassword } = window;
+  const adminHash = typeof hashPassword === 'function' ? hashPassword('admin123') : '';
+
+  try {
+    setProgress(30);
+    log('Mengirim data ke server...', 'info');
+
+    const res = await fetch('/api/seed', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Session-Token': DB.auth.getToken()
+      },
+      body: JSON.stringify({
+        customers:       scannedData.customers,
+        payments:        scannedData.payments,
+        photos:          scannedData.photos,
+        waLogs:          scannedData.waLogs,
+        adminPasswordHash: adminHash
+      })
+    });
+
+    setProgress(80);
+    const json = await res.json();
+
+    if (json.ok) {
+      log(`✓ Pelanggan diimport: ${json.data.customers}`, 'ok');
+      log(`✓ Pembayaran diimport: ${json.data.payments}`, 'ok');
+      log(`✓ Foto diimport: ${json.data.photos}`, 'ok');
+      log(`✓ WA Log diimport: ${json.data.waLogs}`, 'ok');
+      if (json.data.errors?.length) {
+        json.data.errors.forEach(e => log('⚠ ' + e, 'err'));
+      }
+      setProgress(100);
+      setStatus('Selesai ✓', 'done');
+      log('\n✅ Import berhasil! Buka index.html untuk mulai menggunakan.', 'ok');
+
+      setTimeout(() => {
+        if (confirm('Import berhasil! Buka halaman utama sekarang?')) {
+          window.location.href = 'index.html';
+        }
+      }, 500);
+    } else {
+      throw new Error(json.error || 'Unknown error');
+    }
+  } catch(e) {
+    log('❌ Error: ' + e.message, 'err');
+    setStatus('Error', 'error');
+    document.getElementById('btn-import').disabled = false;
+    document.getElementById('btn-scan').disabled   = false;
+  }
+}
+
+// Auto scan on load
+window.addEventListener('DOMContentLoaded', () => {
+  if (!DB.auth.isLoggedIn()) {
+    document.getElementById('summary').style.display = 'block';
+    document.getElementById('summary-content').innerHTML = '<span style="color:#dc2626;">⚠️ Belum login. <a href="login.html">Login dulu</a></span>';
+    return;
+  }
+  setTimeout(scanData, 300);
+});
+</script>
+</body>
+</html>

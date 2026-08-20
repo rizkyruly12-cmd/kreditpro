@@ -1,0 +1,20 @@
+{
+  "name": "kreditpro",
+  "version": "1.0.0",
+  "description": "Sistem Manajemen Kredit Barang - Ruli Rizki Ariyanto",
+  "private": true,
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
