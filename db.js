@@ -26,6 +26,8 @@ function clearToken() {
   sessionStorage.removeItem('kp_token');
   sessionStorage.removeItem('kp_user');
   sessionStorage.removeItem('kp_expires');
+  _SC.clear('customers');
+  _SC.clear('payments');
 }
 
 function getStoredUser() {
@@ -40,8 +42,6 @@ function setStoredUser(user, expiresAt) {
 // ---- Core fetch wrapper ----
 async function apiFetch(path, options = {}) {
   const token = getToken();
-  // Convert /auth?action=login → /auth?action=login (keep as-is)
-  // API base is now /.netlify/functions so path /auth → /.netlify/functions/auth
   const url = API + path;
   const res = await fetch(url, {
     ...options,
@@ -69,14 +69,27 @@ async function apiFetch(path, options = {}) {
 // ============================================================
 const DB_AUTH = {
   async login(username, password) {
-    const res = await apiFetch('/auth?action=login', {
+    // Pakai bootstrap endpoint — login + data sekaligus dalam 1 request
+    const res = await apiFetch('/bootstrap?action=login', {
       method: 'POST',
       body: { username, password }
     });
     if (!res) return { ok: false, reason: 'network' };
     if (!res.ok) return { ok: false, reason: res.error };
+
     setToken(res.data.token);
     setStoredUser(res.data.user, res.data.expiresAt);
+
+    // Simpan data ke cache langsung — tidak perlu fetch lagi
+    if (res.data.customers) {
+      _cache.customers = res.data.customers;
+      _SC.set('customers', res.data.customers);
+    }
+    if (res.data.payments) {
+      _cache.payments = res.data.payments;
+      _SC.set('payments', res.data.payments);
+    }
+
     return { ok: true, user: res.data.user };
   },
 
@@ -93,11 +106,10 @@ const DB_AUTH = {
   },
 
   async changePassword(oldPassword, newPassword) {
-    const res = await apiFetch('/auth?action=change-password', {
+    return apiFetch('/auth?action=change-password', {
       method: 'POST',
       body: { oldPassword, newPassword }
     });
-    return res;
   },
 
   async getUsers() {
