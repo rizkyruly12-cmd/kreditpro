@@ -13,7 +13,21 @@ const _missingEnv = !SUPABASE_URL || !SUPABASE_KEY;
 
 export const supabase = _missingEnv
   ? null
-  : createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+  : createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+      // Nonaktifkan realtime — tidak dipakai di server functions
+      // dan menghindari error WebSocket di Node.js < 22
+      realtime: {
+        params: { eventsPerSecond: -1 }
+      },
+      global: {
+        fetch: fetch,
+      }
+    });
 
 // Call this at the top of each handler to short-circuit if env is missing
 export function checkEnv() {
