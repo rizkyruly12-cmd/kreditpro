@@ -874,11 +874,18 @@ async function initDB() {
 
 // ---- Sync getters (use cache — must call initDB first) ----
 function getCustomers() {
-  return DB._cache?.customers || [];
+  // Access cache via DB object
+  if (DB && DB._cache && DB._cache.customers && DB._cache.customers.length > 0) {
+    return DB._cache.customers;
+  }
+  return [];
 }
 
 function getPayments() {
-  return DB._cache?.payments || [];
+  if (DB && DB._cache && DB._cache.payments && DB._cache.payments.length > 0) {
+    return DB._cache.payments;
+  }
+  return [];
 }
 
 // ---- Async getters (always fresh or cached) ----

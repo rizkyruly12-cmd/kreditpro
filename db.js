@@ -239,17 +239,24 @@ const DB = {
   photos:    DB_PHOTOS,
   walogs:    DB_WALOGS,
 
+  // Expose cache publicly
+  _cache,
+
   // ---- cached getters ----
   async getCustomers(force = false) {
-    if (!_cache.customers || force) {
+    if (!_cache.customers || _cache.customers.length === 0 || force) {
+      console.log('[DB] Loading customers from Supabase...');
       _cache.customers = await DB_CUSTOMERS.getAll();
+      console.log('[DB] Loaded', _cache.customers.length, 'customers');
     }
     return _cache.customers || [];
   },
 
   async getPayments(force = false) {
-    if (!_cache.payments || force) {
+    if (!_cache.payments || _cache.payments.length === 0 || force) {
+      console.log('[DB] Loading payments from Supabase...');
       _cache.payments = await DB_PAYMENTS.getAll();
+      console.log('[DB] Loaded', _cache.payments.length, 'payments');
     }
     return _cache.payments || [];
   },
