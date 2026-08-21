@@ -10,7 +10,8 @@
     "deploy": "netlify deploy --prod"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.45.4"
+    "@supabase/supabase-js": "2.45.4",
+    "ws": "8.18.0"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"

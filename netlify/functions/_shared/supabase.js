@@ -4,6 +4,7 @@
 // pernah terekspos ke browser.
 // ============================================================
 import { createClient } from '@supabase/supabase-js';
+import { WebSocket } from 'ws';
 
 const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY; // service_role key
@@ -19,10 +20,8 @@ export const supabase = _missingEnv
         autoRefreshToken: false,
         detectSessionInUrl: false,
       },
-      // Nonaktifkan realtime — tidak dipakai di server functions
-      // dan menghindari error WebSocket di Node.js < 22
       realtime: {
-        params: { eventsPerSecond: -1 }
+        transport: WebSocket,
       },
       global: {
         fetch: fetch,
