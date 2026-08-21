@@ -1,14 +1,13 @@
 [build]
   publish = "."
   functions = "netlify/functions"
-  command = "rm -rf node_modules && npm install"
+  command = "npm install"
 
 [build.environment]
   NODE_VERSION = "22"
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@supabase/supabase-js", "ws"]
 
 # ---- API redirects → Netlify Functions ----
 [[redirects]]

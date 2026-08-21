@@ -3,29 +3,10 @@
 // ============================================================
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL  = process.env.SUPABASE_URL;
-const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 const _missingEnv = !SUPABASE_URL || !SUPABASE_KEY;
-
-// Patch global WebSocket untuk Node < 22 agar supabase realtime tidak crash
-// Kita tidak pakai realtime, tapi supabase-js tetap menginisialisasi RealtimeClient
-if (typeof globalThis.WebSocket === 'undefined') {
-  try {
-    // Coba pakai ws package jika tersedia
-    const { WebSocket: WS } = await import('ws');
-    globalThis.WebSocket = WS;
-  } catch {
-    // Fallback: dummy WebSocket agar tidak crash saat init
-    globalThis.WebSocket = class DummyWebSocket {
-      constructor() { this.readyState = 3; } // CLOSED
-      close() {}
-      send() {}
-      addEventListener() {}
-      removeEventListener() {}
-    };
-  }
-}
 
 export const supabase = _missingEnv
   ? null
