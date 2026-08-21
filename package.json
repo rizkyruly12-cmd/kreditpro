@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Sistem Manajemen Kredit Barang - Ruli Rizki Ariyanto",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "netlify dev",
     "build": "echo 'Static site - no build needed'",
