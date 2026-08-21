@@ -96,11 +96,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ok = await requireAuth();
   if (!ok) return;
 
-  showPageLoader('Memuat data pelanggan...');
+  showPageLoader('Memuat data...');
   await initDB();
-  // Force fresh load from Supabase
-  await DB.getCustomers(true);
-  await DB.getPayments(true);
+  // Fetch customers dan payments secara paralel (lebih cepat)
+  await Promise.all([
+    DB.getCustomers(true),
+    DB.getPayments(true)
+  ]);
 
   populateYearSelects();
   populatePayMonths();

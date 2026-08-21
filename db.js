@@ -1,12 +1,17 @@
 // ============================================================
 // db.js — Frontend API Client
-// Semua panggilan ke /api/* (Netlify Functions)
-// Menggantikan localStorage untuk data utama
 // ============================================================
 
 const API = window.location.hostname === 'localhost'
   ? 'http://localhost:8888/api'
   : '/.netlify/functions';
+
+// ---- Session cache di sessionStorage (bertahan selama tab terbuka) ----
+const _SC = {
+  get(key) { try { const d = sessionStorage.getItem('kp_cache_'+key); return d ? JSON.parse(d) : null; } catch { return null; } },
+  set(key, val) { try { sessionStorage.setItem('kp_cache_'+key, JSON.stringify(val)); } catch {} },
+  clear(key) { sessionStorage.removeItem('kp_cache_'+key); }
+};
 
 // ---- Session token helper ----
 function getToken() {
@@ -249,25 +254,35 @@ const DB = {
 
   // ---- cached getters ----
   async getCustomers(force = false) {
-    if (!_cache.customers || _cache.customers.length === 0 || force) {
-      console.log('[DB] Loading customers from Supabase...');
-      _cache.customers = await DB_CUSTOMERS.getAll();
-      console.log('[DB] Loaded', _cache.customers.length, 'customers');
+    if (!force && _cache.customers?.length) return _cache.customers;
+    // Cek sessionStorage cache dulu
+    if (!force) {
+      const cached = _SC.get('customers');
+      if (cached?.length) { _cache.customers = cached; return cached; }
     }
+    console.log('[DB] Loading customers from Supabase...');
+    _cache.customers = await DB_CUSTOMERS.getAll();
+    _SC.set('customers', _cache.customers);
+    console.log('[DB] Loaded', _cache.customers.length, 'customers');
     return _cache.customers || [];
   },
 
   async getPayments(force = false) {
-    if (!_cache.payments || _cache.payments.length === 0 || force) {
-      console.log('[DB] Loading payments from Supabase...');
-      _cache.payments = await DB_PAYMENTS.getAll();
-      console.log('[DB] Loaded', _cache.payments.length, 'payments');
+    if (!force && _cache.payments?.length) return _cache.payments;
+    // Cek sessionStorage cache dulu
+    if (!force) {
+      const cached = _SC.get('payments');
+      if (cached?.length) { _cache.payments = cached; return cached; }
     }
+    console.log('[DB] Loading payments from Supabase...');
+    _cache.payments = await DB_PAYMENTS.getAll();
+    _SC.set('payments', _cache.payments);
+    console.log('[DB] Loaded', _cache.payments.length, 'payments');
     return _cache.payments || [];
   },
 
-  invalidateCustomers() { _cache.customers = null; },
-  invalidatePayments()  { _cache.payments  = null; },
+  invalidateCustomers() { _cache.customers = null; _SC.clear('customers'); },
+  invalidatePayments()  { _cache.payments  = null; _SC.clear('payments');  },
 
   async getPhotos(customerId) {
     if (!_cache.photos[customerId]) {
