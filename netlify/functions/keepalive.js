@@ -11,7 +11,7 @@ const handler = async (event) => {
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.log('[keepalive] ENV vars tidak ditemukan, skip.');
-    return { statusCode: 200, body: 'skipped' };
+    return new Response('skipped', { status: 200 });
   }
 
   try {
@@ -30,11 +30,11 @@ const handler = async (event) => {
 
     const now = new Date().toISOString();
     console.log(`[keepalive] OK pada ${now} — Supabase aktif.`);
-    return { statusCode: 200, body: `keepalive OK at ${now}` };
+    return new Response(`keepalive OK at ${now}`, { status: 200 });
 
   } catch (err) {
     console.error('[keepalive] ERROR:', err.message);
-    return { statusCode: 500, body: 'error: ' + err.message };
+    return new Response('error: ' + err.message, { status: 500 });
   }
 };
 
