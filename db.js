@@ -295,7 +295,6 @@ const DB = {
 
   invalidateCustomers() { _cache.customers = null; _SC.clear('customers'); },
   invalidatePayments()  { _cache.payments  = null; _SC.clear('payments');  },
-
   async getPhotos(customerId) {
     if (!_cache.photos[customerId]) {
       _cache.photos[customerId] = await DB_PHOTOS.getByCustomer(customerId);
@@ -305,3 +304,55 @@ const DB = {
 
   invalidatePhotos(customerId) { delete _cache.photos[customerId]; }
 };
+
+// ---- initDB — pakai cache, jangan force fetch ----
+async function initDB() {
+  if (!DB.auth.isLoggedIn()) return;
+  // Data sudah ada di cache dari bootstrap login — tidak perlu fetch ulang
+  await Promise.all([
+    DB.getCustomers(false),
+    DB.getPayments(false)
+  ]);
+}
+
+// ---- Sync getters (pakai in-memory cache) ----
+function getCustomers() {
+  return DB._cache.customers || [];
+}
+
+function getPayments() {
+  return DB._cache.payments || [];
+}
+
+function getCustomerById(id) {
+  return getCustomers().find(c => c.id === id) || null;
+}
+
+function getPaymentsByCustomer(customerId) {
+  return getPayments()
+    .filter(p => p.customerId === customerId)
+    .sort((a, b) => new Date(a.tgl) - new Date(b.tgl));
+}
+
+async function generateCustomerId() {
+  return DB.customers.nextId();
+}
+
+async function generatePaymentId() {
+  return DB.payments.nextId();
+}
+
+async function getCustomerPhoto(customerId) {
+  const photos = await DB.getPhotos(customerId);
+  return photos['cust'] || null;
+}
+
+async function savePhotosForCustomer(customerId, custPhotoData, itemPhotosArray) {
+  const photosObj = {};
+  if (custPhotoData) photosObj['cust'] = custPhotoData;
+  itemPhotosArray.forEach((url, i) => { if (url) photosObj[`item_${i}`] = url; });
+  if (Object.keys(photosObj).length > 0) {
+    await DB.photos.saveAll(customerId, photosObj);
+    DB.invalidatePhotos(customerId);
+  }
+}
