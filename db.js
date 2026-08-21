@@ -6,7 +6,7 @@
 
 const API = window.location.hostname === 'localhost'
   ? 'http://localhost:8888/api'
-  : '/api';
+  : '/.netlify/functions';
 
 // ---- Session token helper ----
 function getToken() {
