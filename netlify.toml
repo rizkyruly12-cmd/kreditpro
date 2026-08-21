@@ -7,21 +7,31 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/auth"
+  to = "/.netlify/functions/auth"
   status = 200
 
 [[redirects]]
-  from = "/login.html"
-  to = "/login.html"
+  from = "/api/customers"
+  to = "/.netlify/functions/customers"
   status = 200
 
 [[redirects]]
-  from = "/index.html"
-  to = "/index.html"
+  from = "/api/payments"
+  to = "/.netlify/functions/payments"
   status = 200
 
 [[redirects]]
-  from = "/seed.html"
-  to = "/seed.html"
+  from = "/api/photos"
+  to = "/.netlify/functions/photos"
+  status = 200
+
+[[redirects]]
+  from = "/api/walogs"
+  to = "/.netlify/functions/walogs"
+  status = 200
+
+[[redirects]]
+  from = "/api/seed"
+  to = "/.netlify/functions/seed"
   status = 200

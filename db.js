@@ -4,7 +4,9 @@
 // Menggantikan localStorage untuk data utama
 // ============================================================
 
-const API = '/api';
+const API = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8888/api'
+  : '/.netlify/functions';
 
 // ---- Session token helper ----
 function getToken() {
@@ -33,7 +35,10 @@ function setStoredUser(user, expiresAt) {
 // ---- Core fetch wrapper ----
 async function apiFetch(path, options = {}) {
   const token = getToken();
-  const res = await fetch(API + path, {
+  // Convert /auth?action=login → /auth?action=login (keep as-is)
+  // API base is now /.netlify/functions so path /auth → /.netlify/functions/auth
+  const url = API + path;
+  const res = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
