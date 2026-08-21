@@ -1,7 +1,7 @@
 // ============================================================
 // /api/customers  — GET all · GET one · POST · PUT · DELETE
 // ============================================================
-import { supabase, ok, err, cors, parseBody, verifySession } from './_shared/supabase.js';
+import { supabase, ok, err, cors, parseBody, verifySession, checkEnv } from './_shared/supabase.js';
 
 // snake_case DB  ↔  camelCase frontend
 function toFront(r) {
@@ -46,6 +46,9 @@ function toDb(b) {
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors(), body: '' };
 
+  const envErr = checkEnv();
+  if (envErr) return envErr;
+
   const user = await verifySession(event);
   if (!user) return err('Unauthorized', 401);
 
@@ -64,6 +67,14 @@ export async function handler(event) {
       .from('customers').select('*').order('id');
     if (error) return err(error.message, 500);
     return ok(data.map(toFront));
+  }
+
+  // ---- POST /api/customers?action=next-id ----
+  if (event.httpMethod === 'POST' && event.queryStringParameters?.action === 'next-id') {
+    const { data } = await supabase.from('customers').select('id').order('id', { ascending: false }).limit(1);
+    const last = data?.[0]?.id || 'N000';
+    const num  = parseInt(last.replace('N','')) + 1;
+    return ok({ id: 'N' + String(num).padStart(3,'0') });
   }
 
   // ---- POST /api/customers  (create) ----
@@ -93,14 +104,6 @@ export async function handler(event) {
     const { error } = await supabase.from('customers').delete().eq('id', id);
     if (error) return err(error.message, 500);
     return ok({ message: 'Pelanggan dihapus' });
-  }
-
-  // ---- POST /api/customers?action=next-id ----
-  if (event.httpMethod === 'POST' && event.queryStringParameters?.action === 'next-id') {
-    const { data } = await supabase.from('customers').select('id').order('id', { ascending: false }).limit(1);
-    const last = data?.[0]?.id || 'N000';
-    const num  = parseInt(last.replace('N','')) + 1;
-    return ok({ id: 'N' + String(num).padStart(3,'0') });
   }
 
   return err('Method not allowed', 405);

@@ -1003,3 +1003,67 @@ async function waGetLogsDB() {
 async function waClearLogsDB() {
   return DB.walogs.clearAll();
 }
+
+// ============================================================
+// HELPER FUNCTIONS — kalkulasi & format
+// ============================================================
+
+/**
+ * Hitung angsuran dari objek customer.
+ * Returns: { angsuranPerBulan, cicilanPerBulan, totalBayar }
+ */
+function hitungAngsuran(c) {
+  const totalBunga     = c.kreditPokok * (c.totalBunga / 100);
+  const totalBayar     = c.kreditPokok + totalBunga;
+  const angsuranPerBulan = c.tenor > 0 ? totalBayar / c.tenor : 0;
+  const cicilanPerBulan  = c.tenor > 0 ? totalBunga / c.tenor : 0;
+  return { angsuranPerBulan, cicilanPerBulan, totalBayar };
+}
+
+/**
+ * Tentukan status kredit pelanggan berdasarkan pembayaran di cache.
+ * Returns: 'lunas' | 'menunggak' | 'aktif'
+ */
+function getStatusKredit(c) {
+  const { angsuranPerBulan, totalBayar } = hitungAngsuran(c);
+  const payments    = getPaymentsByCustomer(c.id);
+  const totalDibayar = payments.reduce((s, p) => s + (p.jumlahAngsuran || 0), 0);
+
+  // Lunas: sudah bayar >= total yang harus dibayar (toleransi Rp1000)
+  if (totalDibayar >= totalBayar - 1000) return 'lunas';
+
+  // Cek apakah menunggak: hitung berapa bulan sudah lewat
+  const tglKredit      = new Date(c.tgl);
+  const today          = new Date();
+  const bulanBerjalan  = Math.max(0,
+    (today.getFullYear() - tglKredit.getFullYear()) * 12 +
+    (today.getMonth()    - tglKredit.getMonth())
+  );
+  const bulanWajib     = Math.min(bulanBerjalan, c.tenor);
+  const seharusnya     = bulanWajib * angsuranPerBulan;
+
+  if (totalDibayar < seharusnya - 1000) return 'menunggak';
+  return 'aktif';
+}
+
+/**
+ * Format angka ke Rupiah: 1500000 → "Rp 1.500.000"
+ */
+function formatRupiah(angka) {
+  if (angka == null || isNaN(angka)) return 'Rp 0';
+  return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+}
+
+/**
+ * Format tanggal ISO ke lokal Indonesia: "2024-03-15" → "15 Mar 2024"
+ */
+function formatTgl(tglStr) {
+  if (!tglStr) return '-';
+  try {
+    return new Date(tglStr).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  } catch {
+    return tglStr;
+  }
+}

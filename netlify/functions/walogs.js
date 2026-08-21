@@ -1,10 +1,13 @@
 // ============================================================
 // /api/walogs  — GET · POST · DELETE all
 // ============================================================
-import { supabase, ok, err, cors, parseBody, verifySession } from './_shared/supabase.js';
+import { supabase, ok, err, cors, parseBody, verifySession, checkEnv } from './_shared/supabase.js';
 
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors(), body: '' };
+
+  const envErr = checkEnv();
+  if (envErr) return envErr;
 
   const user = await verifySession(event);
   if (!user) return err('Unauthorized', 401);

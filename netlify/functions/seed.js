@@ -3,11 +3,14 @@
 // Dipanggil SEKALI setelah deploy pertama.
 // Body: { customers: [...], payments: [...], photos: {...}, waLogs: [...] }
 // ============================================================
-import { supabase, ok, err, cors, parseBody, verifySession } from './_shared/supabase.js';
+import { supabase, ok, err, cors, parseBody, verifySession, checkEnv } from './_shared/supabase.js';
 
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors(), body: '' };
   if (event.httpMethod !== 'POST')    return err('POST only', 405);
+
+  const envErr = checkEnv();
+  if (envErr) return envErr;
 
   const user = await verifySession(event);
   if (!user || user.role !== 'owner') return err('Hanya Owner yang bisa seed data', 403);

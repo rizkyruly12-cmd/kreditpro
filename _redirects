@@ -1,0 +1,16 @@
+# API redirects → Netlify Functions
+/api/auth        /.netlify/functions/auth        200
+/api/auth/*      /.netlify/functions/auth        200
+/api/customers   /.netlify/functions/customers   200
+/api/customers/* /.netlify/functions/customers   200
+/api/payments    /.netlify/functions/payments    200
+/api/payments/*  /.netlify/functions/payments    200
+/api/photos      /.netlify/functions/photos      200
+/api/photos/*    /.netlify/functions/photos      200
+/api/walogs      /.netlify/functions/walogs      200
+/api/walogs/*    /.netlify/functions/walogs      200
+/api/seed        /.netlify/functions/seed        200
+/api/seed/*      /.netlify/functions/seed        200
+
+# SPA fallback
+/*               /index.html                     200

@@ -1,10 +1,13 @@
 // ============================================================
 // /api/photos  — GET · POST (upsert) · DELETE
 // ============================================================
-import { supabase, ok, err, cors, parseBody, verifySession } from './_shared/supabase.js';
+import { supabase, ok, err, cors, parseBody, verifySession, checkEnv } from './_shared/supabase.js';
 
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors(), body: '' };
+
+  const envErr = checkEnv();
+  if (envErr) return envErr;
 
   const user = await verifySession(event);
   if (!user) return err('Unauthorized', 401);
@@ -28,19 +31,6 @@ export async function handler(event) {
     return ok(result);
   }
 
-  // ---- POST (upsert single photo) ----
-  if (event.httpMethod === 'POST') {
-    const { customerId: cid, photoType: ptype, dataUrl } = body;
-    if (!cid || !ptype || !dataUrl) return err('Field wajib: customerId, photoType, dataUrl');
-
-    const { error } = await supabase.from('photos').upsert(
-      { customer_id: cid, photo_type: ptype, data_url: dataUrl },
-      { onConflict: 'customer_id,photo_type' }
-    );
-    if (error) return err(error.message, 500);
-    return ok({ message: 'Foto disimpan' });
-  }
-
   // ---- POST bulk — save all photos for a customer ----
   if (event.httpMethod === 'POST' && event.queryStringParameters?.action === 'bulk') {
     // body = { customerId, photos: { cust:'...', item_0:'...', ... } }
@@ -55,6 +45,19 @@ export async function handler(event) {
     const { error } = await supabase.from('photos').upsert(rows, { onConflict: 'customer_id,photo_type' });
     if (error) return err(error.message, 500);
     return ok({ saved: rows.length });
+  }
+
+  // ---- POST (upsert single photo) ----
+  if (event.httpMethod === 'POST') {
+    const { customerId: cid, photoType: ptype, dataUrl } = body;
+    if (!cid || !ptype || !dataUrl) return err('Field wajib: customerId, photoType, dataUrl');
+
+    const { error } = await supabase.from('photos').upsert(
+      { customer_id: cid, photo_type: ptype, data_url: dataUrl },
+      { onConflict: 'customer_id,photo_type' }
+    );
+    if (error) return err(error.message, 500);
+    return ok({ message: 'Foto disimpan' });
   }
 
   // ---- DELETE one photo ----

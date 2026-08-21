@@ -8,13 +8,27 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY; // service_role key
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY environment variables');
-}
+// Graceful check — return 503 from handler if not configured
+const _missingEnv = !SUPABASE_URL || !SUPABASE_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false }
-});
+export const supabase = _missingEnv
+  ? null
+  : createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+
+// Call this at the top of each handler to short-circuit if env is missing
+export function checkEnv() {
+  if (_missingEnv) {
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json', ...cors() },
+      body: JSON.stringify({
+        ok: false,
+        error: 'Server tidak dikonfigurasi: SUPABASE_URL atau SUPABASE_SERVICE_KEY belum diset di environment variables Netlify.'
+      })
+    };
+  }
+  return null;
+}
 
 // ---- Response helpers ----
 export function ok(data, status = 200) {

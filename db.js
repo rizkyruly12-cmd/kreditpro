@@ -4,9 +4,9 @@
 // Menggantikan localStorage untuk data utama
 // ============================================================
 
-const API = window.location.hostname === 'localhost' 
+const API = window.location.hostname === 'localhost'
   ? 'http://localhost:8888/api'
-  : '/.netlify/functions';
+  : '/api';
 
 // ---- Session token helper ----
 function getToken() {
