@@ -35,6 +35,59 @@ function hidePageLoader() {
   if (el) el.style.display = 'none';
 }
 
+// ============================================================
+//  UTILITY HELPERS
+// ============================================================
+function formatRupiah(n) {
+  if (n == null || isNaN(n)) return 'Rp 0';
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function formatTgl(str) {
+  if (!str) return '-';
+  const d = new Date(str);
+  if (isNaN(d)) return str;
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// Hitung angsuran per bulan dari data pelanggan
+function hitungAngsuran(c) {
+  const kreditPokok    = Number(c.kreditPokok) || 0;
+  const totalBungaPct  = Number(c.totalBunga)  || 0;   // total bunga dalam %
+  const tenor          = Number(c.tenor)        || 1;
+
+  const totalBunga     = kreditPokok * (totalBungaPct / 100);
+  const totalBayar     = kreditPokok + totalBunga;
+  const angsuranPerBulan  = totalBayar / tenor;
+  const cicilanPerBulan   = totalBunga / tenor;         // bunga per bulan
+  const totalProfit    = totalBunga;
+
+  return { angsuranPerBulan, cicilanPerBulan, totalBayar, totalProfit };
+}
+
+// Status kredit: lunas | menunggak | aktif
+function getStatusKredit(c) {
+  const payments = getPaymentsByCustomer(c.id);
+  const { totalBayar } = hitungAngsuran(c);
+  const totalDibayar = payments.reduce((s, p) => s + (p.jumlahAngsuran || 0), 0);
+
+  if (totalDibayar >= totalBayar) return 'lunas';
+
+  // Cek apakah ada angsuran yang terlambat
+  const tglKredit = new Date(c.tgl);
+  const today = new Date();
+  const { angsuranPerBulan } = hitungAngsuran(c);
+  let bulanBerjalan = 0;
+  for (let i = 1; i <= c.tenor; i++) {
+    const tglTempo = new Date(tglKredit);
+    tglTempo.setMonth(tglTempo.getMonth() + i);
+    if (tglTempo <= today) bulanBerjalan = i;
+  }
+  const seharusnyaBayar = Math.min(angsuranPerBulan * bulanBerjalan, totalBayar);
+  if (totalDibayar < seharusnyaBayar - 1) return 'menunggak';
+  return 'aktif';
+}
+
 // ---- INIT ----
 window.addEventListener('DOMContentLoaded', async () => {
   showPageLoader('Memeriksa sesi...');
@@ -2039,64 +2092,10 @@ function waClearLog() {
 //  PHOTO MODULE
 // ============================================================
 
-const PHOTOS_KEY = 'bk_photos';
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
 
-// ---- Storage ----
-function getPhotos() {
-  return JSON.parse(localStorage.getItem(PHOTOS_KEY) || '{}');
-}
-
-function savePhotos(data) {
-  localStorage.setItem(PHOTOS_KEY, JSON.stringify(data));
-}
-
-function getCustomerPhoto(customerId) {
-  return getPhotos()[customerId + '_cust'] || null;
-}
-
-function getItemPhoto(customerId) {
-  // Legacy single-photo — kept for backward compat
-  return getPhotos()[customerId + '_item'] || null;
-}
-
-function getItemPhotosSync(customerId) {
-  // Returns array of dataUrls (new multi-photo format)
-  const photos = getPhotos();
-  const multi = photos[customerId + '_items']; // array
-  if (multi && Array.isArray(multi) && multi.length > 0) return multi;
-  // Fallback: wrap legacy single photo
-  const single = photos[customerId + '_item'];
-  if (single) return [single];
-  return [];
-}
-
-function setItemPhotos(customerId, dataUrlArray) {
-  const photos = getPhotos();
-  photos[customerId + '_items'] = dataUrlArray;
-  // Also keep legacy key for backward compat (first photo)
-  photos[customerId + '_item'] = dataUrlArray[0] || null;
-  savePhotos(photos);
-}
-
-function setCustomerPhoto(customerId, dataUrl) {
-  const photos = getPhotos();
-  photos[customerId + '_cust'] = dataUrl;
-  savePhotos(photos);
-}
-
-function setItemPhoto(customerId, dataUrl) {
-  const photos = getPhotos();
-  photos[customerId + '_item'] = dataUrl;
-  savePhotos(photos);
-}
-
 function deletePhotosForCustomer(customerId) {
-  const photos = getPhotos();
-  delete photos[customerId + '_cust'];
-  delete photos[customerId + '_item'];
-  delete photos[customerId + '_items'];
-  savePhotos(photos);
+  // Stub — actual delete via Supabase handled in data.js deleteCustomer()
 }
 
 // ---- Upload handler ----
