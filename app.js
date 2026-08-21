@@ -138,11 +138,12 @@ function navTo(page) {
   };
   document.getElementById('page-title').textContent = titles[page] || page;
 
-  // async render dengan refresh cache
+  // async render — hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
   (async () => {
     showPageLoader('Memuat data...');
-    await DB.getCustomers(true);
-    await DB.getPayments(true);
+    // Gunakan cache kecuali belum ada data sama sekali
+    await DB.getCustomers(false);
+    await DB.getPayments(false);
     hidePageLoader();
     if (page === 'dashboard') renderDashboard();
     if (page === 'pelanggan') { PG.cust = 1; renderCustomerTable(); }
