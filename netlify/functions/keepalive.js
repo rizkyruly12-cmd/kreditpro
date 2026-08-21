@@ -1,0 +1,42 @@
+// ============================================================
+// keepalive.js — Scheduled function untuk mencegah Supabase
+// auto-pause. Berjalan otomatis setiap 3 hari sekali jam 8 pagi.
+// ============================================================
+import { createClient } from '@supabase/supabase-js';
+import { schedule } from '@netlify/functions';
+
+const handler = async (event) => {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.log('[keepalive] ENV vars tidak ditemukan, skip.');
+    return { statusCode: 200, body: 'skipped' };
+  }
+
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch },
+    });
+
+    // Query ringan — cukup untuk menandai project sebagai aktif
+    const { data, error } = await supabase
+      .from('auth_users')
+      .select('id')
+      .limit(1);
+
+    if (error) throw error;
+
+    const now = new Date().toISOString();
+    console.log(`[keepalive] OK pada ${now} — Supabase aktif.`);
+    return { statusCode: 200, body: `keepalive OK at ${now}` };
+
+  } catch (err) {
+    console.error('[keepalive] ERROR:', err.message);
+    return { statusCode: 500, body: 'error: ' + err.message };
+  }
+};
+
+// Jadwal: setiap 3 hari sekali, jam 8 pagi UTC (3 siang WIB)
+export default schedule('0 8 */3 * *', handler);
