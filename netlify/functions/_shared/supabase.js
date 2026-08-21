@@ -1,16 +1,31 @@
 // ============================================================
 // Shared Supabase client — dipakai semua Netlify Functions
-// Key disimpan aman di environment variable Netlify, tidak
-// pernah terekspos ke browser.
 // ============================================================
 import { createClient } from '@supabase/supabase-js';
-import { WebSocket } from 'ws';
 
 const SUPABASE_URL  = process.env.SUPABASE_URL;
-const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY; // service_role key
+const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 
-// Graceful check — return 503 from handler if not configured
 const _missingEnv = !SUPABASE_URL || !SUPABASE_KEY;
+
+// Patch global WebSocket untuk Node < 22 agar supabase realtime tidak crash
+// Kita tidak pakai realtime, tapi supabase-js tetap menginisialisasi RealtimeClient
+if (typeof globalThis.WebSocket === 'undefined') {
+  try {
+    // Coba pakai ws package jika tersedia
+    const { WebSocket: WS } = await import('ws');
+    globalThis.WebSocket = WS;
+  } catch {
+    // Fallback: dummy WebSocket agar tidak crash saat init
+    globalThis.WebSocket = class DummyWebSocket {
+      constructor() { this.readyState = 3; } // CLOSED
+      close() {}
+      send() {}
+      addEventListener() {}
+      removeEventListener() {}
+    };
+  }
+}
 
 export const supabase = _missingEnv
   ? null
@@ -20,15 +35,9 @@ export const supabase = _missingEnv
         autoRefreshToken: false,
         detectSessionInUrl: false,
       },
-      realtime: {
-        transport: WebSocket,
-      },
-      global: {
-        fetch: fetch,
-      }
+      global: { fetch },
     });
 
-// Call this at the top of each handler to short-circuit if env is missing
 export function checkEnv() {
   if (_missingEnv) {
     return {
@@ -36,14 +45,13 @@ export function checkEnv() {
       headers: { 'Content-Type': 'application/json', ...cors() },
       body: JSON.stringify({
         ok: false,
-        error: 'Server tidak dikonfigurasi: SUPABASE_URL atau SUPABASE_SERVICE_KEY belum diset di environment variables Netlify.'
+        error: 'Server tidak dikonfigurasi: SUPABASE_URL atau SUPABASE_SERVICE_KEY belum diset.'
       })
     };
   }
   return null;
 }
 
-// ---- Response helpers ----
 export function ok(data, status = 200) {
   return {
     statusCode: status,
@@ -68,7 +76,6 @@ export function cors() {
   };
 }
 
-// ---- Session verification ----
 export async function verifySession(event) {
   const token = event.headers['x-session-token'] || event.headers['authorization']?.replace('Bearer ', '');
   if (!token) return null;
@@ -81,7 +88,6 @@ export async function verifySession(event) {
 
   if (error || !data) return null;
   if (new Date(data.expires_at) < new Date()) {
-    // expired — cleanup
     await supabase.from('auth_sessions').delete().eq('token', token);
     return null;
   }
@@ -95,7 +101,6 @@ export async function verifySession(event) {
   return user || null;
 }
 
-// ---- Body parser ----
 export function parseBody(event) {
   try {
     return event.body ? JSON.parse(event.body) : {};
