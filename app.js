@@ -96,27 +96,46 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ok = await requireAuth();
   if (!ok) return;
 
-  showPageLoader('Memuat data...');
-  await initDB();
-  // Fetch customers dan payments secara paralel (lebih cepat)
-  await Promise.all([
-    DB.getCustomers(true),
-    DB.getPayments(true)
-  ]);
+  // Cek apakah ada cache di sessionStorage
+  const hasCachedData = !!sessionStorage.getItem('kp_cache_customers');
 
-  populateYearSelects();
-  populatePayMonths();
-  populateCustFilterYear();
-  setDate();
-  renderSidebarUser();
-
-  // Auto-extend session on user activity
-  ['click','keydown','touchstart'].forEach(ev =>
-    document.addEventListener(ev, () => extendSession(), { passive: true })
-  );
-
-  hidePageLoader();
-  navTo('dashboard');
+  if (hasCachedData) {
+    // Tampilkan data cache dulu — langsung tanpa loading
+    await initDB();
+    await Promise.all([DB.getCustomers(false), DB.getPayments(false)]);
+    hidePageLoader();
+    populateYearSelects();
+    populatePayMonths();
+    populateCustFilterYear();
+    setDate();
+    renderSidebarUser();
+    ['click','keydown','touchstart'].forEach(ev =>
+      document.addEventListener(ev, () => extendSession(), { passive: true })
+    );
+    navTo('dashboard');
+    // Refresh data di background tanpa mengganggu UI
+    Promise.all([DB.getCustomers(true), DB.getPayments(true)]).then(() => {
+      renderDashboard();
+    });
+  } else {
+    // Belum ada cache — fetch dulu baru tampil
+    showPageLoader('Memuat data...');
+    await initDB();
+    await Promise.all([
+      DB.getCustomers(true),
+      DB.getPayments(true)
+    ]);
+    populateYearSelects();
+    populatePayMonths();
+    populateCustFilterYear();
+    setDate();
+    renderSidebarUser();
+    ['click','keydown','touchstart'].forEach(ev =>
+      document.addEventListener(ev, () => extendSession(), { passive: true })
+    );
+    hidePageLoader();
+    navTo('dashboard');
+  }
 });
 
 function setDate() {
