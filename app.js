@@ -1,5 +1,5 @@
-// ============================================================
-// KREDITPRO — Main Application (Supabase version)
+﻿// ============================================================
+// KREDITPRO â€” Main Application (Supabase version)
 // ============================================================
 
 let currentPage = 'dashboard';
@@ -135,11 +135,11 @@ function navTo(page) {
   const titles = {
     dashboard:'Dashboard', pelanggan:'Data Pelanggan',
     pembayaran:'Riwayat Pembayaran', laporan:'Laporan Profit',
-    kartu:'Kartu Angsuran', whatsapp:'WhatsApp — Kirim Pesan'
+    kartu:'Kartu Angsuran', whatsapp:'WhatsApp â€” Kirim Pesan'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
 
-  // async render — hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
+  // async render â€” hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
   (async () => {
     showPageLoader('Memuat data...');
     // Gunakan cache kecuali belum ada data sama sekali
@@ -179,7 +179,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov => {
 // ---- TOAST ----
 function toast(msg, type = 'success') {
   const colors = { success:'#16a34a', danger:'#dc2626', info:'#0891b2', warning:'#d97706' };
-  const icons  = { success:'✅', danger:'❌', info:'ℹ️', warning:'⚠️' };
+  const icons  = { success:'âœ…', danger:'âŒ', info:'â„¹ï¸', warning:'âš ï¸' };
   const t = document.createElement('div');
   t.style.cssText = `background:${colors[type]};color:white;padding:12px 16px;border-radius:10px;
     font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.2);
@@ -259,7 +259,7 @@ function renderDashboard() {
       <div class="stat-info">
         <div class="stat-label">Total Pelanggan</div>
         <div class="stat-value">${customers.length}</div>
-        <div class="stat-sub">${aktif} aktif · ${lunas} lunas · ${menunggak} menunggak</div>
+        <div class="stat-sub">${aktif} aktif Â· ${lunas} lunas Â· ${menunggak} menunggak</div>
       </div>
     </div>
     <div class="stat-card green">
@@ -369,7 +369,7 @@ function renderRecentPayments() {
   customers.forEach(c => custMap[c.id] = c);
 
   if (!payments.length) {
-    document.getElementById('recent-payments').innerHTML = '<div class="empty-state"><div class="empty-icon">💸</div><p>Belum ada pembayaran</p></div>';
+    document.getElementById('recent-payments').innerHTML = '<div class="empty-state"><div class="empty-icon">ðŸ’¸</div><p>Belum ada pembayaran</p></div>';
     return;
   }
 
@@ -436,7 +436,7 @@ function renderDueList() {
   const top = dueCustomers.slice(0,8);
 
   if (!top.length) {
-    document.getElementById('due-list').innerHTML = '<div class="empty-state"><div style="font-size:40px;opacity:.5;margin-bottom:10px;">✓</div><p>Semua pembayaran lancar!</p></div>';
+    document.getElementById('due-list').innerHTML = '<div class="empty-state"><div style="font-size:40px;opacity:.5;margin-bottom:10px;">âœ“</div><p>Semua pembayaran lancar!</p></div>';
     return;
   }
 
@@ -489,7 +489,7 @@ async function renderCustomerTable() {
 
   const tbody = document.getElementById('cust-tbody');
   if (!paged.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👤</div><p>Tidak ada data</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">ðŸ‘¤</div><p>Tidak ada data</p></div></td></tr>`;
   } else {
     tbody.innerHTML = paged.map(c => {
       const { angsuranPerBulan } = hitungAngsuran(c);
@@ -503,7 +503,7 @@ async function renderCustomerTable() {
               : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div class="cust-name">${c.nama}</div>
-              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
+              <div class="cust-id">${c.id} Â· ${c.noHp||'-'}</div>
               ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
             </div>
@@ -621,11 +621,11 @@ function calcPreview() {
 
   const kreditPokok = harga - dp;
 
-  // Hitung totalBungaPct dari bungaPct × tenor, lalu tulis ke field Total Bunga
+  // Hitung totalBungaPct dari bungaPct Ã— tenor, lalu tulis ke field Total Bunga
   const totalBungaPct = bungaPct * tenor;
   document.getElementById('cust-total-bunga').value = totalBungaPct;
 
-  // Gunakan totalBunga (%) untuk kalkulasi — sama persis dengan hitungAngsuran()
+  // Gunakan totalBunga (%) untuk kalkulasi â€” sama persis dengan hitungAngsuran()
   const totalBunga  = kreditPokok * (totalBungaPct / 100);
   const totalBayar  = kreditPokok + totalBunga;
   const angsuran    = totalBayar / tenor;
@@ -757,7 +757,7 @@ async function viewCustomer(id) {
       <td style="font-weight:600;">${formatRupiah(angsuranPerBulan)}</td>
       <td style="font-size:11px;">${formatTgl(tempoStr)}</td>
       <td style="font-size:11px;">${p ? formatTgl(p.tgl) : '-'}</td>
-      <td style="font-size:11px;">${p ? p.ket || '' : (new Date()>tglTempo ? '⚠️ Belum bayar' : '')}</td>
+      <td style="font-size:11px;">${p ? p.ket || '' : (new Date()>tglTempo ? 'âš ï¸ Belum bayar' : '')}</td>
     </tr>`;
   }
 
@@ -767,7 +767,7 @@ async function viewCustomer(id) {
       <button class="tab-btn active" onclick="switchTab('tab-info','detail-tabs')">Info Kredit</button>
       <button class="tab-btn" onclick="switchTab('tab-schedule','detail-tabs')">Jadwal Angsuran</button>
       <button class="tab-btn" onclick="switchTab('tab-history','detail-tabs')">Riwayat Bayar</button>
-      <button class="tab-btn" onclick="switchTab('tab-foto','detail-tabs')">📷 Foto</button>
+      <button class="tab-btn" onclick="switchTab('tab-foto','detail-tabs')">ðŸ“· Foto</button>
     </div>
     <div id="detail-tabs">
       <!-- INFO -->
@@ -782,9 +782,9 @@ async function viewCustomer(id) {
             </div>
             <div>
               <div style="font-size:18px;font-weight:700;">${c.nama}</div>
-              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} · ${c.noHp||'-'}</div>
+              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} Â· ${c.noHp||'-'}</div>
               ${c.nik    ? `<div style="opacity:.7;font-size:11px;">NIK: ${c.nik}</div>` : ''}
-              ${c.alamat ? `<div style="opacity:.7;font-size:11px;">📍 ${c.alamat}</div>` : ''}
+              ${c.alamat ? `<div style="opacity:.7;font-size:11px;">ðŸ“ ${c.alamat}</div>` : ''}
             </div>
             <span class="badge ${badgeClass}" style="margin-left:auto;">${status}</span>
           </div>
@@ -803,10 +803,10 @@ async function viewCustomer(id) {
         <div class="detail-grid">
           <div class="detail-item"><label>Barang</label><span>${c.barang}</span></div>
           <div class="detail-item"><label>Tanggal Kredit</label><span>${formatTgl(c.tgl)}</span></div>
-          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">—</span>'}</span></div>
+          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">â€”</span>'}</span></div>
+          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">â€”</span>'}</span></div>
+          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">â€”</span>'}</span></div>
+          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">â€”</span>'}</span></div>
           <div class="detail-item"><label>Harga Barang</label><span>${formatRupiah(c.harga)}</span></div>
           <div class="detail-item"><label>Uang Muka (DP)</label><span>${formatRupiah(c.dp)}</span></div>
           <div class="detail-item"><label>Kredit Pokok</label><span>${formatRupiah(c.kreditPokok)}</span></div>
@@ -836,9 +836,9 @@ async function viewCustomer(id) {
           </table>
         </div>
         <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;gap:16px;">
-          <span style="background:#f0fdf4;padding:2px 8px;border-radius:4px;">🟢 Sudah bayar</span>
-          <span style="background:#fffbeb;padding:2px 8px;border-radius:4px;">🟡 Belum jatuh tempo</span>
-          <span style="background:#fef2f2;padding:2px 8px;border-radius:4px;">🔴 Terlambat</span>
+          <span style="background:#f0fdf4;padding:2px 8px;border-radius:4px;">ðŸŸ¢ Sudah bayar</span>
+          <span style="background:#fffbeb;padding:2px 8px;border-radius:4px;">ðŸŸ¡ Belum jatuh tempo</span>
+          <span style="background:#fef2f2;padding:2px 8px;border-radius:4px;">ðŸ”´ Terlambat</span>
         </div>
       </div>
       <!-- HISTORY -->
@@ -857,7 +857,7 @@ async function viewCustomer(id) {
               <td style="color:#0891b2;">${formatRupiah(p.cicilan)}</td>
               <td><span class="badge ${p.metode==='Transfer'?'badge-blue':'badge-green'}" style="font-size:10px;">${p.metode||'-'}</span></td>
               <td style="font-size:12px;">${p.ket||''}</td>
-              <td><button class="btn btn-danger btn-xs" onclick="confirmDeletePayment('${p.id}','${id}')">🗑</button></td>
+              <td><button class="btn btn-danger btn-xs" onclick="confirmDeletePayment('${p.id}','${id}')">ðŸ—‘</button></td>
             </tr>`).join('')}
             </tbody>
           </table>
@@ -867,7 +867,7 @@ async function viewCustomer(id) {
           <div><span style="color:#94a3b8;">Total Profit:</span> <strong style="color:#0891b2;">${formatRupiah(totalProfit)}</strong></div>
           <div><span style="color:#94a3b8;">Transaksi:</span> <strong>${payments.length}x</strong></div>
         </div>` :
-        `<div class="empty-state"><div class="empty-icon">💸</div><p>Belum ada pembayaran</p></div>`}
+        `<div class="empty-state"><div class="empty-icon">ðŸ’¸</div><p>Belum ada pembayaran</p></div>`}
       </div>
       <!-- FOTO -->
       <div id="tab-foto" class="tab-pane">
@@ -924,7 +924,7 @@ function exportKartuPDF(customerId) {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Kartu Angsuran — ${c.nama}</title>
+  <title>Kartu Angsuran â€” ${c.nama}</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
@@ -951,8 +951,8 @@ function exportKartuPDF(customerId) {
     @media print { body { padding:15px; } }
   </style></head><body>
   <div class="header">
-    <h1>💳 Kartu Angsuran</h1>
-    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <h1>ðŸ’³ Kartu Angsuran</h1>
+    <p>KreditPro â€” Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="info">
     <div class="info-item"><div class="label">Nama Pelanggan</div><div class="value">${c.nama}</div></div>
@@ -977,7 +977,7 @@ function exportKartuPDF(customerId) {
     <thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">Jumlah</th><th style="text-align:right">Profit</th><th>Metode</th><th>Keterangan</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">Belum ada pembayaran</td></tr>'}</tbody>
   </table>
-  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
+  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} â€” Sistem Manajemen Kredit Barang</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -1018,7 +1018,7 @@ function exportPelangganPDF() {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Data Pelanggan — KreditPro</title>
+  <title>Data Pelanggan â€” KreditPro</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:11px; color:#1e293b; padding:24px; }
@@ -1038,8 +1038,8 @@ function exportPelangganPDF() {
     @media print { body { padding:12px; } @page { size:A4 landscape; margin:15mm; } }
   </style></head><body>
   <div class="header">
-    <h1>👥 Data Seluruh Pelanggan</h1>
-    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <h1>ðŸ‘¥ Data Seluruh Pelanggan</h1>
+    <p>KreditPro â€” Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="stats">
     <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
@@ -1051,7 +1051,7 @@ function exportPelangganPDF() {
     <thead><tr><th>#</th><th>Nama / ID</th><th>Barang</th><th style="text-align:right">Kredit</th><th style="text-align:right">Angsuran</th><th style="text-align:center">Tenor</th><th style="text-align:right">Terbayar</th><th style="text-align:right">Sisa</th><th style="text-align:center">Status</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Total ${customers.length} pelanggan</div>
+  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} â€” Total ${customers.length} pelanggan</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=1100,height=700');
@@ -1086,7 +1086,7 @@ function renderPaymentTable() {
   const totalProfit   = payments.reduce((s,p)=>s+(p.cicilan||0),0);
 
   document.getElementById('pay-summary').textContent =
-    `${payments.length} transaksi · Total: ${formatRupiah(totalFiltered)} · Profit: ${formatRupiah(totalProfit)}`;
+    `${payments.length} transaksi Â· Total: ${formatRupiah(totalFiltered)} Â· Profit: ${formatRupiah(totalProfit)}`;
 
   const total = payments.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -1095,7 +1095,7 @@ function renderPaymentTable() {
 
   const tbody = document.getElementById('pay-tbody');
   if (!paged.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">💸</div><p>Tidak ada data pembayaran</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">ðŸ’¸</div><p>Tidak ada data pembayaran</p></div></td></tr>`;
   } else {
     tbody.innerHTML = paged.map((p, i) => {
       const c = custMap[p.customerId];
@@ -1455,7 +1455,7 @@ function switchLapTab(tab) {
 }
 
 // ============================================================
-// TAB PIUTANG — total uang di pelanggan
+// TAB PIUTANG â€” total uang di pelanggan
 // ============================================================
 function renderPiutang() {
   const customers = getCustomers();
@@ -1516,25 +1516,25 @@ function renderPiutang() {
   const menunggak = customers.filter(c => getStatusKredit(c)==='menunggak').length;
   document.getElementById('piutang-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">💰</div>
+      <div class="stat-icon">ðŸ’°</div>
       <div class="stat-info"><div class="stat-label">Total Piutang Aktif</div>
       <div class="stat-value">${formatRupiah(totalPiutang)}</div>
       <div class="stat-sub">Uang yang masih di pelanggan</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">✅</div>
+      <div class="stat-icon">âœ…</div>
       <div class="stat-info"><div class="stat-label">Sudah Diterima</div>
       <div class="stat-value">${formatRupiah(totalDibayarAll)}</div>
       <div class="stat-sub">Dari total tagihan ${formatRupiah(totalTagihan)}</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">👥</div>
+      <div class="stat-icon">ðŸ‘¥</div>
       <div class="stat-info"><div class="stat-label">Kredit Aktif</div>
       <div class="stat-value">${aktif}</div>
       <div class="stat-sub">pelanggan sedang berjalan</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">⚠️</div>
+      <div class="stat-icon">âš ï¸</div>
       <div class="stat-info"><div class="stat-label">Menunggak</div>
       <div class="stat-value">${menunggak}</div>
       <div class="stat-sub">pelanggan perlu ditagih</div></div>
@@ -1591,30 +1591,30 @@ function renderTunggakan() {
 
   document.getElementById('tunggakan-tbody').innerHTML = rows || `
     <tr><td colspan="8" style="text-align:center;padding:32px;color:#16a34a;">
-      ✅ Tidak ada pelanggan yang menunggak
+      âœ… Tidak ada pelanggan yang menunggak
     </td></tr>`;
 
   document.getElementById('tunggakan-stats').innerHTML = `
     <div class="stat-card orange">
-      <div class="stat-icon">⚠️</div>
+      <div class="stat-icon">âš ï¸</div>
       <div class="stat-info"><div class="stat-label">Pelanggan Menunggak</div>
       <div class="stat-value">${menunggakList.length}</div>
       <div class="stat-sub">perlu segera ditagih</div></div>
     </div>
     <div class="stat-card red" style="--card-color:#dc2626;">
-      <div class="stat-icon">💸</div>
+      <div class="stat-icon">ðŸ’¸</div>
       <div class="stat-info"><div class="stat-label">Total Tunggakan</div>
       <div class="stat-value" style="color:#dc2626;">${formatRupiah(totalTunggakan)}</div>
       <div class="stat-sub">jumlah yang belum dibayar</div></div>
     </div>
     <div class="stat-card blue">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon">ðŸ“Š</div>
       <div class="stat-info"><div class="stat-label">Rata-rata Tunggak</div>
       <div class="stat-value">${menunggakList.length ? formatRupiah(totalTunggakan/menunggakList.length) : 'Rp 0'}</div>
       <div class="stat-sub">per pelanggan menunggak</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">🏆</div>
+      <div class="stat-icon">ðŸ†</div>
       <div class="stat-info"><div class="stat-label">Terbesar Menunggak</div>
       <div class="stat-value" style="font-size:14px;">${menunggakList[0]?.c.nama || '-'}</div>
       <div class="stat-sub">${menunggakList[0] ? formatRupiah(menunggakList[0].selisih) : 'Tidak ada'}</div></div>
@@ -1654,25 +1654,25 @@ function renderArusKas() {
 
   document.getElementById('aruskas-stats').innerHTML = `
     <div class="stat-card teal">
-      <div class="stat-icon">📅</div>
+      <div class="stat-icon">ðŸ“…</div>
       <div class="stat-info"><div class="stat-label">Uang Masuk Bulan Ini</div>
       <div class="stat-value">${formatRupiah(thisUang)}</div>
-      <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'▲':'▼'} ${Math.abs(growth)}% vs bulan lalu</div></div>
+      <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'â–²':'â–¼'} ${Math.abs(growth)}% vs bulan lalu</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">💵</div>
+      <div class="stat-icon">ðŸ’µ</div>
       <div class="stat-info"><div class="stat-label">Profit Bulan Ini</div>
       <div class="stat-value">${formatRupiah(thisProfit)}</div>
       <div class="stat-sub">${thisPays.length} transaksi</div></div>
     </div>
     <div class="stat-card blue">
-      <div class="stat-icon">🔮</div>
+      <div class="stat-icon">ðŸ”®</div>
       <div class="stat-info"><div class="stat-label">Prediksi Bulan Depan</div>
       <div class="stat-value">${formatRupiah(prediksi)}</div>
       <div class="stat-sub">dari ${customers.filter(c=>getStatusKredit(c)!=='lunas').length} kredit aktif</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon">ðŸ“Š</div>
       <div class="stat-info"><div class="stat-label">Bulan Lalu</div>
       <div class="stat-value">${formatRupiah(lastUang)}</div>
       <div class="stat-sub">${lastPays.length} transaksi</div></div>
@@ -1695,7 +1695,7 @@ function renderArusKas() {
       <td class="text-right">${mp.length}</td>
       <td class="text-right" style="color:#0891b2;font-weight:600;">${formatRupiah(u)}</td>
       <td class="text-right" style="color:#16a34a;font-weight:600;">${formatRupiah(pr)}</td>
-      <td class="text-right" style="${vsStyle}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td>
+      <td class="text-right" style="${vsStyle}">${vs==='-'?'-':(Number(vs)>=0?'â–²':'â–¼')+Math.abs(vs)+'%'}</td>
     </tr>`;
     labels.push(label); uangData.push(u); profitData.push(pr);
     prevUang = u;
@@ -1743,25 +1743,25 @@ function renderModal() {
 
   document.getElementById('modal-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">🏦</div>
+      <div class="stat-icon">ðŸ¦</div>
       <div class="stat-info"><div class="stat-label">Total Modal Kredit</div>
       <div class="stat-value">${formatRupiah(totalModal)}</div>
       <div class="stat-sub">Total harga barang: ${formatRupiah(totalHarga)}</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">💹</div>
+      <div class="stat-icon">ðŸ’¹</div>
       <div class="stat-info"><div class="stat-label">Profit Diterima</div>
       <div class="stat-value">${formatRupiah(totalProfit)}</div>
       <div class="stat-sub">ROI terealisasi: ${roi}%</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">🎯</div>
+      <div class="stat-icon">ðŸŽ¯</div>
       <div class="stat-info"><div class="stat-label">Target Profit Total</div>
       <div class="stat-value">${formatRupiah(customers.reduce((s,c)=>s+hitungAngsuran(c).totalProfit,0))}</div>
       <div class="stat-sub">ROI target: ${roiTarget}%</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">💰</div>
+      <div class="stat-icon">ðŸ’°</div>
       <div class="stat-info"><div class="stat-label">Modal Belum Kembali</div>
       <div class="stat-value">${formatRupiah(totalPiutang)}</div>
       <div class="stat-sub">masih di tangan pelanggan</div></div>
@@ -1835,25 +1835,25 @@ function renderBarang() {
 
   document.getElementById('barang-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">📦</div>
+      <div class="stat-icon">ðŸ“¦</div>
       <div class="stat-info"><div class="stat-label">Jenis Barang Berbeda</div>
       <div class="stat-value">${Object.keys(barangMap).length}</div>
       <div class="stat-sub">dari ${customers.length} kredit</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">🏆</div>
+      <div class="stat-icon">ðŸ†</div>
       <div class="stat-info"><div class="stat-label">Barang Terlaris</div>
       <div class="stat-value" style="font-size:13px;">${topBarang?.nama||'-'}</div>
       <div class="stat-sub">${topBarang?.count||0}x dikreditkan</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">💵</div>
+      <div class="stat-icon">ðŸ’µ</div>
       <div class="stat-info"><div class="stat-label">Rata-rata Kredit</div>
       <div class="stat-value">${formatRupiah(avgKredit)}</div>
       <div class="stat-sub">per pelanggan</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">💹</div>
+      <div class="stat-icon">ðŸ’¹</div>
       <div class="stat-info"><div class="stat-label">Total Profit Barang</div>
       <div class="stat-value">${formatRupiah(sorted.reduce((s,b)=>s+b.totalProfit,0))}</div>
       <div class="stat-sub">dari semua kredit</div></div>
@@ -1929,7 +1929,7 @@ function _openPrintWindow(title, bodyHtml) {
     .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
     @media print { body { padding:15px; } @page { margin:15mm; } }`;
   const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title><style>${baseStyle}</style></head><body>
-    <div class="header"><h1>${title}</h1><p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
+    <div class="header"><h1>${title}</h1><p>KreditPro â€” Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
     ${bodyHtml}
     <div class="footer">KreditPro &copy; ${new Date().getFullYear()}</div></body></html>`;
   const w = window.open('','_blank','width=960,height=700');
@@ -2010,7 +2010,7 @@ function printLaporan_aruskas() {
     const pr=mp.reduce((s,p)=>s+(p.cicilan||0),0);
     const [y,mo]=m.split('-');
     const vs=prevU>0?((u-prevU)/prevU*100).toFixed(1):'-';
-    rows+=`<tr><td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(u)}</td><td class="tr">${formatRupiah(pr)}</td><td class="tr" style="color:${vs==='-'?'inherit':Number(vs)>=0?'#16a34a':'#dc2626'}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td></tr>`;
+    rows+=`<tr><td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(u)}</td><td class="tr">${formatRupiah(pr)}</td><td class="tr" style="color:${vs==='-'?'inherit':Number(vs)>=0?'#16a34a':'#dc2626'}">${vs==='-'?'-':(Number(vs)>=0?'â–²':'â–¼')+Math.abs(vs)+'%'}</td></tr>`;
     prevU=u;
   });
   _openPrintWindow('Laporan Arus Kas (12 Bulan Terakhir)', `
@@ -2075,7 +2075,7 @@ async function renderKartuList() {
 
   const grid = document.getElementById('kartu-list-grid');
   if (!paged.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🗂️</div><p>Tidak ada kartu angsuran</p></div>`;
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">ðŸ—‚ï¸</div><p>Tidak ada kartu angsuran</p></div>`;
   } else {
     grid.innerHTML = paged.map(c => buildKartuCard(c)).join('');
   }
@@ -2103,7 +2103,7 @@ function buildKartuCard(c) {
       ? `<img src="${getCustPhotoSync(c.id)}" class="kartu-cust-photo" alt="${c.nama}">`
       : getItemPhotosSync(c.id).length > 0
         ? `<div style="position:relative;"><img src="${getItemPhotosSync(c.id)[0]}" class="kartu-cust-photo" alt="${c.barang}">
-           <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">📦 ${getItemPhotosSync(c.id).length} foto</div></div>`
+           <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">ðŸ“¦ ${getItemPhotosSync(c.id).length} foto</div></div>`
         : ''}
     <div style="background:linear-gradient(135deg,#1e40af,#0891b2);color:white;padding:14px 16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
@@ -2139,14 +2139,14 @@ function buildKartuCard(c) {
         </div>
         <div>
           <div style="color:#94a3b8;font-size:10px;">Sisa Tagihan</div>
-          <div style="font-weight:600;color:${sisa>0?'#dc2626':'#15803d'};">${sisa>0?formatRupiah(sisa):'✅ Lunas'}</div>
+          <div style="font-weight:600;color:${sisa>0?'#dc2626':'#15803d'};">${sisa>0?formatRupiah(sisa):'âœ… Lunas'}</div>
         </div>
       </div>
       ${c.nik || c.alamat ? `
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:11px;color:#64748b;">
-        ${c.nik   ? `<div>🪪 NIK: <span style="font-family:monospace;">${c.nik}</span></div>` : ''}
-        ${c.alamat ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;" title="${c.alamat}">📍 ${c.alamat}</div>` : ''}
-        ${c.noSeri ? `<div style="margin-top:2px;">🔖 Seri: <span style="font-family:monospace;">${c.noSeri}</span></div>` : ''}
+        ${c.nik   ? `<div>ðŸªª NIK: <span style="font-family:monospace;">${c.nik}</span></div>` : ''}
+        ${c.alamat ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;" title="${c.alamat}">ðŸ“ ${c.alamat}</div>` : ''}
+        ${c.noSeri ? `<div style="margin-top:2px;">ðŸ”– Seri: <span style="font-family:monospace;">${c.noSeri}</span></div>` : ''}
       </div>` : ''}
       <div style="margin-top:10px;display:flex;gap:6px;" onclick="event.stopPropagation()">
         <button class="btn btn-outline btn-xs" style="flex:1;" onclick="viewCustomer('${c.id}')">
@@ -2206,15 +2206,15 @@ function renderPagination(containerId, current, total, onClick) {
     }
   }
 
-  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">‹</button>`;
+  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">â€¹</button>`;
   range.forEach(p => {
     if (p === '...') {
-      html += `<span style="padding:0 4px;color:#94a3b8;">…</span>`;
+      html += `<span style="padding:0 4px;color:#94a3b8;">â€¦</span>`;
     } else {
       html += `<button class="page-btn ${p===current?'active':''}" onclick="pgGo('${containerId}',${p})">${p}</button>`;
     }
   });
-  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">›</button>`;
+  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">â€º</button>`;
   el.innerHTML = html;
 }
 
@@ -2234,7 +2234,7 @@ function renderSidebarUser() {
   const roleEl = document.getElementById('sidebar-role');
   if (el) el.textContent = s.avatar || s.displayName[0];
   if (unEl) unEl.textContent = s.displayName || s.username;
-  if (roleEl) roleEl.textContent = s.role === 'owner' ? '👑 Owner' : '👤 Staff';
+  if (roleEl) roleEl.textContent = s.role === 'owner' ? 'ðŸ‘‘ Owner' : 'ðŸ‘¤ Staff';
 }
 
 function doLogout() {
@@ -2290,7 +2290,7 @@ async function renderProfileTab() {
   document.getElementById('acc-avatar-big').textContent = s.avatar || s.displayName[0];
   document.getElementById('acc-displayname').textContent = s.displayName;
   document.getElementById('acc-username-lbl').textContent = '@' + s.username;
-  document.getElementById('acc-role-badge').textContent = s.role === 'owner' ? '👑 Owner' : '👤 Staff';
+  document.getElementById('acc-role-badge').textContent = s.role === 'owner' ? 'ðŸ‘‘ Owner' : 'ðŸ‘¤ Staff';
 
   const lastLogin = user?.lastLogin ? formatTgl(user.lastLogin.slice(0,10)) + ' ' + user.lastLogin.slice(11,16) : '-';
   document.getElementById('acc-lastlogin').textContent = lastLogin;
@@ -2298,7 +2298,7 @@ async function renderProfileTab() {
   const expDate = new Date(s.expiresAt);
   document.getElementById('acc-session-exp').textContent =
     expDate.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) +
-    ' · ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+    ' Â· ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
 }
 
 async function renderUsersTab() {
@@ -2308,7 +2308,7 @@ async function renderUsersTab() {
 
   if (!isOwner) {
     document.getElementById('users-list-wrap').innerHTML =
-      `<div class="alert alert-info">⚠️ Hanya Owner yang dapat mengelola pengguna.</div>`;
+      `<div class="alert alert-info">âš ï¸ Hanya Owner yang dapat mengelola pengguna.</div>`;
     // hide add form
     const addSection = document.querySelector('#tab-users hr');
     if (addSection) {
@@ -2326,10 +2326,10 @@ async function renderUsersTab() {
       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#0ea5e9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;">${u.displayName}</div>
-        <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? '👑 Owner' : '👤 Staff'}</div>
+        <div style="font-size:11px;color:#94a3b8;">@${u.username} Â· ${u.role === 'owner' ? 'ðŸ‘‘ Owner' : 'ðŸ‘¤ Staff'}</div>
         <div style="font-size:11px;color:#94a3b8;">Login terakhir: ${u.lastLogin ? u.lastLogin.slice(0,10) : 'Belum pernah'}</div>
       </div>
-      ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">🗑 Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
+      ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">ðŸ—‘ Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
     </div>`).join('')}`;
 }
 
@@ -2358,7 +2358,7 @@ async function submitAddUser() {
   const alertEl = document.getElementById('add-user-alert');
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '❌ ' + msg;
+    alertEl.innerHTML = 'âŒ ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2369,7 +2369,7 @@ async function submitAddUser() {
   if (!result?.ok) { showErr(result?.error || 'Gagal menambahkan user'); return; }
 
   alertEl.className = 'alert alert-success';
-  alertEl.innerHTML = '✅ Pengguna berhasil ditambahkan.';
+  alertEl.innerHTML = 'âœ… Pengguna berhasil ditambahkan.';
   alertEl.style.display = 'flex';
 
   document.getElementById('new-user-username').value = '';
@@ -2388,7 +2388,7 @@ function submitChangePassword() {
 
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '❌ ' + msg;
+    alertEl.innerHTML = 'âŒ ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2401,7 +2401,7 @@ function submitChangePassword() {
   if (!result.ok) { showErr(result.reason); return; }
 
   alertEl.className = 'alert alert-success';
-  alertEl.innerHTML = '✅ Password berhasil diubah. Anda akan diminta login ulang...';
+  alertEl.innerHTML = 'âœ… Password berhasil diubah. Anda akan diminta login ulang...';
   alertEl.style.display = 'flex';
 
   setTimeout(() => {
@@ -2414,14 +2414,14 @@ async function renderLogTab() {
   const allLogs = await getLogs();
   const logs = allLogs.slice(0, 50);
   const actionLabels = {
-    login: '🔓 Login',
-    logout: '🔒 Logout',
-    change_password: '🔐 Ubah Password'
+    login: 'ðŸ”“ Login',
+    logout: 'ðŸ”’ Logout',
+    change_password: 'ðŸ” Ubah Password'
   };
 
   if (!logs.length) {
     document.getElementById('activity-log').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada aktivitas</p></div>';
+      '<div class="empty-state"><div class="empty-icon">ðŸ“‹</div><p>Belum ada aktivitas</p></div>';
     return;
   }
 
@@ -2440,7 +2440,7 @@ async function renderLogTab() {
           <tr style="border-bottom:1px solid #f1f5f9;">
             <td style="padding:8px;color:#64748b;white-space:nowrap;">${new Date(l.timestamp).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
             <td style="padding:8px;font-weight:600;">@${l.username}</td>
-            <td style="padding:8px;">${actionLabels[l.action] || l.action} — <span style="color:#64748b;">${l.detail}</span></td>
+            <td style="padding:8px;">${actionLabels[l.action] || l.action} â€” <span style="color:#64748b;">${l.detail}</span></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -2461,7 +2461,7 @@ async function renderLogTab() {
     // Warn at 10 minutes remaining
     if (remaining > 0 && remaining < 10 * 60 * 1000 && !window._sessionWarnShown) {
       window._sessionWarnShown = true;
-      toast('⏰ Sesi akan berakhir dalam 10 menit. Klik di mana saja untuk perpanjang.', 'warning');
+      toast('â° Sesi akan berakhir dalam 10 menit. Klik di mana saja untuk perpanjang.', 'warning');
     }
     if (remaining > 10 * 60 * 1000) {
       window._sessionWarnShown = false;
@@ -2506,17 +2506,17 @@ function buildMessage(templateKey, customer) {
   tglTempo.setMonth(tglTempo.getMonth() + angsuranKe);
   const tglTempoStr = tglTempo.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const header = `Assalamu'alaikum / Halo, *${customer.nama}* 🙏`;
-  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. 🙏\n\n_— Bisnis Kredit Ruli Rizki Ariyanto_`;
+  const header = `Assalamu'alaikum / Halo, *${customer.nama}* ðŸ™`;
+  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. ðŸ™\n\n_â€” Bisnis Kredit Ruli Rizki Ariyanto_`;
 
   const templates = {
-    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n📦 *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n💰 *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n📅 *Jatuh Tempo:* ${tglTempoStr}\n📊 *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
+    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\nðŸ“¦ *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\nðŸ’° *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\nðŸ“… *Jatuh Tempo:* ${tglTempoStr}\nðŸ“Š *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
 
-    jatuh_tempo: `${header}\n\n⏰ *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n📅 *${tglTempoStr}*\n\n📦 *Barang:* ${customer.barang}\n💰 *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ✅${footer}`,
+    jatuh_tempo: `${header}\n\nâ° *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\nðŸ“… *${tglTempoStr}*\n\nðŸ“¦ *Barang:* ${customer.barang}\nðŸ’° *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. âœ…${footer}`,
 
-    terlambat: `${header}\n\n⚠️ *PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n📦 *Barang:* ${customer.barang}\n💰 *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n🔢 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. 🙏${footer}`,
+    terlambat: `${header}\n\nâš ï¸ *PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\nðŸ“¦ *Barang:* ${customer.barang}\nðŸ’° *Jumlah Tertunggak:* ${formatRupiah(sisa)}\nðŸ”¢ *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. ðŸ™${footer}`,
 
-    lunas: `${header}\n\n🎉 *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n📦 *Barang:* ${customer.barang}\n✅ *Status:* LUNAS\n💰 *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! 😊${footer}`,
+    lunas: `${header}\n\nðŸŽ‰ *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\nðŸ“¦ *Barang:* ${customer.barang}\nâœ… *Status:* LUNAS\nðŸ’° *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! ðŸ˜Š${footer}`,
 
     custom: ''
   };
@@ -2577,7 +2577,7 @@ function waPopulateCustDropdown() {
   if (!sel) return;
   sel.innerHTML = '<option value="">-- Pilih Pelanggan --</option>' +
     customers.map(c => {
-      const hasPhone = normalizePhone(c.noHp) ? '' : ' ⚠️ (no HP kosong)';
+      const hasPhone = normalizePhone(c.noHp) ? '' : ' âš ï¸ (no HP kosong)';
       return `<option value="${c.id}">${c.nama} (${c.id})${hasPhone}</option>`;
     }).join('');
 }
@@ -2598,10 +2598,10 @@ function waFillQuickInfo() {
 
   infoEl.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-      <div>📦 <strong>${c.barang}</strong></div>
-      <div>📱 <strong>${c.noHp || '—'}</strong> ${phone ? '✅' : '❌ Tidak valid'}</div>
-      <div>💰 Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
-      <div>📊 Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
+      <div>ðŸ“¦ <strong>${c.barang}</strong></div>
+      <div>ðŸ“± <strong>${c.noHp || 'â€”'}</strong> ${phone ? 'âœ…' : 'âŒ Tidak valid'}</div>
+      <div>ðŸ’° Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
+      <div>ðŸ“Š Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
     </div>`;
   infoEl.style.display = 'block';
@@ -2647,7 +2647,7 @@ function waSendSingle() {
   // Show preview first
   waPreviewData = { phone: c.noHp, message, customerId: id, custName: c.nama };
   document.getElementById('wa-preview-bubble').textContent = message;
-  document.getElementById('wa-preview-phone').textContent = `${c.nama} · ${c.noHp}`;
+  document.getElementById('wa-preview-phone').textContent = `${c.nama} Â· ${c.noHp}`;
   openModal('waPreviewModal');
 }
 
@@ -2757,13 +2757,13 @@ function waLoadBlastList() {
       <div class="avatar" style="width:26px;height:26px;font-size:10px;">${c.nama[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nama}</div>
-        <div style="color:#94a3b8;font-size:11px;">📱 ${c.noHp}</div>
+        <div style="color:#94a3b8;font-size:11px;">ðŸ“± ${c.noHp}</div>
       </div>
       <span class="badge ${badgeClass}" style="font-size:10px;">${status}</span>
     </div>`;
   }).join('') + (invalid.length ? `
     <div style="padding:8px 10px;font-size:11px;color:#dc2626;background:#fef2f2;">
-      ⚠️ ${invalid.length} pelanggan tanpa nomor valid tidak termasuk
+      âš ï¸ ${invalid.length} pelanggan tanpa nomor valid tidak termasuk
     </div>` : '');
 }
 
@@ -2778,7 +2778,7 @@ function waStartBlast() {
 
   document.getElementById('confirmMsg').innerHTML =
     `Kirim pesan WhatsApp ke <strong>${waBlastQueue.length} pelanggan</strong>? <br><small style="color:#64748b;">WhatsApp akan terbuka satu per satu di browser.</small>`;
-  document.getElementById('confirmOkBtn').textContent = `📱 Kirim ${waBlastQueue.length} Pesan`;
+  document.getElementById('confirmOkBtn').textContent = `ðŸ“± Kirim ${waBlastQueue.length} Pesan`;
   document.getElementById('confirmOkBtn').className = 'btn btn-success';
   document.getElementById('confirmOkBtn').onclick = () => {
     closeModal('confirmModal');
@@ -2801,7 +2801,7 @@ function waExecuteBlast() {
       if (i === waBlastQueue.length - 1) {
         renderWaLog();
         renderWaStats();
-        toast(`✅ ${sent} pesan berhasil dibuka di WhatsApp`, 'success');
+        toast(`âœ… ${sent} pesan berhasil dibuka di WhatsApp`, 'success');
       }
     }, delay);
     delay += 800; // 0.8s gap per tab to avoid browser blocking
@@ -2820,7 +2820,7 @@ async function renderWaLog() {
   if (!el) return;
 
   if (!logs.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Belum ada pesan terkirim</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">ðŸ“­</div><p>Belum ada pesan terkirim</p></div>`;
     return;
   }
 
@@ -2844,7 +2844,7 @@ async function renderWaLog() {
       <td style="font-size:12px;">${l.phone}</td>
       <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#64748b;" title="${l.message}">${l.message}</td>
       <td>
-        <button class="btn btn-success btn-xs" onclick="waResend('${l.customerId}','${l.phone}')">🔄 Kirim Lagi</button>
+        <button class="btn btn-success btn-xs" onclick="waResend('${l.customerId}','${l.phone}')">ðŸ”„ Kirim Lagi</button>
       </td>
     </tr>`).join('')}
     </tbody>
@@ -2882,7 +2882,7 @@ function waClearLog() {
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
 
 function deletePhotosForCustomer(customerId) {
-  // Stub — actual delete via Supabase handled in data.js deleteCustomer()
+  // Stub â€” actual delete via Supabase handled in data.js deleteCustomer()
 }
 
 // ---- Upload handler ----
@@ -3015,7 +3015,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLightbox();
 });
 
-// Patch openCustModal to init drag-drop — handled directly in openCustModal above
+// Patch openCustModal to init drag-drop â€” handled directly in openCustModal above
 
 // ============================================================
 //  FOTO TAB BUILDER
@@ -3029,7 +3029,7 @@ function buildFotoTab(customerId) {
   if (!hasAny) {
     return `
       <div class="empty-state" style="padding:32px;">
-        <div class="empty-icon">📷</div>
+        <div class="empty-icon">ðŸ“·</div>
         <p style="margin-bottom:12px;">Belum ada foto untuk pelanggan ini</p>
         <button class="btn btn-primary btn-sm" onclick="closeModal('custDetailModal');editCustomer('${customerId}')">
           + Tambah Foto
@@ -3041,14 +3041,14 @@ function buildFotoTab(customerId) {
     <div class="cust-detail-photos">
       <!-- Foto Pelanggan -->
       <div>
-        <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">👤 Foto Pelanggan</div>
+        <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">ðŸ‘¤ Foto Pelanggan</div>
         ${custPhoto ? `
         <div class="cust-photo-box">
           <img src="${custPhoto}" alt="Foto Pelanggan"
                onclick="openLightbox('${custPhoto}','Foto Pelanggan')">
         </div>` : `
         <div class="cust-photo-box" style="display:flex;align-items:center;justify-content:center;height:180px;flex-direction:column;gap:8px;background:#f8fafc;border-radius:10px;border:1px dashed #cbd5e1;">
-          <div style="font-size:32px;opacity:.3;">👤</div>
+          <div style="font-size:32px;opacity:.3;">ðŸ‘¤</div>
           <div style="font-size:12px;color:#94a3b8;">Belum ada foto</div>
         </div>`}
       </div>
@@ -3056,20 +3056,20 @@ function buildFotoTab(customerId) {
       <!-- Foto Barang Gallery -->
       <div>
         <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">
-          📦 Foto Barang
+          ðŸ“¦ Foto Barang
           ${itemPhotos.length > 0 ? `<span class="badge badge-blue" style="font-size:10px;margin-left:4px;">${itemPhotos.length} foto</span>` : ''}
         </div>
         ${itemPhotos.length > 0
           ? buildItemGallery(customerId)
           : `<div style="display:flex;align-items:center;justify-content:center;height:180px;flex-direction:column;gap:8px;background:#f8fafc;border-radius:10px;border:1px dashed #cbd5e1;">
-               <div style="font-size:32px;opacity:.3;">📦</div>
+               <div style="font-size:32px;opacity:.3;">ðŸ“¦</div>
                <div style="font-size:12px;color:#94a3b8;">Belum ada foto barang</div>
              </div>`}
       </div>
     </div>
     <div style="text-align:center;margin-top:12px;">
       <button class="btn btn-outline btn-sm" onclick="closeModal('custDetailModal');editCustomer('${customerId}')">
-        ✏️ Edit / Tambah Foto
+        âœï¸ Edit / Tambah Foto
       </button>
     </div>`;
 }
@@ -3148,7 +3148,7 @@ function renderItemPhotoStrip() {
       <img src="${src}" alt="Foto barang ${i+1}"
            onclick="openLightbox('${src}','Foto Barang ${i+1}')">
       <button type="button" class="item-thumb-remove"
-              onclick="event.stopPropagation();removeItemPhoto(${i})" title="Hapus foto ini">✕</button>
+              onclick="event.stopPropagation();removeItemPhoto(${i})" title="Hapus foto ini">âœ•</button>
       <div class="item-thumb-num">${i+1}</div>
     </div>`).join('');
 }
@@ -3215,12 +3215,12 @@ function buildItemGallery(customerId) {
   return `
     <div class="item-gallery" id="item-gallery-${customerId}">
       <div class="item-gallery-main" style="position:relative;">
-        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">‹</button>
+        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">â€¹</button>
         <img id="gallery-main-img-${customerId}"
              src="${photos[0]}"
              alt="Foto Barang 1"
              onclick="openLightbox(this.src, 'Foto Barang ' + (${customerId === '' ? 0 : `_galleryIndex`}+1) + ' / ${photos.length}')">
-        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">›</button>
+        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">â€º</button>
         ${photos.length > 1 ? `<div class="item-gallery-counter" id="gallery-counter-${customerId}">1 / ${photos.length}</div>` : ''}
       </div>
       ${photos.length > 1 ? `
@@ -3259,3 +3259,4 @@ function galleryRender(customerId) {
     if (t) t.classList.toggle('active', i === _galleryIndex);
   });
 }
+
