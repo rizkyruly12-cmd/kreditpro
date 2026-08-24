@@ -28,6 +28,12 @@ const handler = async (event) => {
 
     if (error) throw error;
 
+    // Bersihkan session expired sekalian
+    await supabase
+      .from('auth_sessions')
+      .delete()
+      .lt('expires_at', new Date().toISOString());
+
     const now = new Date().toISOString();
     console.log(`[keepalive] OK pada ${now} — Supabase aktif.`);
     return new Response(`keepalive OK at ${now}`, { status: 200 });
