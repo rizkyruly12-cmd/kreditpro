@@ -369,12 +369,24 @@
 
       <!-- Tab navigasi laporan -->
       <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" id="lap-tab-ringkasan" onclick="switchLapTab('ringkasan')">📊 Ringkasan</button>
-        <button class="btn btn-outline btn-sm" id="lap-tab-piutang" onclick="switchLapTab('piutang')">💰 Piutang</button>
-        <button class="btn btn-outline btn-sm" id="lap-tab-tunggakan" onclick="switchLapTab('tunggakan')">⚠️ Tunggakan</button>
-        <button class="btn btn-outline btn-sm" id="lap-tab-aruskas" onclick="switchLapTab('aruskas')">📅 Arus Kas</button>
-        <button class="btn btn-outline btn-sm" id="lap-tab-modal" onclick="switchLapTab('modal')">🏦 Modal & ROI</button>
-        <button class="btn btn-outline btn-sm" id="lap-tab-barang" onclick="switchLapTab('barang')">📦 Analisa Barang</button>
+        <button class="btn btn-primary btn-sm" id="lap-tab-ringkasan" onclick="switchLapTab('ringkasan')">
+          <svg width="13" height="13"><use href="#ic-chart"/></svg> Ringkasan
+        </button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-piutang" onclick="switchLapTab('piutang')">
+          <svg width="13" height="13"><use href="#ic-money"/></svg> Piutang
+        </button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-tunggakan" onclick="switchLapTab('tunggakan')">
+          <svg width="13" height="13"><use href="#ic-alert"/></svg> Tunggakan
+        </button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-aruskas" onclick="switchLapTab('aruskas')">
+          <svg width="13" height="13"><use href="#ic-calendar"/></svg> Arus Kas
+        </button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-modal" onclick="switchLapTab('modal')">
+          <svg width="13" height="13"><use href="#ic-bank"/></svg> Modal & ROI
+        </button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-barang" onclick="switchLapTab('barang')">
+          <svg width="13" height="13"><use href="#ic-box"/></svg> Analisa Barang
+        </button>
         <div style="margin-left:auto;">
           <button class="btn btn-outline btn-sm" onclick="printLaporanAktif()">
             <svg width="14" height="14"><use href="#ic-print"/></svg> Export PDF
@@ -584,13 +596,13 @@
             </select>
           </div>
           <div style="margin-bottom:12px;padding:10px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#b45309;">
-            ℹ️ Kirim massal membuka WhatsApp satu per satu. Setiap tab/window WhatsApp Web akan terbuka secara berurutan.
+            ℹ️ Kirim massal membuka WhatsApp satu per satu. WhatsApp Web akan terbuka secara berurutan.
           </div>
           <div id="wa-blast-list" style="max-height:160px;overflow-y:auto;margin-bottom:12px;border:1px solid #e2e8f0;border-radius:8px;"></div>
           <div style="display:flex;gap:8px;align-items:center;">
             <div id="wa-blast-count" class="badge badge-blue" style="font-size:12px;">0 pelanggan</div>
             <button class="btn btn-success" style="flex:1;" onclick="waStartBlast()">
-              🚀 Kirim Semua
+              <svg width="14" height="14"><use href="#ic-whatsapp"/></svg> Kirim Semua
             </button>
           </div>
         </div>
@@ -600,7 +612,9 @@
       <div class="card">
         <div class="card-header">
           <span class="card-title"><span class="card-title-icon"><svg width="14" height="14"><use href="#ic-whatsapp"/></svg></span> Riwayat Pengiriman WA</span>
-          <button class="btn btn-outline btn-sm" onclick="waClearLog()">🗑 Hapus Log</button>
+          <button class="btn btn-outline btn-sm" onclick="waClearLog()">
+            <svg width="13" height="13"><use href="#ic-trash"/></svg> Hapus Log
+          </button>
         </div>
         <div class="table-wrap" id="wa-log-table"></div>
       </div>
@@ -628,17 +642,21 @@
 
         <!-- Foto Pelanggan -->
         <div>
-          <label class="form-label">📷 Foto Pelanggan</label>
+          <label class="form-label">Foto Pelanggan</label>
           <div id="cust-photo-drop" class="photo-drop-zone" onclick="document.getElementById('cust-photo-input').click()">
             <div id="cust-photo-preview" class="photo-preview-empty">
-              <div class="photo-drop-icon">👤</div>
+              <div class="photo-drop-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
               <div class="photo-drop-text">Klik atau seret foto<br><span>JPG, PNG, WEBP max 5MB</span></div>
             </div>
             <img id="cust-photo-img" class="photo-preview-img" style="display:none;" alt="Foto Pelanggan">
           </div>
           <input type="file" id="cust-photo-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload('cust-photo','cust-photo')">
           <div style="display:flex;gap:6px;margin-top:6px;">
-            <button type="button" class="btn btn-outline btn-xs" style="flex:1;" onclick="document.getElementById('cust-photo-input').click()">📁 Pilih File</button>
+            <button type="button" class="btn btn-outline btn-xs" style="flex:1;" onclick="document.getElementById('cust-photo-input').click()">
+                <svg width="12" height="12"><use href="#ic-photo"/></svg> Pilih File
+              </button>
             <button type="button" class="btn btn-outline btn-xs" id="cust-photo-clear-btn" style="display:none;" onclick="clearPhoto('cust-photo')">🗑 Hapus</button>
           </div>
           <input type="hidden" id="cust-photo-data">
@@ -647,7 +665,7 @@
         <!-- Foto Barang — Multiple (maks 5 foto) -->
         <div>
           <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
-            <span>📦 Foto Barang</span>
+            <span>Foto Barang</span>
             <span id="item-photo-count-label" style="font-size:10px;color:#94a3b8;font-weight:400;">0 / 5 foto</span>
           </label>
 
@@ -658,7 +676,9 @@
           <div id="item-photo-drop" class="photo-drop-zone" style="height:100px;"
                onclick="document.getElementById('item-photo-input').click()">
             <div id="item-photo-preview" class="photo-preview-empty">
-              <div class="photo-drop-icon" style="font-size:24px;">📦+</div>
+              <div class="photo-drop-icon" style="font-size:24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><line x1="12" y1="5" x2="12" y2="11"/><line x1="9" y1="8" x2="15" y2="8"/></svg>
+              </div>
               <div class="photo-drop-text">Klik / seret untuk tambah foto<br><span>Maks 5 foto · JPG, PNG, WEBP · 5MB/foto</span></div>
             </div>
           </div>
@@ -667,11 +687,11 @@
           <div style="display:flex;gap:6px;margin-top:6px;">
             <button type="button" class="btn btn-outline btn-xs" style="flex:1;"
                     onclick="document.getElementById('item-photo-input').click()">
-              📁 Tambah Foto
+              <svg width="12" height="12"><use href="#ic-photo"/></svg> Tambah Foto
             </button>
             <button type="button" class="btn btn-danger btn-xs" id="item-photo-clear-all-btn"
                     style="display:none;" onclick="clearAllItemPhotos()">
-              🗑 Hapus Semua
+              <svg width="12" height="12"><use href="#ic-trash"/></svg> Hapus Semua
             </button>
           </div>
         </div>
@@ -748,7 +768,7 @@
       <!-- Preview -->
       <div id="cust-preview" class="alert alert-info" style="display:none;">
         <div>
-          <div class="font-semibold" style="margin-bottom:6px;">📋 Preview Kredit</div>
+          <div class="font-semibold" style="margin-bottom:6px;">Preview Kredit</div>
           <div class="form-row cols-2" style="gap:8px;">
             <div><span class="text-xs text-muted">Kredit Pokok</span><br><span class="font-bold" id="prev-pokok">-</span></div>
             <div><span class="text-xs text-muted">Total Bunga</span><br><span class="font-bold" id="prev-bunga">-</span></div>
@@ -827,7 +847,9 @@
     </div>
     <div class="modal-body" id="custDetailBody"></div>
     <div class="modal-footer">
-      <button class="btn btn-outline btn-sm" onclick="printDetailModal()">🖨️ Export PDF Kartu</button>
+      <button class="btn btn-outline btn-sm" onclick="printDetailModal()">
+        <svg width="13" height="13"><use href="#ic-print"/></svg> Export PDF Kartu
+      </button>
       <button class="btn btn-primary btn-sm" id="custDetailAddPayBtn">+ Catat Pembayaran</button>
       <button class="btn btn-outline" onclick="closeModal('custDetailModal')">Tutup</button>
     </div>
@@ -838,7 +860,7 @@
 <div class="modal-overlay" id="confirmModal">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
-      <span class="modal-title">⚠️ Konfirmasi</span>
+      <span class="modal-title">Konfirmasi</span>
       <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
     </div>
     <div class="modal-body">
@@ -860,7 +882,7 @@
 <div class="modal-overlay" id="waPreviewModal">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">📱 Preview Pesan WhatsApp</span>
+      <span class="modal-title">Preview Pesan WhatsApp</span>
       <button class="modal-close" onclick="closeModal('waPreviewModal')">✕</button>
     </div>
     <div class="modal-body">
@@ -868,13 +890,15 @@
         <div style="background:white;border-radius:8px;padding:12px 14px;max-width:85%;box-shadow:0 1px 2px rgba(0,0,0,.15);font-size:13px;line-height:1.6;white-space:pre-wrap;" id="wa-preview-bubble"></div>
       </div>
       <div style="margin-top:14px;padding:10px 12px;background:#f8fafc;border-radius:8px;font-size:12px;color:#64748b;">
-        📱 Akan dikirim ke: <strong id="wa-preview-phone"></strong> via WhatsApp
+        Akan dikirim ke: <strong id="wa-preview-phone"></strong> via WhatsApp
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('waPreviewModal')">Batal</button>
       <button class="btn btn-outline btn-sm" onclick="waCopyFromPreview()">📋 Salin</button>
-      <button class="btn btn-success" onclick="waOpenFromPreview()">📱 Buka WhatsApp</button>
+      <button class="btn btn-success" onclick="waOpenFromPreview()">
+        <svg width="14" height="14"><use href="#ic-whatsapp"/></svg> Buka WhatsApp
+      </button>
     </div>
   </div>
 </div>
@@ -883,7 +907,7 @@
 <div class="modal-overlay" id="accountModal">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">⚙️ Pengaturan Akun</span>
+      <span class="modal-title">Pengaturan Akun</span>
       <button class="modal-close" onclick="closeModal('accountModal')">✕</button>
     </div>
     <div class="modal-body">
@@ -975,7 +999,9 @@
 
     <div class="modal-footer" id="account-modal-footer">
       <button class="btn btn-outline" onclick="closeModal('accountModal')">Tutup</button>
-      <button class="btn btn-primary" id="pw-save-btn" onclick="submitChangePassword()" style="display:none;">🔐 Simpan Password</button>
+      <button class="btn btn-primary" id="pw-save-btn" onclick="submitChangePassword()" style="display:none;">
+        <svg width="13" height="13"><use href="#ic-settings"/></svg> Simpan Password
+      </button>
     </div>
   </div>
 </div>

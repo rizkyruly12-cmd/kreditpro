@@ -1516,25 +1516,25 @@ function renderPiutang() {
   const menunggak = customers.filter(c => getStatusKredit(c)==='menunggak').length;
   document.getElementById('piutang-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">ðŸ’°</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Total Piutang Aktif</div>
       <div class="stat-value">${formatRupiah(totalPiutang)}</div>
       <div class="stat-sub">Uang yang masih di pelanggan</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">âœ…</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Sudah Diterima</div>
       <div class="stat-value">${formatRupiah(totalDibayarAll)}</div>
       <div class="stat-sub">Dari total tagihan ${formatRupiah(totalTagihan)}</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">ðŸ‘¥</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Kredit Aktif</div>
       <div class="stat-value">${aktif}</div>
       <div class="stat-sub">pelanggan sedang berjalan</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">âš ï¸</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Menunggak</div>
       <div class="stat-value">${menunggak}</div>
       <div class="stat-sub">pelanggan perlu ditagih</div></div>
@@ -1596,25 +1596,25 @@ function renderTunggakan() {
 
   document.getElementById('tunggakan-stats').innerHTML = `
     <div class="stat-card orange">
-      <div class="stat-icon">âš ï¸</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Pelanggan Menunggak</div>
       <div class="stat-value">${menunggakList.length}</div>
       <div class="stat-sub">perlu segera ditagih</div></div>
     </div>
     <div class="stat-card red" style="--card-color:#dc2626;">
-      <div class="stat-icon">ðŸ’¸</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Total Tunggakan</div>
       <div class="stat-value" style="color:#dc2626;">${formatRupiah(totalTunggakan)}</div>
       <div class="stat-sub">jumlah yang belum dibayar</div></div>
     </div>
     <div class="stat-card blue">
-      <div class="stat-icon">ðŸ“Š</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Rata-rata Tunggak</div>
       <div class="stat-value">${menunggakList.length ? formatRupiah(totalTunggakan/menunggakList.length) : 'Rp 0'}</div>
       <div class="stat-sub">per pelanggan menunggak</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">ðŸ†</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Terbesar Menunggak</div>
       <div class="stat-value" style="font-size:14px;">${menunggakList[0]?.c.nama || '-'}</div>
       <div class="stat-sub">${menunggakList[0] ? formatRupiah(menunggakList[0].selisih) : 'Tidak ada'}</div></div>
@@ -1654,25 +1654,25 @@ function renderArusKas() {
 
   document.getElementById('aruskas-stats').innerHTML = `
     <div class="stat-card teal">
-      <div class="stat-icon">ðŸ“…</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Uang Masuk Bulan Ini</div>
       <div class="stat-value">${formatRupiah(thisUang)}</div>
       <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'â–²':'â–¼'} ${Math.abs(growth)}% vs bulan lalu</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">ðŸ’µ</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Profit Bulan Ini</div>
       <div class="stat-value">${formatRupiah(thisProfit)}</div>
       <div class="stat-sub">${thisPays.length} transaksi</div></div>
     </div>
     <div class="stat-card blue">
-      <div class="stat-icon">ðŸ”®</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Prediksi Bulan Depan</div>
       <div class="stat-value">${formatRupiah(prediksi)}</div>
       <div class="stat-sub">dari ${customers.filter(c=>getStatusKredit(c)!=='lunas').length} kredit aktif</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">ðŸ“Š</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Bulan Lalu</div>
       <div class="stat-value">${formatRupiah(lastUang)}</div>
       <div class="stat-sub">${lastPays.length} transaksi</div></div>
@@ -1743,25 +1743,25 @@ function renderModal() {
 
   document.getElementById('modal-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">ðŸ¦</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Total Modal Kredit</div>
       <div class="stat-value">${formatRupiah(totalModal)}</div>
       <div class="stat-sub">Total harga barang: ${formatRupiah(totalHarga)}</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">ðŸ’¹</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Profit Diterima</div>
       <div class="stat-value">${formatRupiah(totalProfit)}</div>
       <div class="stat-sub">ROI terealisasi: ${roi}%</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">ðŸŽ¯</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Target Profit Total</div>
       <div class="stat-value">${formatRupiah(customers.reduce((s,c)=>s+hitungAngsuran(c).totalProfit,0))}</div>
       <div class="stat-sub">ROI target: ${roiTarget}%</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">ðŸ’°</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Modal Belum Kembali</div>
       <div class="stat-value">${formatRupiah(totalPiutang)}</div>
       <div class="stat-sub">masih di tangan pelanggan</div></div>
@@ -1835,25 +1835,25 @@ function renderBarang() {
 
   document.getElementById('barang-stats').innerHTML = `
     <div class="stat-card blue">
-      <div class="stat-icon">ðŸ“¦</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Jenis Barang Berbeda</div>
       <div class="stat-value">${Object.keys(barangMap).length}</div>
       <div class="stat-sub">dari ${customers.length} kredit</div></div>
     </div>
     <div class="stat-card teal">
-      <div class="stat-icon">ðŸ†</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Barang Terlaris</div>
       <div class="stat-value" style="font-size:13px;">${topBarang?.nama||'-'}</div>
       <div class="stat-sub">${topBarang?.count||0}x dikreditkan</div></div>
     </div>
     <div class="stat-card green">
-      <div class="stat-icon">ðŸ’µ</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Rata-rata Kredit</div>
       <div class="stat-value">${formatRupiah(avgKredit)}</div>
       <div class="stat-sub">per pelanggan</div></div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-icon">ðŸ’¹</div>
+      <div class="stat-icon"><svg width="18" height="18"><use href="#ic-chart"/></svg></div>
       <div class="stat-info"><div class="stat-label">Total Profit Barang</div>
       <div class="stat-value">${formatRupiah(sorted.reduce((s,b)=>s+b.totalProfit,0))}</div>
       <div class="stat-sub">dari semua kredit</div></div>
