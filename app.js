@@ -715,7 +715,9 @@ function confirmDeleteCustomer(id) {
 }
 
 // ---- CUSTOMER DETAIL ----
+let _currentViewId = null;
 async function viewCustomer(id) {
+  _currentViewId = id;
   const c = getCustomerById(id);
   if (!c) return;
 
@@ -894,7 +896,169 @@ function switchTab(tabId, groupId) {
 }
 
 function printDetailModal() {
-  window.print();
+  if (_currentViewId) {
+    exportKartuPDF(_currentViewId);
+  }
+}
+
+// ---- Export PDF Kartu Angsuran per Pelanggan ----
+function exportKartuPDF(customerId) {
+  const c = getCustomerById(customerId);
+  if (!c) return;
+  const payments = getPaymentsByCustomer(customerId);
+  const { angsuranPerBulan, cicilanPerBulan, totalBayar } = hitungAngsuran(c);
+  const totalDibayar = payments.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+  const sisa = Math.max(0, totalBayar - totalDibayar);
+  const status = getStatusKredit(c);
+  const paidCount = Math.min(Math.floor(totalDibayar / angsuranPerBulan), c.tenor);
+
+  const rows = payments.map((p,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${p.tgl ? new Date(p.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '-'}</td>
+      <td class="num">${formatRupiah(p.jumlahAngsuran)}</td>
+      <td class="num">${formatRupiah(p.cicilan)}</td>
+      <td>${p.metode||'-'}</td>
+      <td>${p.ket||'-'}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>Kartu Angsuran — ${c.nama}</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1e40af; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#1e40af; }
+    .header p { font-size:11px; color:#64748b; margin-top:3px; }
+    .info { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-bottom:20px; padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; }
+    .info-item .label { font-size:10px; color:#64748b; text-transform:uppercase; font-weight:600; }
+    .info-item .value { font-size:13px; font-weight:600; margin-top:2px; }
+    .stats { display:flex; gap:12px; margin-bottom:20px; }
+    .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center; }
+    .stat .label { font-size:10px; color:#64748b; }
+    .stat .value { font-size:15px; font-weight:700; color:#1e40af; margin-top:3px; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:#1e40af; color:white; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; }
+    td { padding:7px 10px; border-bottom:1px solid #f1f5f9; font-size:11px; }
+    tr:nth-child(even) td { background:#f8fafc; }
+    .num { text-align:right; }
+    .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .badge-lunas { background:#dcfce7; color:#15803d; }
+    .badge-aktif { background:#dbeafe; color:#1d4ed8; }
+    .badge-menunggak { background:#fee2e2; color:#dc2626; }
+    .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:20px; border-top:1px solid #e2e8f0; padding-top:10px; }
+    @media print { body { padding:15px; } }
+  </style></head><body>
+  <div class="header">
+    <h1>💳 Kartu Angsuran</h1>
+    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+  </div>
+  <div class="info">
+    <div class="info-item"><div class="label">Nama Pelanggan</div><div class="value">${c.nama}</div></div>
+    <div class="info-item"><div class="label">ID Pelanggan</div><div class="value">${c.id}</div></div>
+    <div class="info-item"><div class="label">Barang</div><div class="value">${c.barang}</div></div>
+    <div class="info-item"><div class="label">No. Seri</div><div class="value">${c.noSeri||'-'}</div></div>
+    <div class="info-item"><div class="label">Tanggal Kredit</div><div class="value">${c.tgl ? new Date(c.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '-'}</div></div>
+    <div class="info-item"><div class="label">Status</div><div class="value"><span class="badge badge-${status}">${status}</span></div></div>
+    <div class="info-item"><div class="label">No. HP</div><div class="value">${c.noHp||'-'}</div></div>
+    <div class="info-item"><div class="label">NIK</div><div class="value">${c.nik||'-'}</div></div>
+    <div class="info-item" style="grid-column:1/-1;"><div class="label">Alamat</div><div class="value">${c.alamat||'-'}</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">Harga Barang</div><div class="value">${formatRupiah(c.harga)}</div></div>
+    <div class="stat"><div class="label">Kredit Pokok</div><div class="value">${formatRupiah(c.kreditPokok)}</div></div>
+    <div class="stat"><div class="label">Angsuran/Bulan</div><div class="value">${formatRupiah(angsuranPerBulan)}</div></div>
+    <div class="stat"><div class="label">Tenor</div><div class="value">${c.tenor} Bulan</div></div>
+    <div class="stat"><div class="label">Terbayar</div><div class="value">${paidCount}/${c.tenor}</div></div>
+    <div class="stat"><div class="label">Sisa Tagihan</div><div class="value" style="color:#dc2626;">${formatRupiah(sisa)}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">Jumlah</th><th style="text-align:right">Profit</th><th>Metode</th><th>Keterangan</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">Belum ada pembayaran</td></tr>'}</tbody>
+  </table>
+  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 500);
+}
+
+// ---- Export PDF Data Semua Pelanggan ----
+function exportPelangganPDF() {
+  const customers = getCustomers();
+  const payments = getPayments();
+
+  const rows = customers.map((c,i) => {
+    const pays = payments.filter(p=>p.customerId===c.id);
+    const { totalBayar, angsuranPerBulan } = hitungAngsuran(c);
+    const totalDibayar = pays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    const sisa = Math.max(0, totalBayar - totalDibayar);
+    const status = getStatusKredit(c);
+    const badgeStyle = status==='lunas'?'background:#dcfce7;color:#15803d':status==='menunggak'?'background:#fee2e2;color:#dc2626':'background:#dbeafe;color:#1d4ed8';
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${c.nama}</strong><br><span style="font-size:10px;color:#64748b;">${c.id}</span></td>
+      <td>${c.barang}</td>
+      <td class="num">${formatRupiah(c.kreditPokok)}</td>
+      <td class="num">${formatRupiah(angsuranPerBulan)}</td>
+      <td style="text-align:center;">${c.tenor} bln</td>
+      <td class="num">${formatRupiah(totalDibayar)}</td>
+      <td class="num" style="color:#dc2626;">${formatRupiah(sisa)}</td>
+      <td style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;${badgeStyle}">${status}</span></td>
+    </tr>`;
+  }).join('');
+
+  const lunas = customers.filter(c=>getStatusKredit(c)==='lunas').length;
+  const aktif = customers.filter(c=>getStatusKredit(c)==='aktif').length;
+  const menunggak = customers.filter(c=>getStatusKredit(c)==='menunggak').length;
+
+  const html = `<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>Data Pelanggan — KreditPro</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; font-size:11px; color:#1e293b; padding:24px; }
+    .header { text-align:center; margin-bottom:18px; border-bottom:2px solid #1e40af; padding-bottom:12px; }
+    .header h1 { font-size:18px; color:#1e40af; }
+    .header p { font-size:11px; color:#64748b; margin-top:3px; }
+    .stats { display:flex; gap:12px; margin-bottom:18px; }
+    .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
+    .stat .label { font-size:10px; color:#64748b; }
+    .stat .value { font-size:16px; font-weight:700; color:#1e40af; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:#1e40af; color:white; padding:7px 8px; text-align:left; font-size:10px; text-transform:uppercase; white-space:nowrap; }
+    td { padding:6px 8px; border-bottom:1px solid #f1f5f9; vertical-align:top; }
+    tr:nth-child(even) td { background:#f8fafc; }
+    .num { text-align:right; white-space:nowrap; }
+    .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
+    @media print { body { padding:12px; } @page { size:A4 landscape; margin:15mm; } }
+  </style></head><body>
+  <div class="header">
+    <h1>👥 Data Seluruh Pelanggan</h1>
+    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
+    <div class="stat"><div class="label">Aktif</div><div class="value" style="color:#1d4ed8;">${aktif}</div></div>
+    <div class="stat"><div class="label">Lunas</div><div class="value" style="color:#15803d;">${lunas}</div></div>
+    <div class="stat"><div class="label">Menunggak</div><div class="value" style="color:#dc2626;">${menunggak}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Nama / ID</th><th>Barang</th><th style="text-align:right">Kredit</th><th style="text-align:right">Angsuran</th><th style="text-align:center">Tenor</th><th style="text-align:right">Terbayar</th><th style="text-align:right">Sisa</th><th style="text-align:center">Status</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Total ${customers.length} pelanggan</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=1100,height=700');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 500);
 }
 
 // ============================================================
@@ -1262,7 +1426,74 @@ function renderLaporan() {
 }
 
 function printLaporan() {
-  window.print();
+  const year = document.getElementById('lap-year')?.value || new Date().getFullYear();
+  const payments = getPayments();
+  const customers = getCustomers();
+
+  // Hitung data
+  const yearPay = payments.filter(p => p.tgl?.startsWith(year));
+  const totalUang = yearPay.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+  const totalProfit = yearPay.reduce((s,p)=>s+(p.cicilan||0),0);
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+  const rowsPerMonth = months.map((mn, i) => {
+    const mo = String(i+1).padStart(2,'0');
+    const mp = yearPay.filter(p=>p.tgl?.slice(5,7)===mo);
+    const u = mp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    const pr = mp.reduce((s,p)=>s+(p.cicilan||0),0);
+    return `<tr>
+      <td>${mn}</td>
+      <td class="num">${mp.length}</td>
+      <td class="num">${formatRupiah(u)}</td>
+      <td class="num">${formatRupiah(pr)}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>Laporan Profit ${year} — KreditPro</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
+    .header { text-align:center; margin-bottom:24px; border-bottom:2px solid #1e40af; padding-bottom:16px; }
+    .header h1 { font-size:20px; color:#1e40af; }
+    .header p { font-size:12px; color:#64748b; margin-top:4px; }
+    .stats { display:flex; gap:16px; margin-bottom:24px; }
+    .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:14px; text-align:center; }
+    .stat .label { font-size:11px; color:#64748b; margin-bottom:4px; }
+    .stat .value { font-size:16px; font-weight:700; color:#1e40af; }
+    table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+    th { background:#1e40af; color:white; padding:9px 12px; text-align:left; font-size:11px; text-transform:uppercase; }
+    td { padding:8px 12px; border-bottom:1px solid #f1f5f9; font-size:12px; }
+    tr:nth-child(even) td { background:#f8fafc; }
+    .num { text-align:right; }
+    .total td { font-weight:700; background:#eff6ff !important; color:#1e40af; border-top:2px solid #1e40af; }
+    .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:24px; border-top:1px solid #e2e8f0; padding-top:12px; }
+    @media print { body { padding:15px; } }
+  </style></head><body>
+  <div class="header">
+    <h1>📊 Laporan Profit Tahun ${year}</h1>
+    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">Total Transaksi</div><div class="value">${yearPay.length}</div></div>
+    <div class="stat"><div class="label">Total Uang Masuk</div><div class="value">${formatRupiah(totalUang)}</div></div>
+    <div class="stat"><div class="label">Total Profit</div><div class="value">${formatRupiah(totalProfit)}</div></div>
+    <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Bulan</th><th style="text-align:right">Transaksi</th><th style="text-align:right">Uang Masuk</th><th style="text-align:right">Profit</th></tr></thead>
+    <tbody>${rowsPerMonth}</tbody>
+    <tfoot><tr class="total"><td>TOTAL</td><td class="num">${yearPay.length}</td><td class="num">${formatRupiah(totalUang)}</td><td class="num">${formatRupiah(totalProfit)}</td></tr></tfoot>
+  </table>
+  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 500);
 }
 
 // ============================================================
