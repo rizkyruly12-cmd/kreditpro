@@ -149,7 +149,7 @@ function navTo(page) {
     if (page === 'dashboard') renderDashboard();
     if (page === 'pelanggan') { PG.cust = 1; renderCustomerTable(); }
     if (page === 'pembayaran') { PG.pay = 1; renderPaymentTable(); }
-    if (page === 'laporan') renderLaporan();
+    if (page === 'laporan') { renderLaporan(); switchLapTab('ringkasan'); }
     if (page === 'kartu') { PG.kartu = 1; renderKartuList(); }
     if (page === 'whatsapp') renderWhatsAppPage();
   })();
@@ -1426,7 +1426,629 @@ function renderLaporan() {
 }
 
 function printLaporan() {
+  printLaporanAktif();
+}
+
+// ---- Switch tab laporan ----
+let _lapTab = 'ringkasan';
+let aruskasChartInst = null;
+let modalChartInst   = null;
+let roiChartInst     = null;
+let barangChartInst  = null;
+
+function switchLapTab(tab) {
+  _lapTab = tab;
+  const tabs = ['ringkasan','piutang','tunggakan','aruskas','modal','barang'];
+  tabs.forEach(t => {
+    const panel = document.getElementById('lap-panel-'+t);
+    const btn   = document.getElementById('lap-tab-'+t);
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    if (btn) {
+      btn.className = t === tab ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+    }
+  });
+  if (tab === 'piutang')   renderPiutang();
+  if (tab === 'tunggakan') renderTunggakan();
+  if (tab === 'aruskas')   renderArusKas();
+  if (tab === 'modal')     renderModal();
+  if (tab === 'barang')    renderBarang();
+}
+
+// ============================================================
+// TAB PIUTANG — total uang di pelanggan
+// ============================================================
+function renderPiutang() {
+  const customers = getCustomers();
+  const payments  = getPayments();
+  const search    = document.getElementById('piutang-search')?.value.toLowerCase() || '';
+
+  let totalPiutang = 0, totalTagihan = 0, totalDibayarAll = 0;
+  let rows = '';
+
+  const filtered = customers.filter(c => !search || c.nama.toLowerCase().includes(search) || c.id.toLowerCase().includes(search));
+
+  // Urutkan berdasarkan sisa piutang terbesar
+  const sorted = filtered.map(c => {
+    const pays = payments.filter(p => p.customerId === c.id);
+    const { totalBayar } = hitungAngsuran(c);
+    const totalDibayar = pays.reduce((s,p) => s+(p.jumlahAngsuran||0), 0);
+    const sisa = Math.max(0, totalBayar - totalDibayar);
+    return { c, totalBayar, totalDibayar, sisa };
+  }).sort((a,b) => b.sisa - a.sisa);
+
+  sorted.forEach(({ c, totalBayar, totalDibayar, sisa }) => {
+    const status = getStatusKredit(c);
+    const progress = Math.min(100, totalBayar > 0 ? (totalDibayar/totalBayar*100) : 100);
+    const badgeClass = status==='lunas'?'badge-green':status==='menunggak'?'badge-red':'badge-blue';
+    totalTagihan   += totalBayar;
+    totalDibayarAll += totalDibayar;
+    totalPiutang   += sisa;
+
+    rows += `<tr>
+      <td><strong>${c.nama}</strong><br><span style="font-size:11px;color:#94a3b8;">${c.id}</span></td>
+      <td style="font-size:12px;">${c.barang}</td>
+      <td class="text-right">${formatRupiah(totalBayar)}</td>
+      <td class="text-right" style="color:#16a34a;">${formatRupiah(totalDibayar)}</td>
+      <td class="text-right" style="color:${sisa>0?'#dc2626':'#16a34a'};font-weight:700;">${formatRupiah(sisa)}</td>
+      <td style="min-width:120px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;background:#f1f5f9;border-radius:4px;height:6px;">
+            <div style="width:${progress.toFixed(0)}%;background:${status==='lunas'?'#16a34a':status==='menunggak'?'#dc2626':'#3b82f6'};height:6px;border-radius:4px;"></div>
+          </div>
+          <span style="font-size:11px;color:#64748b;white-space:nowrap;">${progress.toFixed(0)}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${badgeClass}">${status}</span></td>
+    </tr>`;
+  });
+
+  document.getElementById('piutang-tbody').innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Tidak ada data</td></tr>';
+  document.getElementById('piutang-tfoot').innerHTML = `
+    <tr style="background:#eff6ff;font-weight:700;">
+      <td colspan="2">TOTAL (${sorted.length} pelanggan)</td>
+      <td class="text-right">${formatRupiah(totalTagihan)}</td>
+      <td class="text-right" style="color:#16a34a;">${formatRupiah(totalDibayarAll)}</td>
+      <td class="text-right" style="color:#dc2626;">${formatRupiah(totalPiutang)}</td>
+      <td colspan="2"></td>
+    </tr>`;
+
+  const aktif    = customers.filter(c => getStatusKredit(c)==='aktif').length;
+  const menunggak = customers.filter(c => getStatusKredit(c)==='menunggak').length;
+  document.getElementById('piutang-stats').innerHTML = `
+    <div class="stat-card blue">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info"><div class="stat-label">Total Piutang Aktif</div>
+      <div class="stat-value">${formatRupiah(totalPiutang)}</div>
+      <div class="stat-sub">Uang yang masih di pelanggan</div></div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info"><div class="stat-label">Sudah Diterima</div>
+      <div class="stat-value">${formatRupiah(totalDibayarAll)}</div>
+      <div class="stat-sub">Dari total tagihan ${formatRupiah(totalTagihan)}</div></div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info"><div class="stat-label">Kredit Aktif</div>
+      <div class="stat-value">${aktif}</div>
+      <div class="stat-sub">pelanggan sedang berjalan</div></div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info"><div class="stat-label">Menunggak</div>
+      <div class="stat-value">${menunggak}</div>
+      <div class="stat-sub">pelanggan perlu ditagih</div></div>
+    </div>`;
+}
+
+// ============================================================
+// TAB TUNGGAKAN
+// ============================================================
+function renderTunggakan() {
+  const customers = getCustomers();
+  const payments  = getPayments();
+  const today     = new Date();
+
+  const menunggakList = customers
+    .map(c => {
+      const pays = payments.filter(p => p.customerId === c.id);
+      const { angsuranPerBulan, totalBayar } = hitungAngsuran(c);
+      const totalDibayar = pays.reduce((s,p) => s+(p.jumlahAngsuran||0), 0);
+      if (totalDibayar >= totalBayar) return null; // lunas
+
+      const tglKredit = new Date(c.tgl);
+      let bulanBerjalan = 0;
+      for (let i = 1; i <= c.tenor; i++) {
+        const t = new Date(tglKredit); t.setMonth(t.getMonth()+i);
+        if (t <= today) bulanBerjalan = i;
+      }
+      const seharusnya = Math.min(angsuranPerBulan * bulanBerjalan, totalBayar);
+      const selisih    = Math.max(0, seharusnya - totalDibayar);
+      if (selisih < 1) return null; // tidak menunggak
+      const bulanTunggak = Math.ceil(selisih / angsuranPerBulan);
+      return { c, angsuranPerBulan, seharusnya, totalDibayar, selisih, bulanTunggak };
+    })
+    .filter(Boolean)
+    .sort((a,b) => b.selisih - a.selisih);
+
+  const totalTunggakan = menunggakList.reduce((s,x) => s+x.selisih, 0);
+
+  let rows = '';
+  menunggakList.forEach(({ c, angsuranPerBulan, seharusnya, totalDibayar, selisih, bulanTunggak }) => {
+    rows += `<tr>
+      <td><strong>${c.nama}</strong><br><span style="font-size:11px;color:#94a3b8;">${c.id}</span></td>
+      <td style="font-size:12px;">${c.barang}</td>
+      <td style="font-size:12px;">${formatTgl(c.tgl)}</td>
+      <td class="text-right">${formatRupiah(angsuranPerBulan)}</td>
+      <td class="text-right">${formatRupiah(seharusnya)}</td>
+      <td class="text-right" style="color:#16a34a;">${formatRupiah(totalDibayar)}</td>
+      <td class="text-right" style="color:#dc2626;font-weight:700;">${formatRupiah(selisih)}
+        <br><span style="font-size:10px;background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:10px;">${bulanTunggak} bln</span>
+      </td>
+      <td><button class="btn btn-outline btn-xs" onclick="viewCustomer('${c.id}')">Detail</button></td>
+    </tr>`;
+  });
+
+  document.getElementById('tunggakan-tbody').innerHTML = rows || `
+    <tr><td colspan="8" style="text-align:center;padding:32px;color:#16a34a;">
+      ✅ Tidak ada pelanggan yang menunggak
+    </td></tr>`;
+
+  document.getElementById('tunggakan-stats').innerHTML = `
+    <div class="stat-card orange">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info"><div class="stat-label">Pelanggan Menunggak</div>
+      <div class="stat-value">${menunggakList.length}</div>
+      <div class="stat-sub">perlu segera ditagih</div></div>
+    </div>
+    <div class="stat-card red" style="--card-color:#dc2626;">
+      <div class="stat-icon">💸</div>
+      <div class="stat-info"><div class="stat-label">Total Tunggakan</div>
+      <div class="stat-value" style="color:#dc2626;">${formatRupiah(totalTunggakan)}</div>
+      <div class="stat-sub">jumlah yang belum dibayar</div></div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info"><div class="stat-label">Rata-rata Tunggak</div>
+      <div class="stat-value">${menunggakList.length ? formatRupiah(totalTunggakan/menunggakList.length) : 'Rp 0'}</div>
+      <div class="stat-sub">per pelanggan menunggak</div></div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-info"><div class="stat-label">Terbesar Menunggak</div>
+      <div class="stat-value" style="font-size:14px;">${menunggakList[0]?.c.nama || '-'}</div>
+      <div class="stat-sub">${menunggakList[0] ? formatRupiah(menunggakList[0].selisih) : 'Tidak ada'}</div></div>
+    </div>`;
+}
+
+// ============================================================
+// TAB ARUS KAS
+// ============================================================
+function renderArusKas() {
+  const payments  = getPayments();
+  const customers = getCustomers();
+  const today     = new Date();
+
+  // Semua bulan dari data
+  const bulanSet = [...new Set(payments.map(p=>p.tgl?.slice(0,7)).filter(Boolean))].sort();
+
+  // Prediksi bulan depan dari kredit aktif
+  const nextMonth = new Date(today.getFullYear(), today.getMonth()+1, 1).toISOString().slice(0,7);
+  const prediksi  = customers
+    .filter(c => getStatusKredit(c) !== 'lunas')
+    .reduce((s,c) => s + hitungAngsuran(c).angsuranPerBulan, 0);
+
+  // Bulan ini
+  const thisMonth = today.toISOString().slice(0,7);
+  const thisPays  = payments.filter(p=>p.tgl?.startsWith(thisMonth));
+  const thisUang  = thisPays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+  const thisProfit= thisPays.reduce((s,p)=>s+(p.cicilan||0),0);
+
+  // Bulan lalu
+  const lastMonthDate = new Date(today.getFullYear(), today.getMonth()-1, 1);
+  const lastMonth = lastMonthDate.toISOString().slice(0,7);
+  const lastPays  = payments.filter(p=>p.tgl?.startsWith(lastMonth));
+  const lastUang  = lastPays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+
+  const growth = lastUang > 0 ? ((thisUang-lastUang)/lastUang*100).toFixed(1) : 0;
+
+  document.getElementById('aruskas-stats').innerHTML = `
+    <div class="stat-card teal">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info"><div class="stat-label">Uang Masuk Bulan Ini</div>
+      <div class="stat-value">${formatRupiah(thisUang)}</div>
+      <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'▲':'▼'} ${Math.abs(growth)}% vs bulan lalu</div></div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">💵</div>
+      <div class="stat-info"><div class="stat-label">Profit Bulan Ini</div>
+      <div class="stat-value">${formatRupiah(thisProfit)}</div>
+      <div class="stat-sub">${thisPays.length} transaksi</div></div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">🔮</div>
+      <div class="stat-info"><div class="stat-label">Prediksi Bulan Depan</div>
+      <div class="stat-value">${formatRupiah(prediksi)}</div>
+      <div class="stat-sub">dari ${customers.filter(c=>getStatusKredit(c)!=='lunas').length} kredit aktif</div></div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info"><div class="stat-label">Bulan Lalu</div>
+      <div class="stat-value">${formatRupiah(lastUang)}</div>
+      <div class="stat-sub">${lastPays.length} transaksi</div></div>
+    </div>`;
+
+  // Tabel & chart 12 bulan terakhir
+  const last12 = bulanSet.slice(-12);
+  let rows = '', labels = [], uangData = [], profitData = [];
+  let prevUang = 0;
+  last12.forEach((m,i) => {
+    const mp = payments.filter(p=>p.tgl?.startsWith(m));
+    const u  = mp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    const pr = mp.reduce((s,p)=>s+(p.cicilan||0),0);
+    const [y,mo] = m.split('-');
+    const label  = new Date(y,mo-1).toLocaleDateString('id-ID',{month:'short',year:'2-digit'});
+    const vs = prevUang>0 ? ((u-prevUang)/prevUang*100).toFixed(1) : '-';
+    const vsStyle = vs==='-'?'':Number(vs)>=0?'color:#16a34a':'color:#dc2626';
+    rows += `<tr>
+      <td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td>
+      <td class="text-right">${mp.length}</td>
+      <td class="text-right" style="color:#0891b2;font-weight:600;">${formatRupiah(u)}</td>
+      <td class="text-right" style="color:#16a34a;font-weight:600;">${formatRupiah(pr)}</td>
+      <td class="text-right" style="${vsStyle}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td>
+    </tr>`;
+    labels.push(label); uangData.push(u); profitData.push(pr);
+    prevUang = u;
+  });
+  document.getElementById('aruskas-tbody').innerHTML = rows;
+
+  if (aruskasChartInst) aruskasChartInst.destroy();
+  const ctx = document.getElementById('aruskasChart').getContext('2d');
+  aruskasChartInst = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'Uang Masuk', data:uangData, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.1)', tension:.3, fill:true, pointRadius:4 },
+      { label:'Profit', data:profitData, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,.1)', tension:.3, fill:true, pointRadius:4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top'}, tooltip:{ callbacks:{label:c=>`${c.dataset.label}: Rp ${c.parsed.y.toLocaleString('id-ID')}`}}},
+      scales:{ y:{ ticks:{callback:v=>'Rp '+(v/1e6).toFixed(1)+'Jt'}, grid:{color:'#f1f5f9'}}, x:{grid:{display:false}} }
+    }
+  });
+}
+
+// ============================================================
+// TAB MODAL & ROI
+// ============================================================
+function renderModal() {
+  const customers = getCustomers();
+  const payments  = getPayments();
+
+  // Total modal dikeluarkan = semua harga barang (setelah dp, modal = kreditPokok)
+  const totalModal     = customers.reduce((s,c) => s+c.kreditPokok, 0);
+  const totalDP        = customers.reduce((s,c) => s+(c.dp||0), 0);
+  const totalHarga     = customers.reduce((s,c) => s+(c.harga||0), 0);
+  const totalProfit    = payments.reduce((s,p) => s+(p.cicilan||0), 0);
+  const totalDiterima  = payments.reduce((s,p) => s+(p.jumlahAngsuran||0), 0);
+  const totalPiutang   = customers.reduce((c,x) => {
+    const pays = payments.filter(p=>p.customerId===x.id);
+    const { totalBayar } = hitungAngsuran(x);
+    const dibayar = pays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    return c + Math.max(0, totalBayar - dibayar);
+  }, 0);
+
+  // ROI = total profit / total modal * 100
+  const roi       = totalModal > 0 ? (totalProfit/totalModal*100).toFixed(1) : 0;
+  const roiTarget = totalModal > 0 ? (customers.reduce((s,c)=>s+hitungAngsuran(c).totalProfit,0)/totalModal*100).toFixed(1) : 0;
+
+  document.getElementById('modal-stats').innerHTML = `
+    <div class="stat-card blue">
+      <div class="stat-icon">🏦</div>
+      <div class="stat-info"><div class="stat-label">Total Modal Kredit</div>
+      <div class="stat-value">${formatRupiah(totalModal)}</div>
+      <div class="stat-sub">Total harga barang: ${formatRupiah(totalHarga)}</div></div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">💹</div>
+      <div class="stat-info"><div class="stat-label">Profit Diterima</div>
+      <div class="stat-value">${formatRupiah(totalProfit)}</div>
+      <div class="stat-sub">ROI terealisasi: ${roi}%</div></div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-info"><div class="stat-label">Target Profit Total</div>
+      <div class="stat-value">${formatRupiah(customers.reduce((s,c)=>s+hitungAngsuran(c).totalProfit,0))}</div>
+      <div class="stat-sub">ROI target: ${roiTarget}%</div></div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info"><div class="stat-label">Modal Belum Kembali</div>
+      <div class="stat-value">${formatRupiah(totalPiutang)}</div>
+      <div class="stat-sub">masih di tangan pelanggan</div></div>
+    </div>`;
+
+  // Chart komposisi modal
+  if (modalChartInst) modalChartInst.destroy();
+  const ctx1 = document.getElementById('modalChart').getContext('2d');
+  const modalKembali = totalDiterima - totalProfit; // pokok yang sudah kembali
+  modalChartInst = new Chart(ctx1, {
+    type:'doughnut',
+    data:{ labels:['Modal Kembali','Modal di Pelanggan','Profit Diterima'],
+      datasets:[{ data:[modalKembali, totalPiutang - (totalPiutang - Math.max(0,totalModal-modalKembali)), totalProfit].map(v=>Math.max(0,v)),
+        backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderWidth:2 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>`${c.label}: ${formatRupiah(c.parsed)}`}}}
+    }
+  });
+
+  // ROI chart per tahun
+  const yearlyROI = {};
+  payments.forEach(p => {
+    const yr = p.tgl?.slice(0,4); if (!yr) return;
+    if (!yearlyROI[yr]) yearlyROI[yr] = { profit:0, modal:0 };
+    yearlyROI[yr].profit += p.cicilan||0;
+  });
+  customers.forEach(c => {
+    const yr = c.tgl?.slice(0,4); if (!yr) return;
+    if (!yearlyROI[yr]) yearlyROI[yr] = { profit:0, modal:0 };
+    yearlyROI[yr].modal += c.kreditPokok||0;
+  });
+  const roiYears = Object.keys(yearlyROI).sort();
+  const roiData  = roiYears.map(y => yearlyROI[y].modal>0 ? parseFloat((yearlyROI[y].profit/yearlyROI[y].modal*100).toFixed(1)) : 0);
+
+  if (roiChartInst) roiChartInst.destroy();
+  const ctx2 = document.getElementById('roiChart').getContext('2d');
+  roiChartInst = new Chart(ctx2, {
+    type:'bar',
+    data:{ labels:roiYears, datasets:[{ label:'ROI (%)', data:roiData, backgroundColor:'rgba(16,185,129,.8)', borderRadius:6 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`ROI: ${c.parsed.y}%`}}},
+      scales:{ y:{ticks:{callback:v=>v+'%'}, grid:{color:'#f1f5f9'}}, x:{grid:{display:false}} }
+    }
+  });
+}
+
+// ============================================================
+// TAB ANALISA BARANG
+// ============================================================
+function renderBarang() {
+  const customers = getCustomers();
+  const payments  = getPayments();
+
+  // Kelompokkan per jenis barang (ambil kata pertama-kedua)
+  const barangMap = {};
+  customers.forEach(c => {
+    const key = c.barang;
+    if (!barangMap[key]) barangMap[key] = { nama:c.barang, count:0, totalKredit:0, totalProfit:0, totalDp:0 };
+    barangMap[key].count++;
+    barangMap[key].totalKredit += c.kreditPokok||0;
+    barangMap[key].totalDp     += c.dp||0;
+    barangMap[key].totalProfit += hitungAngsuran(c).totalProfit;
+  });
+
+  const sorted = Object.values(barangMap).sort((a,b)=>b.count-a.count).slice(0,15);
+  const maxCount = sorted[0]?.count || 1;
+
+  // Stats
+  const avgKredit = customers.length ? customers.reduce((s,c)=>s+(c.kreditPokok||0),0)/customers.length : 0;
+  const topBarang = sorted[0];
+
+  document.getElementById('barang-stats').innerHTML = `
+    <div class="stat-card blue">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info"><div class="stat-label">Jenis Barang Berbeda</div>
+      <div class="stat-value">${Object.keys(barangMap).length}</div>
+      <div class="stat-sub">dari ${customers.length} kredit</div></div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-info"><div class="stat-label">Barang Terlaris</div>
+      <div class="stat-value" style="font-size:13px;">${topBarang?.nama||'-'}</div>
+      <div class="stat-sub">${topBarang?.count||0}x dikreditkan</div></div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">💵</div>
+      <div class="stat-info"><div class="stat-label">Rata-rata Kredit</div>
+      <div class="stat-value">${formatRupiah(avgKredit)}</div>
+      <div class="stat-sub">per pelanggan</div></div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon">💹</div>
+      <div class="stat-info"><div class="stat-label">Total Profit Barang</div>
+      <div class="stat-value">${formatRupiah(sorted.reduce((s,b)=>s+b.totalProfit,0))}</div>
+      <div class="stat-sub">dari semua kredit</div></div>
+    </div>`;
+
+  document.getElementById('barang-list').innerHTML = sorted.map((b,i) => `
+    <div style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="width:20px;text-align:center;font-size:11px;font-weight:700;color:${i<3?'#d97706':'#94a3b8'}">${i+1}</span>
+        <span style="flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.nama}</span>
+        <span style="font-size:12px;font-weight:700;color:#0891b2;">${b.count}x</span>
+      </div>
+      <div style="padding-left:28px;">
+        <div style="background:#f1f5f9;border-radius:4px;height:5px;margin-bottom:4px;">
+          <div style="width:${(b.count/maxCount*100).toFixed(0)}%;background:#3b82f6;height:5px;border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;gap:12px;font-size:11px;color:#64748b;">
+          <span>Kredit: <strong>${formatRupiah(b.totalKredit)}</strong></span>
+          <span>Profit: <strong style="color:#16a34a;">${formatRupiah(b.totalProfit)}</strong></span>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Chart distribusi nilai kredit
+  const rangeMap = { '<500rb':0, '500rb-1jt':0, '1jt-2jt':0, '2jt-3jt':0, '3jt-5jt':0, '>5jt':0 };
+  customers.forEach(c => {
+    const k = c.kreditPokok||0;
+    if (k < 500000) rangeMap['<500rb']++;
+    else if (k < 1000000) rangeMap['500rb-1jt']++;
+    else if (k < 2000000) rangeMap['1jt-2jt']++;
+    else if (k < 3000000) rangeMap['2jt-3jt']++;
+    else if (k < 5000000) rangeMap['3jt-5jt']++;
+    else rangeMap['>5jt']++;
+  });
+
+  if (barangChartInst) barangChartInst.destroy();
+  const ctx = document.getElementById('barangChart').getContext('2d');
+  barangChartInst = new Chart(ctx, {
+    type:'pie',
+    data:{ labels:Object.keys(rangeMap), datasets:[{
+      data:Object.values(rangeMap),
+      backgroundColor:['#6366f1','#3b82f6','#10b981','#f59e0b','#f97316','#dc2626'], borderWidth:2
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom',labels:{font:{size:11}}},
+        tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed} pelanggan`}}}
+    }
+  });
+}
+
+// ---- Export PDF sesuai tab aktif ----
+function printLaporanAktif() {
+  if (_lapTab === 'ringkasan')  printLaporan_ringkasan();
+  else if (_lapTab === 'piutang')   printLaporan_piutang();
+  else if (_lapTab === 'tunggakan') printLaporan_tunggakan();
+  else if (_lapTab === 'aruskas')   printLaporan_aruskas();
+  else if (_lapTab === 'modal')     printLaporan_modal();
+  else if (_lapTab === 'barang')    printLaporan_barang();
+}
+
+function _openPrintWindow(title, bodyHtml) {
+  const baseStyle = `* { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:28px; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1e40af; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#1e40af; }
+    .header p { font-size:11px; color:#64748b; margin-top:3px; }
+    .stats { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .stat { flex:1; min-width:150px; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
+    .stat .lbl { font-size:10px; color:#64748b; } .stat .val { font-size:15px; font-weight:700; color:#1e40af; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; } th { background:#1e40af; color:white; padding:7px 9px; text-align:left; font-size:10px; text-transform:uppercase; }
+    td { padding:6px 9px; border-bottom:1px solid #f1f5f9; font-size:11px; } tr:nth-child(even) td { background:#f8fafc; }
+    .tr { text-align:right; } tfoot td { font-weight:700; background:#eff6ff !important; color:#1e40af; border-top:2px solid #1e40af; }
+    .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
+    @media print { body { padding:15px; } @page { margin:15mm; } }`;
+  const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title><style>${baseStyle}</style></head><body>
+    <div class="header"><h1>${title}</h1><p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
+    ${bodyHtml}
+    <div class="footer">KreditPro &copy; ${new Date().getFullYear()}</div></body></html>`;
+  const w = window.open('','_blank','width=960,height=700');
+  w.document.write(html); w.document.close(); w.focus();
+  setTimeout(()=>w.print(), 500);
+}
+
+function printLaporan_ringkasan() {
   const year = document.getElementById('lap-year')?.value || new Date().getFullYear();
+  const payments = getPayments(); const customers = getCustomers();
+  const yp = payments.filter(p=>p.tgl?.startsWith(year));
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const rows = months.map((mn,i)=>{
+    const mo=String(i+1).padStart(2,'0'); const mp=yp.filter(p=>p.tgl?.slice(5,7)===mo);
+    return `<tr><td>${mn}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(mp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0))}</td><td class="tr">${formatRupiah(mp.reduce((s,p)=>s+(p.cicilan||0),0))}</td></tr>`;
+  }).join('');
+  _openPrintWindow(`Laporan Profit Tahun ${year}`, `
+    <div class="stats">
+      <div class="stat"><div class="lbl">Transaksi</div><div class="val">${yp.length}</div></div>
+      <div class="stat"><div class="lbl">Uang Masuk</div><div class="val">${formatRupiah(yp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0))}</div></div>
+      <div class="stat"><div class="lbl">Profit</div><div class="val">${formatRupiah(yp.reduce((s,p)=>s+(p.cicilan||0),0))}</div></div>
+      <div class="stat"><div class="lbl">Total Pelanggan</div><div class="val">${customers.length}</div></div>
+    </div>
+    <table><thead><tr><th>Bulan</th><th class="tr">Transaksi</th><th class="tr">Uang Masuk</th><th class="tr">Profit</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><td>TOTAL</td><td class="tr">${yp.length}</td><td class="tr">${formatRupiah(yp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0))}</td><td class="tr">${formatRupiah(yp.reduce((s,p)=>s+(p.cicilan||0),0))}</td></tr></tfoot></table>`);
+}
+
+function printLaporan_piutang() {
+  const customers = getCustomers(); const payments = getPayments();
+  let totalTagihan=0, totalDibayar=0, totalSisa=0;
+  const rows = customers.map(c=>{
+    const pays=payments.filter(p=>p.customerId===c.id);
+    const {totalBayar}=hitungAngsuran(c);
+    const dibayar=pays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    const sisa=Math.max(0,totalBayar-dibayar);
+    totalTagihan+=totalBayar; totalDibayar+=dibayar; totalSisa+=sisa;
+    const st=getStatusKredit(c);
+    return `<tr><td>${c.nama}<br><span style="font-size:10px;color:#64748b">${c.id}</span></td><td>${c.barang}</td><td class="tr">${formatRupiah(totalBayar)}</td><td class="tr">${formatRupiah(dibayar)}</td><td class="tr" style="color:${sisa>0?'#dc2626':'#16a34a'}">${formatRupiah(sisa)}</td><td>${st}</td></tr>`;
+  }).join('');
+  _openPrintWindow('Laporan Piutang Pelanggan', `
+    <div class="stats">
+      <div class="stat"><div class="lbl">Total Piutang</div><div class="val" style="color:#dc2626">${formatRupiah(totalSisa)}</div></div>
+      <div class="stat"><div class="lbl">Sudah Diterima</div><div class="val" style="color:#16a34a">${formatRupiah(totalDibayar)}</div></div>
+      <div class="stat"><div class="lbl">Total Tagihan</div><div class="val">${formatRupiah(totalTagihan)}</div></div>
+    </div>
+    <table><thead><tr><th>Pelanggan</th><th>Barang</th><th class="tr">Total Tagihan</th><th class="tr">Dibayar</th><th class="tr">Sisa</th><th>Status</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="2">TOTAL</td><td class="tr">${formatRupiah(totalTagihan)}</td><td class="tr">${formatRupiah(totalDibayar)}</td><td class="tr" style="color:#dc2626">${formatRupiah(totalSisa)}</td><td></td></tr></tfoot></table>`);
+}
+
+function printLaporan_tunggakan() {
+  const customers=getCustomers(); const payments=getPayments(); const today=new Date();
+  let totalTunggak=0;
+  const rows=customers.map(c=>{
+    const pays=payments.filter(p=>p.customerId===c.id);
+    const {angsuranPerBulan,totalBayar}=hitungAngsuran(c);
+    const dibayar=pays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    if(dibayar>=totalBayar) return '';
+    const tglK=new Date(c.tgl); let bulan=0;
+    for(let i=1;i<=c.tenor;i++){const t=new Date(tglK);t.setMonth(t.getMonth()+i);if(t<=today)bulan=i;}
+    const seharusnya=Math.min(angsuranPerBulan*bulan,totalBayar);
+    const selisih=Math.max(0,seharusnya-dibayar);
+    if(selisih<1) return '';
+    totalTunggak+=selisih;
+    return `<tr><td>${c.nama}</td><td>${c.barang}</td><td class="tr">${formatRupiah(angsuranPerBulan)}</td><td class="tr">${formatRupiah(seharusnya)}</td><td class="tr">${formatRupiah(dibayar)}</td><td class="tr" style="color:#dc2626;font-weight:700">${formatRupiah(selisih)}</td></tr>`;
+  }).join('');
+  _openPrintWindow('Laporan Tunggakan', `
+    <div class="stats"><div class="stat"><div class="lbl">Total Tunggakan</div><div class="val" style="color:#dc2626">${formatRupiah(totalTunggak)}</div></div></div>
+    <table><thead><tr><th>Pelanggan</th><th>Barang</th><th class="tr">Angsuran/Bln</th><th class="tr">Seharusnya</th><th class="tr">Dibayar</th><th class="tr">Selisih</th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center">Tidak ada tunggakan</td></tr>'}</tbody></table>`);
+}
+
+function printLaporan_aruskas() {
+  const payments=getPayments();
+  const bulanSet=[...new Set(payments.map(p=>p.tgl?.slice(0,7)).filter(Boolean))].sort().slice(-12);
+  let rows='', prevU=0;
+  bulanSet.forEach(m=>{
+    const mp=payments.filter(p=>p.tgl?.startsWith(m));
+    const u=mp.reduce((s,p)=>s+(p.jumlahAngsuran||0),0);
+    const pr=mp.reduce((s,p)=>s+(p.cicilan||0),0);
+    const [y,mo]=m.split('-');
+    const vs=prevU>0?((u-prevU)/prevU*100).toFixed(1):'-';
+    rows+=`<tr><td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(u)}</td><td class="tr">${formatRupiah(pr)}</td><td class="tr" style="color:${vs==='-'?'inherit':Number(vs)>=0?'#16a34a':'#dc2626'}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td></tr>`;
+    prevU=u;
+  });
+  _openPrintWindow('Laporan Arus Kas (12 Bulan Terakhir)', `
+    <table><thead><tr><th>Bulan</th><th class="tr">Transaksi</th><th class="tr">Uang Masuk</th><th class="tr">Profit</th><th class="tr">vs Bln Lalu</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+
+function printLaporan_modal() {
+  const customers=getCustomers(); const payments=getPayments();
+  const totalModal=customers.reduce((s,c)=>s+c.kreditPokok,0);
+  const totalProfit=payments.reduce((s,p)=>s+(p.cicilan||0),0);
+  const roi=totalModal>0?(totalProfit/totalModal*100).toFixed(1):0;
+  const totalPiutang=customers.reduce((acc,c)=>{
+    const pays=payments.filter(p=>p.customerId===c.id);
+    const {totalBayar}=hitungAngsuran(c);
+    return acc+Math.max(0,totalBayar-pays.reduce((s,p)=>s+(p.jumlahAngsuran||0),0));
+  },0);
+  _openPrintWindow('Laporan Modal & ROI', `
+    <div class="stats">
+      <div class="stat"><div class="lbl">Total Modal</div><div class="val">${formatRupiah(totalModal)}</div></div>
+      <div class="stat"><div class="lbl">Profit Diterima</div><div class="val" style="color:#16a34a">${formatRupiah(totalProfit)}</div></div>
+      <div class="stat"><div class="lbl">ROI Terealisasi</div><div class="val" style="color:#0891b2">${roi}%</div></div>
+      <div class="stat"><div class="lbl">Modal di Pelanggan</div><div class="val" style="color:#dc2626">${formatRupiah(totalPiutang)}</div></div>
+    </div>`);
+}
+
+function printLaporan_barang() {
+  const customers=getCustomers(); const payments=getPayments();
+  const map={};
+  customers.forEach(c=>{
+    if(!map[c.barang]) map[c.barang]={nama:c.barang,count:0,kredit:0,profit:0};
+    map[c.barang].count++; map[c.barang].kredit+=c.kreditPokok;
+    map[c.barang].profit+=hitungAngsuran(c).totalProfit;
+  });
+  const sorted=Object.values(map).sort((a,b)=>b.count-a.count);
+  const rows=sorted.map((b,i)=>`<tr><td>${i+1}</td><td>${b.nama}</td><td class="tr">${b.count}</td><td class="tr">${formatRupiah(b.kredit)}</td><td class="tr">${formatRupiah(b.profit)}</td></tr>`).join('');
+  _openPrintWindow('Laporan Analisa Barang', `
+    <table><thead><tr><th>#</th><th>Barang</th><th class="tr">Jumlah</th><th class="tr">Total Kredit</th><th class="tr">Total Profit</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
   const payments = getPayments();
   const customers = getCustomers();
 

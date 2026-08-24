@@ -334,37 +334,125 @@
 
     <!-- ==================== LAPORAN ==================== -->
     <section id="page-laporan" class="page">
-      <div class="stats-grid" id="laporan-stats"></div>
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-header">
-          <span class="card-title">📈 Profit Per Bulan</span>
-          <div class="flex gap-2">
-            <select id="lap-year" class="form-control" style="width:auto;padding:5px 10px;font-size:12px;" onchange="renderLaporan()">
-            </select>
-            <button class="btn btn-outline btn-sm" onclick="printLaporan()">
-              <svg width="14" height="14"><use href="#ic-print"/></svg>
-              Export PDF
-            </button>
-          </div>
-        </div>
-        <div class="chart-container" style="height:300px;">
-          <canvas id="laporanChart"></canvas>
+
+      <!-- Tab navigasi laporan -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="lap-tab-ringkasan" onclick="switchLapTab('ringkasan')">📊 Ringkasan</button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-piutang" onclick="switchLapTab('piutang')">💰 Piutang</button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-tunggakan" onclick="switchLapTab('tunggakan')">⚠️ Tunggakan</button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-aruskas" onclick="switchLapTab('aruskas')">📅 Arus Kas</button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-modal" onclick="switchLapTab('modal')">🏦 Modal & ROI</button>
+        <button class="btn btn-outline btn-sm" id="lap-tab-barang" onclick="switchLapTab('barang')">📦 Analisa Barang</button>
+        <div style="margin-left:auto;">
+          <button class="btn btn-outline btn-sm" onclick="printLaporanAktif()">
+            <svg width="14" height="14"><use href="#ic-print"/></svg> Export PDF
+          </button>
         </div>
       </div>
-      <div class="grid-2">
-        <div class="card">
+
+      <!-- TAB: RINGKASAN -->
+      <div id="lap-panel-ringkasan">
+        <div class="stats-grid" id="laporan-stats"></div>
+        <div class="card" style="margin-bottom:20px;">
           <div class="card-header">
-            <span class="card-title">💎 Top Pelanggan (Profit)</span>
+            <span class="card-title">📈 Profit Per Bulan</span>
+            <select id="lap-year" class="form-control" style="width:auto;padding:5px 10px;font-size:12px;" onchange="renderLaporan()"></select>
           </div>
-          <div id="top-customers"></div>
+          <div class="chart-container" style="height:300px;"><canvas id="laporanChart"></canvas></div>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">📋 Ringkasan Per Tahun</span>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">💎 Top Pelanggan (Profit)</span></div>
+            <div id="top-customers"></div>
           </div>
-          <div id="yearly-summary"></div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📋 Ringkasan Per Tahun</span></div>
+            <div id="yearly-summary"></div>
+          </div>
         </div>
       </div>
+
+      <!-- TAB: PIUTANG -->
+      <div id="lap-panel-piutang" style="display:none;">
+        <div class="stats-grid" id="piutang-stats"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💰 Detail Piutang Per Pelanggan</span>
+            <input type="text" id="piutang-search" class="form-control" style="width:200px;font-size:12px;" placeholder="Cari nama..." oninput="renderPiutang()">
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>Pelanggan</th><th>Barang</th><th>Total Tagihan</th>
+              <th>Sudah Dibayar</th><th>Sisa Piutang</th><th>Progress</th><th>Status</th>
+            </tr></thead>
+            <tbody id="piutang-tbody"></tbody>
+            <tfoot id="piutang-tfoot"></tfoot>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- TAB: TUNGGAKAN -->
+      <div id="lap-panel-tunggakan" style="display:none;">
+        <div class="stats-grid" id="tunggakan-stats"></div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚠️ Daftar Pelanggan Menunggak</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>Pelanggan</th><th>Barang</th><th>Tgl Kredit</th>
+              <th>Angsuran/Bln</th><th>Seharusnya Bayar</th><th>Sudah Bayar</th>
+              <th>Selisih Tunggak</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="tunggakan-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- TAB: ARUS KAS -->
+      <div id="lap-panel-aruskas" style="display:none;">
+        <div class="stats-grid" id="aruskas-stats"></div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header"><span class="card-title">📅 Arus Kas Bulanan</span></div>
+          <div class="chart-container" style="height:280px;"><canvas id="aruskasChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📋 Rincian Per Bulan</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Bulan</th><th>Transaksi</th><th>Uang Masuk</th><th>Profit</th><th>vs Bulan Lalu</th></tr></thead>
+            <tbody id="aruskas-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- TAB: MODAL & ROI -->
+      <div id="lap-panel-modal" style="display:none;">
+        <div class="stats-grid" id="modal-stats"></div>
+        <div class="grid-2" style="margin-top:20px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">🏦 Komposisi Modal</span></div>
+            <div class="chart-container" style="height:260px;"><canvas id="modalChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📈 Pertumbuhan ROI</span></div>
+            <div class="chart-container" style="height:260px;"><canvas id="roiChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: ANALISA BARANG -->
+      <div id="lap-panel-barang" style="display:none;">
+        <div class="stats-grid" id="barang-stats"></div>
+        <div class="grid-2" style="margin-top:20px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">📦 Top Barang Dikreditkan</span></div>
+            <div id="barang-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📊 Distribusi Nilai Kredit</span></div>
+            <div class="chart-container" style="height:260px;"><canvas id="barangChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ==================== KARTU ANGSURAN ==================== -->
