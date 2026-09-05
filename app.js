@@ -1290,10 +1290,11 @@ async function savePayment() {
 
   showPageLoader('Menyimpan pembayaran...');
   let res;
+  let newId = null;
   if (editId) {
     res = await DB.payments.update(editId, { customerId:custId, tgl, metode, jumlahAngsuran:jumlah, cicilan, ket });
   } else {
-    const newId = await generatePaymentId();
+    newId = await generatePaymentId();
     res = await DB.payments.create({ id:newId, customerId:custId, tgl, jumlahAngsuran:jumlah, cicilan, metode, ket });
   }
 
@@ -1308,13 +1309,11 @@ async function savePayment() {
   renderPaymentTable();
   if (currentPage === 'dashboard') renderDashboard();
 
-  // Tawarkan cetak struk jika pembayaran baru
+  // Tampilkan struk otomatis setelah pembayaran baru
   if (!editId) {
     const c = getCustomerById(custId);
     if (c) {
-      const pays = getPaymentsByCustomer(custId);
-      const lastPay = pays[pays.length - 1] || { tgl, jumlahAngsuran: jumlah, cicilan, metode, ket };
-      setTimeout(() => printStruk(c, { id: newId || editId, tgl, jumlahAngsuran: jumlah, cicilan, metode, ket }), 300);
+      setTimeout(() => printStruk(c, { id: newId, tgl, jumlahAngsuran: jumlah, cicilan, metode, ket }), 400);
     }
   }
 }
