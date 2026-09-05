@@ -657,7 +657,9 @@
             <button type="button" class="btn btn-outline btn-xs" style="flex:1;" onclick="document.getElementById('cust-photo-input').click()">
                 <svg width="12" height="12"><use href="#ic-photo"/></svg> Pilih File
               </button>
-            <button type="button" class="btn btn-outline btn-xs" id="cust-photo-clear-btn" style="display:none;" onclick="clearPhoto('cust-photo')">🗑 Hapus</button>
+            <button type="button" class="btn btn-outline btn-xs" id="cust-photo-clear-btn" style="display:none;" onclick="clearPhoto('cust-photo')">
+              <svg width="12" height="12"><use href="#ic-trash"/></svg> Hapus
+            </button>
           </div>
           <input type="hidden" id="cust-photo-data">
         </div>
@@ -780,7 +782,9 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('custModal')">Batal</button>
-      <button class="btn btn-primary" onclick="saveCustomer()">💾 Simpan</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">
+        <svg width="14" height="14"><use href="#ic-edit"/></svg> Simpan
+      </button>
     </div>
   </div>
 </div>
@@ -833,7 +837,9 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('payModal')">Batal</button>
-      <button class="btn btn-success" onclick="savePayment()">💾 Simpan Pembayaran</button>
+      <button class="btn btn-success" onclick="savePayment()">
+        <svg width="14" height="14"><use href="#ic-payment"/></svg> Simpan Pembayaran
+      </button>
     </div>
   </div>
 </div>

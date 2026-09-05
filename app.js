@@ -2757,9 +2757,9 @@ function waFillQuickInfo() {
 
   infoEl.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-      <div>📦 <strong>${c.barang}</strong></div>
-      <div>📱 <strong>${c.noHp || '—'}</strong> ${phone ? '✅' : '❌ Tidak valid'}</div>
-      <div>💰 Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
+      <div><strong>${c.barang}</strong></div>
+      <div>${c.noHp || '—'} ${phone ? '✓' : '✗ Tidak valid'}</div>
+      <div>Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
       <div>📊 Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
     </div>`;
@@ -2916,7 +2916,7 @@ function waLoadBlastList() {
       <div class="avatar" style="width:26px;height:26px;font-size:10px;">${c.nama[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nama}</div>
-        <div style="color:#94a3b8;font-size:11px;">📱 ${c.noHp}</div>
+        <div style="color:#94a3b8;font-size:11px;">${c.noHp}</div>
       </div>
       <span class="badge ${badgeClass}" style="font-size:10px;">${status}</span>
     </div>`;
@@ -3003,7 +3003,9 @@ async function renderWaLog() {
       <td style="font-size:12px;">${l.phone}</td>
       <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#64748b;" title="${l.message}">${l.message}</td>
       <td>
-        <button class="btn btn-success btn-xs" onclick="waResend('${l.customerId}','${l.phone}')">🔄 Kirim Lagi</button>
+        <button class="btn btn-success btn-xs" onclick="waResend('${l.customerId}','${l.phone}')">
+          <svg width="12" height="12"><use href="#ic-whatsapp"/></svg> Kirim Lagi
+        </button>
       </td>
     </tr>`).join('')}
     </tbody>
