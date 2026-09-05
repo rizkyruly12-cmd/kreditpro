@@ -265,7 +265,7 @@
                 <span class="card-title-icon" style="background:#fef3c7;color:#d97706;"><svg width="14" height="14"><use href="#ic-alert"/></svg></span>
                 Jatuh Tempo Bulan Ini
               </span>
-            <button class="btn btn-outline btn-sm" onclick="navTo('pelanggan')">Lihat Semua</button>
+            <button class="btn btn-outline btn-sm" onclick="openDueModal()">Lihat Semua</button>
           </div>
           <div id="due-list"></div>
         </div>
@@ -852,6 +852,22 @@
       </button>
       <button class="btn btn-primary btn-sm" id="custDetailAddPayBtn">+ Catat Pembayaran</button>
       <button class="btn btn-outline" onclick="closeModal('custDetailModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Semua Jatuh Tempo -->
+<div class="modal-overlay" id="dueModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <span class="modal-title">
+        <svg width="16" height="16" style="color:#d97706;margin-right:6px;"><use href="#ic-alert"/></svg>
+        Semua Pelanggan Jatuh Tempo
+      </span>
+      <button class="modal-close" onclick="closeModal('dueModal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div id="due-modal-list" style="max-height:70vh;overflow-y:auto;"></div>
     </div>
   </div>
 </div>

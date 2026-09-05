@@ -443,7 +443,7 @@ function renderDueList() {
   document.getElementById('due-list').innerHTML = top.map(({c,sisa,status}) => {
     const photo = getCustPhotoSync(c.id);
     return `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="viewCustomer('${c.id}')">
       <div style="display:flex;align-items:center;gap:10px;">
         ${photo ? `<img src="${photo}" class="avatar-photo" alt="${c.nama}">` : `<div class="avatar">${c.nama[0]}</div>`}
         <div>
@@ -457,6 +457,70 @@ function renderDueList() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ---- Modal semua jatuh tempo ----
+function openDueModal() {
+  const customers = getCustomers();
+  const payments  = getPayments();
+  const today     = new Date();
+  const list = [];
+
+  customers.forEach(c => {
+    const status = getStatusKredit(c);
+    if (status === 'lunas') return;
+    const tglKredit = new Date(c.tgl);
+    const bulanBerjalan = Math.floor((today - tglKredit) / (1000*60*60*24*30.44));
+    const pays = getPaymentsByCustomer(c.id);
+    const { angsuranPerBulan, totalBayar } = hitungAngsuran(c);
+    const totalDibayar = pays.reduce((s,p) => s+(p.jumlahAngsuran||0), 0);
+    const totalSeharusnya = Math.min(bulanBerjalan+1, c.tenor) * angsuranPerBulan;
+    const sisa = totalSeharusnya - totalDibayar;
+    const sisaTotal = Math.max(0, totalBayar - totalDibayar);
+    if (sisa > 0) list.push({ c, sisa, sisaTotal, status, angsuranPerBulan });
+  });
+
+  list.sort((a,b) => b.sisa - a.sisa);
+
+  const el = document.getElementById('due-modal-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:40px;">
+      <div style="font-size:36px;opacity:.4;margin-bottom:10px;">✓</div>
+      <p>Semua pembayaran lancar bulan ini!</p>
+    </div>`;
+  } else {
+    // Summary header
+    const totalTagihan = list.reduce((s,x) => s+x.sisa, 0);
+    const menunggakCount = list.filter(x=>x.status==='menunggak').length;
+    el.innerHTML = `
+      <div style="padding:14px 20px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;gap:16px;flex-wrap:wrap;">
+        <div><span style="font-size:11px;color:#92400e;">Total Pelanggan</span><br><strong>${list.length} orang</strong></div>
+        <div><span style="font-size:11px;color:#92400e;">Menunggak</span><br><strong style="color:#dc2626;">${menunggakCount} orang</strong></div>
+        <div><span style="font-size:11px;color:#92400e;">Total Tagihan Bulan Ini</span><br><strong style="color:#dc2626;">${formatRupiah(totalTagihan)}</strong></div>
+      </div>
+      ${list.map(({c, sisa, sisaTotal, status, angsuranPerBulan}) => {
+        const photo = getCustPhotoSync(c.id);
+        const badgeClass = status==='menunggak'?'badge-red':'badge-orange';
+        return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="closeModal('dueModal');viewCustomer('${c.id}')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${photo ? `<img src="${photo}" class="avatar-photo" alt="${c.nama}">` : `<div class="avatar">${c.nama[0]}</div>`}
+            <div>
+              <div style="font-weight:600;font-size:13px;">${c.nama}</div>
+              <div style="font-size:11px;color:#94a3b8;">${c.id} · ${c.c?.noHp||c.noHp||'-'}</div>
+              <div style="font-size:11px;color:#64748b;">${c.barang}</div>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+            <div style="font-size:11px;color:#64748b;">Tagihan bulan ini</div>
+            <div style="font-weight:700;font-size:13px;color:#dc2626;">${formatRupiah(sisa)}</div>
+            <div style="font-size:10px;color:#94a3b8;">Sisa total: ${formatRupiah(sisaTotal)}</div>
+            <span class="badge ${badgeClass}" style="font-size:10px;">${status}</span>
+          </div>
+        </div>`;
+      }).join('')}`;
+  }
+  openModal('dueModal');
 }
 
 // ============================================================
@@ -477,6 +541,13 @@ async function renderCustomerTable() {
     const matchStatus = !filterStatus || getStatusKredit(c) === filterStatus;
     const matchYear = !filterYear || c.tgl?.startsWith(filterYear);
     return matchSearch && matchStatus && matchYear;
+  });
+
+  // Urutkan terbaru di atas (sort by tgl desc, lalu id desc)
+  customers.sort((a,b) => {
+    const tglDiff = new Date(b.tgl) - new Date(a.tgl);
+    if (tglDiff !== 0) return tglDiff;
+    return b.id.localeCompare(a.id);
   });
 
   const total = customers.length;
@@ -1236,6 +1307,126 @@ async function savePayment() {
   populatePayMonths();
   renderPaymentTable();
   if (currentPage === 'dashboard') renderDashboard();
+
+  // Tawarkan cetak struk jika pembayaran baru
+  if (!editId) {
+    const c = getCustomerById(custId);
+    if (c) {
+      const pays = getPaymentsByCustomer(custId);
+      const lastPay = pays[pays.length - 1] || { tgl, jumlahAngsuran: jumlah, cicilan, metode, ket };
+      setTimeout(() => printStruk(c, { id: newId || editId, tgl, jumlahAngsuran: jumlah, cicilan, metode, ket }), 300);
+    }
+  }
+}
+
+// ---- Struk / Invoice Pembayaran ----
+function printStruk(c, pay) {
+  if (!c || !pay) return;
+
+  const { angsuranPerBulan, totalBayar } = hitungAngsuran(c);
+  const allPays = getPaymentsByCustomer(c.id);
+  const totalDibayar = allPays.reduce((s,p) => s+(p.jumlahAngsuran||0), 0);
+  const sisaTagihan  = Math.max(0, totalBayar - totalDibayar);
+  const angsuranKe   = allPays.length;
+  const status       = getStatusKredit(c);
+  const tglFormatted = pay.tgl ? new Date(pay.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '-';
+  const now          = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  const html = `<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <title>Struk Pembayaran — ${c.nama}</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',Arial,sans-serif; background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
+    .struk {
+      background:white; width:320px; padding:24px 20px;
+      border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.12);
+    }
+    .header { text-align:center; margin-bottom:16px; padding-bottom:14px; border-bottom:2px dashed #e2e8f0; }
+    .logo { width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px; }
+    .logo svg { width:26px;height:26px;fill:none;stroke:white;stroke-width:1.5; }
+    .brand { font-size:18px;font-weight:800;color:#1e293b;letter-spacing:-.03em; }
+    .sub { font-size:11px;color:#94a3b8;margin-top:2px; }
+    .title { font-size:13px;font-weight:700;color:#1e40af;margin-top:10px;text-transform:uppercase;letter-spacing:.05em; }
+    .section { margin:12px 0;padding:12px;background:#f8fafc;border-radius:8px; }
+    .row { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px; }
+    .row:last-child { margin-bottom:0; }
+    .lbl { font-size:11px;color:#64748b; }
+    .val { font-size:12px;font-weight:600;color:#1e293b;text-align:right;max-width:180px; }
+    .divider { border:none;border-top:1px dashed #e2e8f0;margin:12px 0; }
+    .amount-box { background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:10px;padding:14px;text-align:center;margin:14px 0; }
+    .amount-label { font-size:11px;color:rgba(255,255,255,.75); }
+    .amount-value { font-size:24px;font-weight:800;color:white;margin-top:4px; }
+    .status-box { text-align:center;margin:10px 0; }
+    .badge { display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700; }
+    .badge-lunas { background:#dcfce7;color:#15803d; }
+    .badge-aktif  { background:#dbeafe;color:#1d4ed8; }
+    .badge-menunggak { background:#fee2e2;color:#dc2626; }
+    .footer { text-align:center;margin-top:14px;padding-top:12px;border-top:2px dashed #e2e8f0; }
+    .footer p { font-size:10px;color:#94a3b8;line-height:1.6; }
+    .no-struk { font-size:10px;color:#cbd5e1;margin-top:4px; }
+    @media print {
+      body { background:white;padding:0; }
+      .struk { box-shadow:none;border-radius:0; }
+    }
+  </style></head><body>
+  <div class="struk">
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+      </div>
+      <div class="brand">KreditPro</div>
+      <div class="sub">Ruli Rizki Ariyanto</div>
+      <div class="title">Bukti Pembayaran</div>
+    </div>
+
+    <div class="section">
+      <div class="row"><span class="lbl">No. Struk</span><span class="val" style="font-size:10px;color:#64748b;">${pay.id || '-'}</span></div>
+      <div class="row"><span class="lbl">Tanggal Bayar</span><span class="val">${tglFormatted}</span></div>
+      <div class="row"><span class="lbl">Metode</span><span class="val">${pay.metode || 'Tunai'}</span></div>
+    </div>
+
+    <div class="section">
+      <div class="row"><span class="lbl">Nama Pelanggan</span><span class="val">${c.nama}</span></div>
+      <div class="row"><span class="lbl">ID Pelanggan</span><span class="val">${c.id}</span></div>
+      <div class="row"><span class="lbl">Barang</span><span class="val">${c.barang}</span></div>
+      ${c.noHp ? `<div class="row"><span class="lbl">No. HP</span><span class="val">${c.noHp}</span></div>` : ''}
+    </div>
+
+    <div class="amount-box">
+      <div class="amount-label">Jumlah Dibayar</div>
+      <div class="amount-value">${formatRupiah(pay.jumlahAngsuran)}</div>
+      ${pay.cicilan ? `<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;">Termasuk bunga: ${formatRupiah(pay.cicilan)}</div>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="row"><span class="lbl">Angsuran ke-</span><span class="val">${angsuranKe} / ${c.tenor}</span></div>
+      <div class="row"><span class="lbl">Total Kredit</span><span class="val">${formatRupiah(totalBayar)}</span></div>
+      <div class="row"><span class="lbl">Sudah Dibayar</span><span class="val" style="color:#15803d;">${formatRupiah(totalDibayar)}</span></div>
+      <hr class="divider">
+      <div class="row">
+        <span class="lbl" style="font-weight:700;">Sisa Tagihan</span>
+        <span class="val" style="color:${sisaTagihan>0?'#dc2626':'#15803d'};font-size:14px;">${formatRupiah(sisaTagihan)}</span>
+      </div>
+    </div>
+
+    <div class="status-box">
+      <span class="badge badge-${status}">${status === 'lunas' ? '✓ LUNAS' : status === 'menunggak' ? 'MENUNGGAK' : 'AKTIF'}</span>
+    </div>
+
+    ${pay.ket ? `<div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:11px;color:#64748b;margin-bottom:10px;"><strong>Keterangan:</strong> ${pay.ket}</div>` : ''}
+
+    <div class="footer">
+      <p>Terima kasih atas pembayaran Anda.<br>Simpan struk ini sebagai bukti pembayaran.</p>
+      <p class="no-struk">Dicetak: ${now}</p>
+    </div>
+  </div>
+  <script>window.onload = () => { window.print(); }<\/script>
+  </body></html>`;
+
+  const w = window.open('','_blank','width=400,height=700');
+  w.document.write(html);
+  w.document.close();
 }
 
 function confirmDeletePayment(payId, custId) {
