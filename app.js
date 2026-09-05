@@ -1362,7 +1362,6 @@ function printStruk(c, pay) {
     <div style="background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
       <div style="font-size:11px;color:rgba(255,255,255,.75);">Jumlah Dibayar</div>
       <div style="font-size:26px;font-weight:800;color:white;margin-top:4px;">${formatRupiah(pay.jumlahAngsuran)}</div>
-      ${pay.cicilan?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px;">Termasuk bunga: ${formatRupiah(pay.cicilan)}</div>`:''}
     </div>
 
     <!-- Ringkasan -->
