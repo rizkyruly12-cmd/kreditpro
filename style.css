@@ -1019,3 +1019,16 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
   #page-laporan > div:first-child { gap: 5px; }
   #page-laporan > div:first-child .btn { font-size: 11px; padding: 5px 9px; }
 }
+
+/* ============================================================
+   STRUK PRINT
+   ============================================================ */
+@media print {
+  body > * { display: none !important; }
+  #strukModal { display: block !important; position: static !important; background: none !important; padding: 0 !important; }
+  #strukModal .modal { box-shadow: none !important; max-width: 100% !important; border-radius: 0 !important; }
+  #strukModal .modal-header { background: none !important; border-bottom: 2px solid #1e40af !important; }
+  #strukModal .modal-header span { color: #1e40af !important; }
+  #strukModal .modal-footer { display: none !important; }
+  #strukModal .modal-close { display: none !important; }
+}

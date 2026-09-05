@@ -1332,101 +1332,69 @@ function printStruk(c, pay) {
   const tglFormatted = pay.tgl ? new Date(pay.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '-';
   const now          = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  const html = `<!DOCTYPE html><html lang="id"><head>
-  <meta charset="UTF-8">
-  <title>Struk Pembayaran — ${c.nama}</title>
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Segoe UI',Arial,sans-serif; background:#f5f5f5; display:flex; justify-content:center; padding:20px; }
-    .struk {
-      background:white; width:320px; padding:24px 20px;
-      border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.12);
-    }
-    .header { text-align:center; margin-bottom:16px; padding-bottom:14px; border-bottom:2px dashed #e2e8f0; }
-    .logo { width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px; }
-    .logo svg { width:26px;height:26px;fill:none;stroke:white;stroke-width:1.5; }
-    .brand { font-size:18px;font-weight:800;color:#1e293b;letter-spacing:-.03em; }
-    .sub { font-size:11px;color:#94a3b8;margin-top:2px; }
-    .title { font-size:13px;font-weight:700;color:#1e40af;margin-top:10px;text-transform:uppercase;letter-spacing:.05em; }
-    .section { margin:12px 0;padding:12px;background:#f8fafc;border-radius:8px; }
-    .row { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px; }
-    .row:last-child { margin-bottom:0; }
-    .lbl { font-size:11px;color:#64748b; }
-    .val { font-size:12px;font-weight:600;color:#1e293b;text-align:right;max-width:180px; }
-    .divider { border:none;border-top:1px dashed #e2e8f0;margin:12px 0; }
-    .amount-box { background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:10px;padding:14px;text-align:center;margin:14px 0; }
-    .amount-label { font-size:11px;color:rgba(255,255,255,.75); }
-    .amount-value { font-size:24px;font-weight:800;color:white;margin-top:4px; }
-    .status-box { text-align:center;margin:10px 0; }
-    .badge { display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700; }
-    .badge-lunas { background:#dcfce7;color:#15803d; }
-    .badge-aktif  { background:#dbeafe;color:#1d4ed8; }
-    .badge-menunggak { background:#fee2e2;color:#dc2626; }
-    .footer { text-align:center;margin-top:14px;padding-top:12px;border-top:2px dashed #e2e8f0; }
-    .footer p { font-size:10px;color:#94a3b8;line-height:1.6; }
-    .no-struk { font-size:10px;color:#cbd5e1;margin-top:4px; }
-    @media print {
-      body { background:white;padding:0; }
-      .struk { box-shadow:none;border-radius:0; }
-    }
-  </style></head><body>
-  <div class="struk">
-    <div class="header">
-      <div class="logo">
-        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+  const html = `
+  <div style="padding:20px;font-family:'Segoe UI',sans-serif;font-size:13px;color:#1e293b;">
+    <!-- Header -->
+    <div style="text-align:center;padding-bottom:16px;border-bottom:2px dashed #e2e8f0;margin-bottom:16px;">
+      <div style="width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
       </div>
-      <div class="brand">KreditPro</div>
-      <div class="sub">Ruli Rizki Ariyanto</div>
-      <div class="title">Bukti Pembayaran</div>
+      <div style="font-size:18px;font-weight:800;color:#1e293b;">KreditPro</div>
+      <div style="font-size:11px;color:#94a3b8;">Ruli Rizki Ariyanto</div>
+      <div style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;letter-spacing:.05em;margin-top:6px;">Bukti Pembayaran</div>
     </div>
 
-    <div class="section">
-      <div class="row"><span class="lbl">No. Struk</span><span class="val" style="font-size:10px;color:#64748b;">${pay.id || '-'}</span></div>
-      <div class="row"><span class="lbl">Tanggal Bayar</span><span class="val">${tglFormatted}</span></div>
-      <div class="row"><span class="lbl">Metode</span><span class="val">${pay.metode || 'Tunai'}</span></div>
+    <!-- Info transaksi -->
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">No. Struk</span><span style="font-size:11px;color:#94a3b8;">${pay.id||'-'}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Tanggal Bayar</span><span style="font-weight:600;">${tglFormatted}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:#64748b;font-size:11px;">Metode</span><span style="font-weight:600;">${pay.metode||'Tunai'}</span></div>
     </div>
 
-    <div class="section">
-      <div class="row"><span class="lbl">Nama Pelanggan</span><span class="val">${c.nama}</span></div>
-      <div class="row"><span class="lbl">ID Pelanggan</span><span class="val">${c.id}</span></div>
-      <div class="row"><span class="lbl">Barang</span><span class="val">${c.barang}</span></div>
-      ${c.noHp ? `<div class="row"><span class="lbl">No. HP</span><span class="val">${c.noHp}</span></div>` : ''}
+    <!-- Info pelanggan -->
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Nama</span><span style="font-weight:600;">${c.nama}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">ID</span><span style="font-weight:600;">${c.id}</span></div>
+      <div style="display:flex;justify-content:space-between;${c.noHp?'margin-bottom:5px;':''}"><span style="color:#64748b;font-size:11px;">Barang</span><span style="font-weight:600;text-align:right;max-width:180px;">${c.barang}</span></div>
+      ${c.noHp?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;font-size:11px;">No. HP</span><span style="font-weight:600;">${c.noHp}</span></div>`:''}
     </div>
 
-    <div class="amount-box">
-      <div class="amount-label">Jumlah Dibayar</div>
-      <div class="amount-value">${formatRupiah(pay.jumlahAngsuran)}</div>
-      ${pay.cicilan ? `<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;">Termasuk bunga: ${formatRupiah(pay.cicilan)}</div>` : ''}
+    <!-- Jumlah bayar -->
+    <div style="background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:11px;color:rgba(255,255,255,.75);">Jumlah Dibayar</div>
+      <div style="font-size:26px;font-weight:800;color:white;margin-top:4px;">${formatRupiah(pay.jumlahAngsuran)}</div>
+      ${pay.cicilan?`<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:3px;">Termasuk bunga: ${formatRupiah(pay.cicilan)}</div>`:''}
     </div>
 
-    <div class="section">
-      <div class="row"><span class="lbl">Angsuran ke-</span><span class="val">${angsuranKe} / ${c.tenor}</span></div>
-      <div class="row"><span class="lbl">Total Kredit</span><span class="val">${formatRupiah(totalBayar)}</span></div>
-      <div class="row"><span class="lbl">Sudah Dibayar</span><span class="val" style="color:#15803d;">${formatRupiah(totalDibayar)}</span></div>
-      <hr class="divider">
-      <div class="row">
-        <span class="lbl" style="font-weight:700;">Sisa Tagihan</span>
-        <span class="val" style="color:${sisaTagihan>0?'#dc2626':'#15803d'};font-size:14px;">${formatRupiah(sisaTagihan)}</span>
+    <!-- Ringkasan -->
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Angsuran ke-</span><span style="font-weight:600;">${angsuranKe} / ${c.tenor}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Total Kredit</span><span style="font-weight:600;">${formatRupiah(totalBayar)}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#64748b;font-size:11px;">Sudah Dibayar</span><span style="font-weight:600;color:#15803d;">${formatRupiah(totalDibayar)}</span></div>
+      <div style="border-top:1px dashed #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;">
+        <span style="font-weight:700;">Sisa Tagihan</span>
+        <span style="font-weight:800;font-size:15px;color:${sisaTagihan>0?'#dc2626':'#15803d'};">${formatRupiah(sisaTagihan)}</span>
       </div>
     </div>
 
-    <div class="status-box">
-      <span class="badge badge-${status}">${status === 'lunas' ? '✓ LUNAS' : status === 'menunggak' ? 'MENUNGGAK' : 'AKTIF'}</span>
+    <!-- Status -->
+    <div style="text-align:center;margin-bottom:12px;">
+      <span style="display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;${status==='lunas'?'background:#dcfce7;color:#15803d;':status==='menunggak'?'background:#fee2e2;color:#dc2626;':'background:#dbeafe;color:#1d4ed8;'}">
+        ${status==='lunas'?'✓ LUNAS':status==='menunggak'?'MENUNGGAK':'AKTIF'}
+      </span>
     </div>
 
-    ${pay.ket ? `<div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:11px;color:#64748b;margin-bottom:10px;"><strong>Keterangan:</strong> ${pay.ket}</div>` : ''}
+    ${pay.ket?`<div style="padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:11px;color:#92400e;margin-bottom:12px;"><strong>Keterangan:</strong> ${pay.ket}</div>`:''}
 
-    <div class="footer">
-      <p>Terima kasih atas pembayaran Anda.<br>Simpan struk ini sebagai bukti pembayaran.</p>
-      <p class="no-struk">Dicetak: ${now}</p>
+    <!-- Footer -->
+    <div style="text-align:center;padding-top:12px;border-top:2px dashed #e2e8f0;">
+      <p style="font-size:11px;color:#64748b;line-height:1.6;">Terima kasih atas pembayaran Anda.<br>Simpan struk ini sebagai bukti pembayaran.</p>
+      <p style="font-size:10px;color:#cbd5e1;margin-top:4px;">Dicetak: ${now}</p>
     </div>
-  </div>
-  <script>window.onload = () => { window.print(); }<\/script>
-  </body></html>`;
+  </div>`;
 
-  const w = window.open('','_blank','width=400,height=700');
-  w.document.write(html);
-  w.document.close();
+  document.getElementById('struk-content').innerHTML = html;
+  openModal('strukModal');
 }
 
 function confirmDeletePayment(payId, custId) {

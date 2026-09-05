@@ -856,6 +856,28 @@
   </div>
 </div>
 
+<!-- Modal Struk Pembayaran -->
+<div class="modal-overlay" id="strukModal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header" style="background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:14px 14px 0 0;">
+      <span class="modal-title" style="color:white;">Bukti Pembayaran</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:none;" onclick="window.print()">
+          <svg width="13" height="13"><use href="#ic-print"/></svg> Cetak
+        </button>
+        <button class="modal-close" style="background:rgba(255,255,255,.2);color:white;" onclick="closeModal('strukModal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding:0;max-height:80vh;overflow-y:auto;" id="struk-content"></div>
+    <div class="modal-footer" style="justify-content:center;gap:10px;">
+      <button class="btn btn-outline" onclick="closeModal('strukModal')">Tutup</button>
+      <button class="btn btn-primary" onclick="window.print()">
+        <svg width="14" height="14"><use href="#ic-print"/></svg> Cetak / Save PDF
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Semua Jatuh Tempo -->
 <div class="modal-overlay" id="dueModal">
   <div class="modal" style="max-width:600px;">
