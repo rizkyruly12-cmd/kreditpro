@@ -1329,66 +1329,76 @@ function printStruk(c, pay) {
   const angsuranKe   = allPays.length;
   const status       = getStatusKredit(c);
   const tglFormatted = pay.tgl ? new Date(pay.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) : '-';
-  const now          = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const now          = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+
+  const statusColor  = status==='lunas' ? '#15803d' : status==='menunggak' ? '#dc2626' : '#1d4ed8';
+  const statusBg     = status==='lunas' ? '#dcfce7' : status==='menunggak' ? '#fee2e2' : '#dbeafe';
+  const statusLabel  = status==='lunas' ? '✓ LUNAS' : status==='menunggak' ? 'MENUNGGAK' : 'AKTIF';
 
   const html = `
-  <div style="padding:20px;font-family:'Segoe UI',sans-serif;font-size:13px;color:#1e293b;">
+  <div style="font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#1e293b;width:100%;max-width:320px;margin:0 auto;">
+
     <!-- Header -->
-    <div style="text-align:center;padding-bottom:16px;border-bottom:2px dashed #e2e8f0;margin-bottom:16px;">
-      <div style="width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+    <div style="text-align:center;padding:16px 0 14px;border-bottom:2px dashed #e2e8f0;margin-bottom:14px;">
+      <div style="width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
       </div>
-      <div style="font-size:18px;font-weight:800;color:#1e293b;">KreditPro</div>
-      <div style="font-size:11px;color:#94a3b8;">Ruli Rizki Ariyanto</div>
-      <div style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;letter-spacing:.05em;margin-top:6px;">Bukti Pembayaran</div>
+      <div style="font-size:16px;font-weight:800;color:#1e293b;letter-spacing:-.03em;">KreditPro</div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:1px;">Ruli Rizki Ariyanto</div>
+      <div style="margin-top:8px;display:inline-block;padding:3px 14px;border:1.5px solid #1e40af;border-radius:20px;font-size:10px;font-weight:700;color:#1e40af;letter-spacing:.05em;text-transform:uppercase;">Bukti Pembayaran</div>
     </div>
 
-    <!-- Info transaksi -->
-    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">No. Struk</span><span style="font-size:11px;color:#94a3b8;">${pay.id||'-'}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Tanggal Bayar</span><span style="font-weight:600;">${tglFormatted}</span></div>
-      <div style="display:flex;justify-content:space-between;"><span style="color:#64748b;font-size:11px;">Metode</span><span style="font-weight:600;">${pay.metode||'Tunai'}</span></div>
-    </div>
+    <!-- Info Transaksi -->
+    <table style="width:100%;margin-bottom:10px;border-collapse:collapse;">
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;width:45%;">No. Struk</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${pay.id||'-'}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">Tanggal</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${tglFormatted}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">Metode</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${pay.metode||'Tunai'}</td></tr>
+    </table>
 
-    <!-- Info pelanggan -->
-    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Nama</span><span style="font-weight:600;">${c.nama}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">ID</span><span style="font-weight:600;">${c.id}</span></div>
-      <div style="display:flex;justify-content:space-between;${c.noHp?'margin-bottom:5px;':''}"><span style="color:#64748b;font-size:11px;">Barang</span><span style="font-weight:600;text-align:right;max-width:180px;">${c.barang}</span></div>
-      ${c.noHp?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748b;font-size:11px;">No. HP</span><span style="font-weight:600;">${c.noHp}</span></div>`:''}
-    </div>
+    <div style="border-top:1px dashed #e2e8f0;margin:10px 0;"></div>
 
-    <!-- Jumlah bayar -->
-    <div style="background:linear-gradient(135deg,#1e40af,#0891b2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
-      <div style="font-size:11px;color:rgba(255,255,255,.75);">Jumlah Dibayar</div>
-      <div style="font-size:26px;font-weight:800;color:white;margin-top:4px;">${formatRupiah(pay.jumlahAngsuran)}</div>
+    <!-- Info Pelanggan -->
+    <table style="width:100%;margin-bottom:10px;border-collapse:collapse;">
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;width:45%;">Nama</td><td style="padding:4px 0;font-size:11px;font-weight:700;text-align:right;">${c.nama}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">ID</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${c.id}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">Barang</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${c.barang}</td></tr>
+      ${c.noHp?`<tr><td style="padding:4px 0;font-size:11px;color:#64748b;">No. HP</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${c.noHp}</td></tr>`:''}
+    </table>
+
+    <div style="border-top:1px dashed #e2e8f0;margin:10px 0;"></div>
+
+    <!-- Jumlah Bayar -->
+    <div style="background:#1e40af;border-radius:10px;padding:12px 16px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em;">Jumlah Dibayar</div>
+      <div style="font-size:24px;font-weight:800;color:white;margin-top:3px;letter-spacing:-.02em;">${formatRupiah(pay.jumlahAngsuran)}</div>
     </div>
 
     <!-- Ringkasan -->
-    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Angsuran ke-</span><span style="font-weight:600;">${angsuranKe} / ${c.tenor}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:#64748b;font-size:11px;">Total Kredit</span><span style="font-weight:600;">${formatRupiah(totalBayar)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#64748b;font-size:11px;">Sudah Dibayar</span><span style="font-weight:600;color:#15803d;">${formatRupiah(totalDibayar)}</span></div>
-      <div style="border-top:1px dashed #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;">
-        <span style="font-weight:700;">Sisa Tagihan</span>
-        <span style="font-weight:800;font-size:15px;color:${sisaTagihan>0?'#dc2626':'#15803d'};">${formatRupiah(sisaTagihan)}</span>
-      </div>
+    <table style="width:100%;margin-bottom:10px;border-collapse:collapse;">
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;width:45%;">Angsuran ke-</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${angsuranKe} / ${c.tenor}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">Total Kredit</td><td style="padding:4px 0;font-size:11px;font-weight:600;text-align:right;">${formatRupiah(totalBayar)}</td></tr>
+      <tr><td style="padding:4px 0;font-size:11px;color:#64748b;">Sudah Dibayar</td><td style="padding:4px 0;font-size:11px;font-weight:600;color:#15803d;text-align:right;">${formatRupiah(totalDibayar)}</td></tr>
+    </table>
+
+    <!-- Sisa Tagihan -->
+    <div style="background:#f8fafc;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border:1px solid #e2e8f0;">
+      <span style="font-size:12px;font-weight:700;color:#1e293b;">Sisa Tagihan</span>
+      <span style="font-size:16px;font-weight:800;color:${sisaTagihan>0?'#dc2626':'#15803d'};">${formatRupiah(sisaTagihan)}</span>
     </div>
 
     <!-- Status -->
     <div style="text-align:center;margin-bottom:12px;">
-      <span style="display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;${status==='lunas'?'background:#dcfce7;color:#15803d;':status==='menunggak'?'background:#fee2e2;color:#dc2626;':'background:#dbeafe;color:#1d4ed8;'}">
-        ${status==='lunas'?'✓ LUNAS':status==='menunggak'?'MENUNGGAK':'AKTIF'}
-      </span>
+      <span style="display:inline-block;padding:4px 18px;border-radius:20px;font-size:11px;font-weight:700;background:${statusBg};color:${statusColor};">${statusLabel}</span>
     </div>
 
-    ${pay.ket?`<div style="padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:11px;color:#92400e;margin-bottom:12px;"><strong>Keterangan:</strong> ${pay.ket}</div>`:''}
+    ${pay.ket?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:7px 12px;font-size:11px;color:#92400e;margin-bottom:12px;"><strong>Ket:</strong> ${pay.ket}</div>`:''}
 
     <!-- Footer -->
     <div style="text-align:center;padding-top:12px;border-top:2px dashed #e2e8f0;">
-      <p style="font-size:11px;color:#64748b;line-height:1.6;">Terima kasih atas pembayaran Anda.<br>Simpan struk ini sebagai bukti pembayaran.</p>
-      <p style="font-size:10px;color:#cbd5e1;margin-top:4px;">Dicetak: ${now}</p>
+      <div style="font-size:10px;color:#94a3b8;line-height:1.7;">Terima kasih atas pembayaran Anda.<br>Simpan sebagai bukti pembayaran resmi.</div>
+      <div style="font-size:9px;color:#cbd5e1;margin-top:4px;">${now}</div>
     </div>
+
   </div>`;
 
   document.getElementById('struk-content').innerHTML = html;
