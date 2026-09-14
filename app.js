@@ -1,5 +1,5 @@
-// ============================================================
-// KREDITPRO — Main Application (Supabase version)
+﻿// ============================================================
+// Kredit Ruli — Main Application (Supabase version)
 // ============================================================
 
 let currentPage = 'dashboard';
@@ -843,7 +843,7 @@ async function viewCustomer(id) {
     <div id="detail-tabs">
       <!-- INFO -->
       <div id="tab-info" class="tab-pane active">
-        <div style="background:linear-gradient(135deg,#1e40af,#0ea5e9);color:white;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="background:linear-gradient(135deg,#4338ca,#0ea5e9);color:white;border-radius:10px;padding:16px;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
             <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);
               display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;overflow:hidden;flex-shrink:0;">
@@ -999,8 +999,8 @@ function exportKartuPDF(customerId) {
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
-    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1e40af; padding-bottom:14px; }
-    .header h1 { font-size:18px; color:#1e40af; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #4338ca; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#4338ca; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .info { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-bottom:20px; padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; }
     .info-item .label { font-size:10px; color:#64748b; text-transform:uppercase; font-weight:600; }
@@ -1008,9 +1008,9 @@ function exportKartuPDF(customerId) {
     .stats { display:flex; gap:12px; margin-bottom:20px; }
     .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center; }
     .stat .label { font-size:10px; color:#64748b; }
-    .stat .value { font-size:15px; font-weight:700; color:#1e40af; margin-top:3px; }
+    .stat .value { font-size:15px; font-weight:700; color:#4338ca; margin-top:3px; }
     table { width:100%; border-collapse:collapse; }
-    th { background:#1e40af; color:white; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; }
+    th { background:#4338ca; color:white; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; }
     td { padding:7px 10px; border-bottom:1px solid #f1f5f9; font-size:11px; }
     tr:nth-child(even) td { background:#f8fafc; }
     .num { text-align:right; }
@@ -1023,7 +1023,7 @@ function exportKartuPDF(customerId) {
   </style></head><body>
   <div class="header">
     <h1>Kartu Angsuran</h1>
-    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="info">
     <div class="info-item"><div class="label">Nama Pelanggan</div><div class="value">${c.nama}</div></div>
@@ -1048,7 +1048,7 @@ function exportKartuPDF(customerId) {
     <thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">Jumlah</th><th style="text-align:right">Profit</th><th>Metode</th><th>Keterangan</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">Belum ada pembayaran</td></tr>'}</tbody>
   </table>
-  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -1089,19 +1089,19 @@ function exportPelangganPDF() {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Data Pelanggan — KreditPro</title>
+  <title>Data Pelanggan — Kredit Ruli</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:11px; color:#1e293b; padding:24px; }
-    .header { text-align:center; margin-bottom:18px; border-bottom:2px solid #1e40af; padding-bottom:12px; }
-    .header h1 { font-size:18px; color:#1e40af; }
+    .header { text-align:center; margin-bottom:18px; border-bottom:2px solid #4338ca; padding-bottom:12px; }
+    .header h1 { font-size:18px; color:#4338ca; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .stats { display:flex; gap:12px; margin-bottom:18px; }
     .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
     .stat .label { font-size:10px; color:#64748b; }
-    .stat .value { font-size:16px; font-weight:700; color:#1e40af; margin-top:2px; }
+    .stat .value { font-size:16px; font-weight:700; color:#4338ca; margin-top:2px; }
     table { width:100%; border-collapse:collapse; }
-    th { background:#1e40af; color:white; padding:7px 8px; text-align:left; font-size:10px; text-transform:uppercase; white-space:nowrap; }
+    th { background:#4338ca; color:white; padding:7px 8px; text-align:left; font-size:10px; text-transform:uppercase; white-space:nowrap; }
     td { padding:6px 8px; border-bottom:1px solid #f1f5f9; vertical-align:top; }
     tr:nth-child(even) td { background:#f8fafc; }
     .num { text-align:right; white-space:nowrap; }
@@ -1110,7 +1110,7 @@ function exportPelangganPDF() {
   </style></head><body>
   <div class="header">
     <h1>Data Seluruh Pelanggan</h1>
-    <p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="stats">
     <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
@@ -1122,7 +1122,7 @@ function exportPelangganPDF() {
     <thead><tr><th>#</th><th>Nama / ID</th><th>Barang</th><th style="text-align:right">Kredit</th><th style="text-align:right">Angsuran</th><th style="text-align:center">Tenor</th><th style="text-align:right">Terbayar</th><th style="text-align:right">Sisa</th><th style="text-align:center">Status</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div class="footer">KreditPro &copy; ${new Date().getFullYear()} — Total ${customers.length} pelanggan</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} — Total ${customers.length} pelanggan</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=1100,height=700');
@@ -1340,12 +1340,12 @@ function printStruk(c, pay) {
 
     <!-- Header -->
     <div style="text-align:center;padding:16px 0 14px;border-bottom:2px dashed #e2e8f0;margin-bottom:14px;">
-      <div style="width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;">
+      <div style="width:40px;height:40px;background:linear-gradient(135deg,#4338ca,#06b6d4);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
       </div>
-      <div style="font-size:16px;font-weight:800;color:#1e293b;letter-spacing:-.03em;">KreditPro</div>
+      <div style="font-size:16px;font-weight:800;color:#1e293b;letter-spacing:-.03em;">Kredit Ruli</div>
       <div style="font-size:10px;color:#94a3b8;margin-top:1px;">Ruli Rizki Ariyanto</div>
-      <div style="margin-top:8px;display:inline-block;padding:3px 14px;border:1.5px solid #1e40af;border-radius:20px;font-size:10px;font-weight:700;color:#1e40af;letter-spacing:.05em;text-transform:uppercase;">Bukti Pembayaran</div>
+      <div style="margin-top:8px;display:inline-block;padding:3px 14px;border:1.5px solid #4338ca;border-radius:20px;font-size:10px;font-weight:700;color:#4338ca;letter-spacing:.05em;text-transform:uppercase;">Bukti Pembayaran</div>
     </div>
 
     <!-- Info Transaksi -->
@@ -1368,7 +1368,7 @@ function printStruk(c, pay) {
     <div style="border-top:1px dashed #e2e8f0;margin:10px 0;"></div>
 
     <!-- Jumlah Bayar -->
-    <div style="background:#1e40af;border-radius:10px;padding:12px 16px;text-align:center;margin-bottom:12px;">
+    <div style="background:#4338ca;border-radius:10px;padding:12px 16px;text-align:center;margin-bottom:12px;">
       <div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em;">Jumlah Dibayar</div>
       <div style="font-size:24px;font-weight:800;color:white;margin-top:3px;letter-spacing:-.02em;">${formatRupiah(pay.jumlahAngsuran)}</div>
     </div>
@@ -2084,21 +2084,21 @@ function printLaporanAktif() {
 function _openPrintWindow(title, bodyHtml) {
   const baseStyle = `* { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:28px; }
-    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1e40af; padding-bottom:14px; }
-    .header h1 { font-size:18px; color:#1e40af; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #4338ca; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#4338ca; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .stats { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
     .stat { flex:1; min-width:150px; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
-    .stat .lbl { font-size:10px; color:#64748b; } .stat .val { font-size:15px; font-weight:700; color:#1e40af; margin-top:2px; }
-    table { width:100%; border-collapse:collapse; } th { background:#1e40af; color:white; padding:7px 9px; text-align:left; font-size:10px; text-transform:uppercase; }
+    .stat .lbl { font-size:10px; color:#64748b; } .stat .val { font-size:15px; font-weight:700; color:#4338ca; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; } th { background:#4338ca; color:white; padding:7px 9px; text-align:left; font-size:10px; text-transform:uppercase; }
     td { padding:6px 9px; border-bottom:1px solid #f1f5f9; font-size:11px; } tr:nth-child(even) td { background:#f8fafc; }
-    .tr { text-align:right; } tfoot td { font-weight:700; background:#eff6ff !important; color:#1e40af; border-top:2px solid #1e40af; }
+    .tr { text-align:right; } tfoot td { font-weight:700; background:#eff6ff !important; color:#4338ca; border-top:2px solid #4338ca; }
     .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
     @media print { body { padding:15px; } @page { margin:15mm; } }`;
   const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title><style>${baseStyle}</style></head><body>
-    <div class="header"><h1>${title}</h1><p>KreditPro — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
+    <div class="header"><h1>${title}</h1><p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
     ${bodyHtml}
-    <div class="footer">KreditPro &copy; ${new Date().getFullYear()}</div></body></html>`;
+    <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()}</div></body></html>`;
   const w = window.open('','_blank','width=960,height=700');
   w.document.write(html); w.document.close(); w.focus();
   setTimeout(()=>w.print(), 500);
@@ -2272,7 +2272,7 @@ function buildKartuCard(c) {
         ? `<div style="position:relative;"><img src="${getItemPhotosSync(c.id)[0]}" class="kartu-cust-photo" alt="${c.barang}">
            <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">📦 ${getItemPhotosSync(c.id).length} foto</div></div>`
         : ''}
-    <div style="background:linear-gradient(135deg,#1e40af,#0891b2);color:white;padding:14px 16px;">
+    <div style="background:linear-gradient(135deg,#4338ca,#0891b2);color:white;padding:14px 16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
         <div>
           <div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">KARTU ANGSURAN</div>
