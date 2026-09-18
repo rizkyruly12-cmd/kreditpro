@@ -550,7 +550,7 @@
             <select class="form-control" id="wa-template-select" onchange="waApplyTemplate()">
               <option value="tagihan">📋 Tagihan Angsuran</option>
               <option value="jatuh_tempo">⏰ Pengingat Jatuh Tempo</option>
-              <option value="terlambat">⚠️ Keterlambatan Bayar</option>
+              <option value="terlambat">Keterlambatan Bayar</option>
               <option value="lunas">🎉 Ucapan Lunas</option>
               <option value="custom">✏️ Pesan Sendiri</option>
             </select>
@@ -581,7 +581,7 @@
           <div class="form-group">
             <label class="form-label">Filter Penerima</label>
             <select class="form-control" id="wa-blast-filter" onchange="waLoadBlastList()">
-              <option value="menunggak">⚠️ Semua Yang Menunggak</option>
+              <option value="menunggak">Semua Yang Menunggak</option>
               <option value="jatuh_tempo_bulan_ini">📅 Jatuh Tempo Bulan Ini</option>
               <option value="aktif">✅ Semua Aktif</option>
               <option value="semua">👥 Semua Pelanggan</option>
@@ -592,11 +592,11 @@
             <select class="form-control" id="wa-blast-template" onchange="waUpdateBlastPreview()">
               <option value="tagihan">📋 Tagihan Angsuran</option>
               <option value="jatuh_tempo">⏰ Pengingat Jatuh Tempo</option>
-              <option value="terlambat">⚠️ Keterlambatan Bayar</option>
+              <option value="terlambat">Keterlambatan Bayar</option>
             </select>
           </div>
           <div style="margin-bottom:12px;padding:10px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#b45309;">
-            ℹ️ Kirim massal membuka WhatsApp satu per satu. WhatsApp Web akan terbuka secara berurutan.
+            Kirim massal membuka WhatsApp satu per satu. WhatsApp Web akan terbuka secara berurutan.
           </div>
           <div id="wa-blast-list" style="max-height:160px;overflow-y:auto;margin-bottom:12px;border:1px solid #e2e8f0;border-radius:8px;"></div>
           <div style="display:flex;gap:8px;align-items:center;">
@@ -632,7 +632,7 @@
   <div class="modal modal-lg">
     <div class="modal-header">
       <span class="modal-title" id="custModalTitle">Tambah Pelanggan</span>
-      <button class="modal-close" onclick="closeModal('custModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('custModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="cust-edit-id">
@@ -794,7 +794,7 @@
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="payModalTitle">Catat Pembayaran</span>
-      <button class="modal-close" onclick="closeModal('payModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('payModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pay-edit-id">
@@ -849,7 +849,7 @@
   <div class="modal modal-xl">
     <div class="modal-header">
       <span class="modal-title" id="custDetailTitle">Detail Pelanggan</span>
-      <button class="modal-close" onclick="closeModal('custDetailModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('custDetailModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" id="custDetailBody"></div>
     <div class="modal-footer">
@@ -871,7 +871,7 @@
         <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:none;" onclick="window.print()">
           <svg width="13" height="13"><use href="#ic-print"/></svg> Cetak
         </button>
-        <button class="modal-close" style="background:rgba(255,255,255,.2);color:white;" onclick="closeModal('strukModal')">✕</button>
+        <button class="modal-close" style="background:rgba(255,255,255,.2);color:white;" onclick="closeModal('strukModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
     <div class="modal-body" style="padding:0;max-height:80vh;overflow-y:auto;" id="struk-content"></div>
@@ -892,7 +892,7 @@
         <svg width="16" height="16" style="color:#d97706;margin-right:6px;"><use href="#ic-alert"/></svg>
         Semua Pelanggan Jatuh Tempo
       </span>
-      <button class="modal-close" onclick="closeModal('dueModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('dueModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="padding:0;">
       <div id="due-modal-list" style="max-height:70vh;overflow-y:auto;"></div>
@@ -905,7 +905,7 @@
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
       <span class="modal-title">Konfirmasi</span>
-      <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('confirmModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <p id="confirmMsg" style="font-size:14px;"></p>
@@ -927,7 +927,7 @@
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">Preview Pesan WhatsApp</span>
-      <button class="modal-close" onclick="closeModal('waPreviewModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('waPreviewModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div style="background:#e5ddd5;border-radius:10px;padding:16px;min-height:120px;">
@@ -939,7 +939,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('waPreviewModal')">Batal</button>
-      <button class="btn btn-outline btn-sm" onclick="waCopyFromPreview()">📋 Salin</button>
+      <button class="btn btn-outline btn-sm" onclick="waCopyFromPreview()">Salin</button>
       <button class="btn btn-success" onclick="waOpenFromPreview()">
         <svg width="14" height="14"><use href="#ic-whatsapp"/></svg> Buka WhatsApp
       </button>
@@ -952,7 +952,7 @@
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title">Pengaturan Akun</span>
-      <button class="modal-close" onclick="closeModal('accountModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('accountModal')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="tabs">
@@ -977,7 +977,7 @@
           </div>
         </div>
         <div style="margin-top:16px;padding:10px 14px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-size:12px;color:#1d4ed8;">
-          ℹ️ Sesi aktif selama <strong>8 jam</strong> sejak login terakhir. Aktivitas otomatis memperpanjang sesi.
+          Sesi aktif selama <strong>8 jam</strong> sejak login terakhir. Aktivitas otomatis memperpanjang sesi.
         </div>
       </div>
 
@@ -999,7 +999,7 @@
           <input type="password" class="form-control" id="pw-confirm" placeholder="Ulangi password baru">
         </div>
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#b45309;margin-bottom:4px;">
-          ⚠️ Setelah password diubah, Anda akan diminta login ulang.
+          Setelah password diubah, Anda akan diminta login ulang.
         </div>
       </div>
 
@@ -1052,7 +1052,7 @@
 
 <!-- Photo Lightbox -->
 <div id="photo-lightbox" onclick="closeLightbox()">
-  <button id="photo-lightbox-close" onclick="closeLightbox()">✕</button>
+  <button id="photo-lightbox-close" onclick="closeLightbox()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   <img id="photo-lightbox-img" src="" alt="">
   <div id="photo-lightbox-caption"></div>
 </div>

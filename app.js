@@ -179,7 +179,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov => {
 // ---- TOAST ----
 function toast(msg, type = 'success') {
   const colors = { success:'#16a34a', danger:'#dc2626', info:'#0891b2', warning:'#d97706' };
-  const icons  = { success:'✅', danger:'❌', info:'ℹ️', warning:'⚠️' };
+  const icons  = { success:'', danger:'', info:'', warning:'' };
   const t = document.createElement('div');
   t.style.cssText = `background:${colors[type]};color:white;padding:12px 16px;border-radius:10px;
     font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.2);
@@ -369,7 +369,7 @@ function renderRecentPayments() {
   customers.forEach(c => custMap[c.id] = c);
 
   if (!payments.length) {
-    document.getElementById('recent-payments').innerHTML = '<div class="empty-state"><div class="empty-icon">💸</div><p>Belum ada pembayaran</p></div>';
+    document.getElementById('recent-payments').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><p>Belum ada pembayaran</p></div>';
     return;
   }
 
@@ -485,7 +485,7 @@ function openDueModal() {
   const el = document.getElementById('due-modal-list');
   if (!list.length) {
     el.innerHTML = `<div class="empty-state" style="padding:40px;">
-      <div style="font-size:36px;opacity:.4;margin-bottom:10px;">✓</div>
+      <div style="margin-bottom:10px;opacity:.35;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div>
       <p>Semua pembayaran lancar bulan ini!</p>
     </div>`;
   } else {
@@ -560,7 +560,7 @@ async function renderCustomerTable() {
 
   const tbody = document.getElementById('cust-tbody');
   if (!paged.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👤</div><p>Tidak ada data</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><p>Tidak ada data</p></div></td></tr>`;
   } else {
     tbody.innerHTML = paged.map(c => {
       const { angsuranPerBulan } = hitungAngsuran(c);
@@ -692,7 +692,7 @@ function calcPreview() {
 
   const kreditPokok = harga - dp;
 
-  // Hitung totalBungaPct dari bungaPct × tenor, lalu tulis ke field Total Bunga
+  // Hitung totalBungaPct dari bungaPct tenor, lalu tulis ke field Total Bunga
   const totalBungaPct = bungaPct * tenor;
   document.getElementById('cust-total-bunga').value = totalBungaPct;
 
@@ -828,7 +828,7 @@ async function viewCustomer(id) {
       <td style="font-weight:600;">${formatRupiah(angsuranPerBulan)}</td>
       <td style="font-size:11px;">${formatTgl(tempoStr)}</td>
       <td style="font-size:11px;">${p ? formatTgl(p.tgl) : '-'}</td>
-      <td style="font-size:11px;">${p ? p.ket || '' : (new Date()>tglTempo ? '⚠️ Belum bayar' : '')}</td>
+      <td style="font-size:11px;">${p ? p.ket || '' : (new Date()>tglTempo ? 'Belum bayar' : '')}</td>
     </tr>`;
   }
 
@@ -838,7 +838,7 @@ async function viewCustomer(id) {
       <button class="tab-btn active" onclick="switchTab('tab-info','detail-tabs')">Info Kredit</button>
       <button class="tab-btn" onclick="switchTab('tab-schedule','detail-tabs')">Jadwal Angsuran</button>
       <button class="tab-btn" onclick="switchTab('tab-history','detail-tabs')">Riwayat Bayar</button>
-      <button class="tab-btn" onclick="switchTab('tab-foto','detail-tabs')">📷 Foto</button>
+      <button class="tab-btn" onclick="switchTab('tab-foto','detail-tabs')">Foto</button>
     </div>
     <div id="detail-tabs">
       <!-- INFO -->
@@ -855,7 +855,7 @@ async function viewCustomer(id) {
               <div style="font-size:18px;font-weight:700;">${c.nama}</div>
               <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} · ${c.noHp||'-'}</div>
               ${c.nik    ? `<div style="opacity:.7;font-size:11px;">NIK: ${c.nik}</div>` : ''}
-              ${c.alamat ? `<div style="opacity:.7;font-size:11px;">📍 ${c.alamat}</div>` : ''}
+              ${c.alamat ? `<div style="opacity:.7;font-size:11px;">${c.alamat}</div>` : ''}
             </div>
             <span class="badge ${badgeClass}" style="margin-left:auto;">${status}</span>
           </div>
@@ -907,9 +907,9 @@ async function viewCustomer(id) {
           </table>
         </div>
         <div style="margin-top:8px;font-size:11px;color:#94a3b8;display:flex;gap:16px;">
-          <span style="background:#f0fdf4;padding:2px 8px;border-radius:4px;">🟢 Sudah bayar</span>
-          <span style="background:#fffbeb;padding:2px 8px;border-radius:4px;">🟡 Belum jatuh tempo</span>
-          <span style="background:#fef2f2;padding:2px 8px;border-radius:4px;">🔴 Terlambat</span>
+          <span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">Sudah bayar</span>
+          <span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">Belum jatuh tempo</span>
+          <span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">Terlambat</span>
         </div>
       </div>
       <!-- HISTORY -->
@@ -928,7 +928,7 @@ async function viewCustomer(id) {
               <td style="color:#0891b2;">${formatRupiah(p.cicilan)}</td>
               <td><span class="badge ${p.metode==='Transfer'?'badge-blue':'badge-green'}" style="font-size:10px;">${p.metode||'-'}</span></td>
               <td style="font-size:12px;">${p.ket||''}</td>
-              <td><button class="btn btn-danger btn-xs" onclick="confirmDeletePayment('${p.id}','${id}')">🗑</button></td>
+              <td><button class="btn btn-danger btn-xs" onclick="confirmDeletePayment('${p.id}','${id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg</button></td>
             </tr>`).join('')}
             </tbody>
           </table>
@@ -938,7 +938,7 @@ async function viewCustomer(id) {
           <div><span style="color:#94a3b8;">Total Profit:</span> <strong style="color:#0891b2;">${formatRupiah(totalProfit)}</strong></div>
           <div><span style="color:#94a3b8;">Transaksi:</span> <strong>${payments.length}x</strong></div>
         </div>` :
-        `<div class="empty-state"><div class="empty-icon">💸</div><p>Belum ada pembayaran</p></div>`}
+        `<div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><p>Belum ada pembayaran</p></div>`}
       </div>
       <!-- FOTO -->
       <div id="tab-foto" class="tab-pane">
@@ -1166,7 +1166,7 @@ function renderPaymentTable() {
 
   const tbody = document.getElementById('pay-tbody');
   if (!paged.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">💸</div><p>Tidak ada data pembayaran</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><p>Tidak ada data pembayaran</p></div></td></tr>`;
   } else {
     tbody.innerHTML = paged.map((p, i) => {
       const c = custMap[p.customerId];
@@ -2243,7 +2243,7 @@ async function renderKartuList() {
 
   const grid = document.getElementById('kartu-list-grid');
   if (!paged.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🗂️</div><p>Tidak ada kartu angsuran</p></div>`;
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" opacity=".35"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><p>Tidak ada kartu angsuran</p></div>`;
   } else {
     grid.innerHTML = paged.map(c => buildKartuCard(c)).join('');
   }
@@ -2271,7 +2271,7 @@ function buildKartuCard(c) {
       ? `<img src="${getCustPhotoSync(c.id)}" class="kartu-cust-photo" alt="${c.nama}">`
       : getItemPhotosSync(c.id).length > 0
         ? `<div style="position:relative;"><img src="${getItemPhotosSync(c.id)[0]}" class="kartu-cust-photo" alt="${c.barang}">
-           <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">📦 ${getItemPhotosSync(c.id).length} foto</div></div>`
+           <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">${getItemPhotosSync(c.id).length} foto</div></div>`
         : ''}
     <div style="background:linear-gradient(135deg,#4338ca,#0891b2);color:white;padding:14px 16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
@@ -2312,9 +2312,9 @@ function buildKartuCard(c) {
       </div>
       ${c.nik || c.alamat ? `
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:11px;color:#64748b;">
-        ${c.nik   ? `<div>🪪 NIK: <span style="font-family:monospace;">${c.nik}</span></div>` : ''}
-        ${c.alamat ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;" title="${c.alamat}">📍 ${c.alamat}</div>` : ''}
-        ${c.noSeri ? `<div style="margin-top:2px;">🔖 Seri: <span style="font-family:monospace;">${c.noSeri}</span></div>` : ''}
+        ${c.nik   ? `<div>NIK: <span style="font-family:monospace;">${c.nik}</span></div>` : ''}
+        ${c.alamat ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;" title="${c.alamat}">${c.alamat}</div>` : ''}
+        ${c.noSeri ? `<div style="margin-top:2px;">Seri: <span style="font-family:monospace;">${c.noSeri}</span></div>` : ''}
       </div>` : ''}
       <div style="margin-top:10px;display:flex;gap:6px;" onclick="event.stopPropagation()">
         <button class="btn btn-outline btn-xs" style="flex:1;" onclick="viewCustomer('${c.id}')">
@@ -2402,7 +2402,7 @@ function renderSidebarUser() {
   const roleEl = document.getElementById('sidebar-role');
   if (el) el.textContent = s.avatar || s.displayName[0];
   if (unEl) unEl.textContent = s.displayName || s.username;
-  if (roleEl) roleEl.textContent = s.role === 'owner' ? '👑 Owner' : '👤 Staff';
+  if (roleEl) roleEl.textContent = s.role === 'owner' ? 'Owner' : 'Staff';
 }
 
 function doLogout() {
@@ -2458,7 +2458,7 @@ async function renderProfileTab() {
   document.getElementById('acc-avatar-big').textContent = s.avatar || s.displayName[0];
   document.getElementById('acc-displayname').textContent = s.displayName;
   document.getElementById('acc-username-lbl').textContent = '@' + s.username;
-  document.getElementById('acc-role-badge').textContent = s.role === 'owner' ? '👑 Owner' : '👤 Staff';
+  document.getElementById('acc-role-badge').textContent = s.role === 'owner' ? 'Owner' : 'Staff';
 
   const lastLogin = user?.lastLogin ? formatTgl(user.lastLogin.slice(0,10)) + ' ' + user.lastLogin.slice(11,16) : '-';
   document.getElementById('acc-lastlogin').textContent = lastLogin;
@@ -2476,7 +2476,7 @@ async function renderUsersTab() {
 
   if (!isOwner) {
     document.getElementById('users-list-wrap').innerHTML =
-      `<div class="alert alert-info">⚠️ Hanya Owner yang dapat mengelola pengguna.</div>`;
+      `<div class="alert alert-info">Hanya Owner yang dapat mengelola pengguna.</div>`;
     // hide add form
     const addSection = document.querySelector('#tab-users hr');
     if (addSection) {
@@ -2494,7 +2494,7 @@ async function renderUsersTab() {
       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#0ea5e9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;">${u.displayName}</div>
-        <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? '👑 Owner' : '👤 Staff'}</div>
+        <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
         <div style="font-size:11px;color:#94a3b8;">Login terakhir: ${u.lastLogin ? u.lastLogin.slice(0,10) : 'Belum pernah'}</div>
       </div>
       ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">🗑 Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
@@ -2526,7 +2526,7 @@ async function submitAddUser() {
   const alertEl = document.getElementById('add-user-alert');
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '❌ ' + msg;
+    alertEl.innerHTML = '✗ ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2556,7 +2556,7 @@ function submitChangePassword() {
 
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '❌ ' + msg;
+    alertEl.innerHTML = '✗ ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2582,14 +2582,14 @@ async function renderLogTab() {
   const allLogs = await getLogs();
   const logs = allLogs.slice(0, 50);
   const actionLabels = {
-    login: '🔓 Login',
-    logout: '🔒 Logout',
-    change_password: '🔐 Ubah Password'
+    login: 'Login',
+    logout: 'Logout',
+    change_password: 'Ubah Password'
   };
 
   if (!logs.length) {
     document.getElementById('activity-log').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">📋</div><p>Belum ada aktivitas</p></div>';
+      '<div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><p>Belum ada aktivitas</p></div>';
     return;
   }
 
@@ -2682,7 +2682,7 @@ function buildMessage(templateKey, customer) {
 
     jatuh_tempo: `${header}\n\n⏰ *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n📅 *${tglTempoStr}*\n\n📦 *Barang:* ${customer.barang}\n💰 *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ✅${footer}`,
 
-    terlambat: `${header}\n\n⚠️ *PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n📦 *Barang:* ${customer.barang}\n💰 *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n🔢 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. 🙏${footer}`,
+    terlambat: `${header}\n\n*PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n📦 *Barang:* ${customer.barang}\n💰 *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n🔢 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. 🙏${footer}`,
 
     lunas: `${header}\n\n🎉 *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n📦 *Barang:* ${customer.barang}\n✅ *Status:* LUNAS\n💰 *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! 😊${footer}`,
 
@@ -2745,7 +2745,7 @@ function waPopulateCustDropdown() {
   if (!sel) return;
   sel.innerHTML = '<option value="">-- Pilih Pelanggan --</option>' +
     customers.map(c => {
-      const hasPhone = normalizePhone(c.noHp) ? '' : ' ⚠️ (no HP kosong)';
+      const hasPhone = normalizePhone(c.noHp) ? '' : ' (no HP kosong)';
       return `<option value="${c.id}">${c.nama} (${c.id})${hasPhone}</option>`;
     }).join('');
 }
@@ -2769,7 +2769,7 @@ function waFillQuickInfo() {
       <div><strong>${c.barang}</strong></div>
       <div>${c.noHp || '—'} ${phone ? '✓' : '✗ Tidak valid'}</div>
       <div>Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
-      <div>📊 Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
+      <div>Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
     </div>`;
   infoEl.style.display = 'block';
@@ -2931,7 +2931,7 @@ function waLoadBlastList() {
     </div>`;
   }).join('') + (invalid.length ? `
     <div style="padding:8px 10px;font-size:11px;color:#dc2626;background:#fef2f2;">
-      ⚠️ ${invalid.length} pelanggan tanpa nomor valid tidak termasuk
+      ${invalid.length} pelanggan tanpa nomor valid tidak termasuk
     </div>` : '');
 }
 
@@ -2946,7 +2946,7 @@ function waStartBlast() {
 
   document.getElementById('confirmMsg').innerHTML =
     `Kirim pesan WhatsApp ke <strong>${waBlastQueue.length} pelanggan</strong>? <br><small style="color:#64748b;">WhatsApp akan terbuka satu per satu di browser.</small>`;
-  document.getElementById('confirmOkBtn').textContent = `📱 Kirim ${waBlastQueue.length} Pesan`;
+  document.getElementById('confirmOkBtn').textContent = `Kirim ${waBlastQueue.length} Pesan`;
   document.getElementById('confirmOkBtn').className = 'btn btn-success';
   document.getElementById('confirmOkBtn').onclick = () => {
     closeModal('confirmModal');
@@ -2988,7 +2988,7 @@ async function renderWaLog() {
   if (!el) return;
 
   if (!logs.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Belum ada pesan terkirim</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><p>Belum ada pesan terkirim</p></div>`;
     return;
   }
 
@@ -3199,7 +3199,7 @@ function buildFotoTab(customerId) {
   if (!hasAny) {
     return `
       <div class="empty-state" style="padding:32px;">
-        <div class="empty-icon">📷</div>
+        <div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
         <p style="margin-bottom:12px;">Belum ada foto untuk pelanggan ini</p>
         <button class="btn btn-primary btn-sm" onclick="closeModal('custDetailModal');editCustomer('${customerId}')">
           + Tambah Foto
@@ -3218,7 +3218,7 @@ function buildFotoTab(customerId) {
                onclick="openLightbox('${custPhoto}','Foto Pelanggan')">
         </div>` : `
         <div class="cust-photo-box" style="display:flex;align-items:center;justify-content:center;height:180px;flex-direction:column;gap:8px;background:#f8fafc;border-radius:10px;border:1px dashed #cbd5e1;">
-          <div style="font-size:32px;opacity:.3;">👤</div>
+          <div style="margin-bottom:8px;opacity:.35;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
           <div style="font-size:12px;color:#94a3b8;">Belum ada foto</div>
         </div>`}
       </div>
@@ -3226,13 +3226,13 @@ function buildFotoTab(customerId) {
       <!-- Foto Barang Gallery -->
       <div>
         <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">
-          📦 Foto Barang
+          Foto Barang
           ${itemPhotos.length > 0 ? `<span class="badge badge-blue" style="font-size:10px;margin-left:4px;">${itemPhotos.length} foto</span>` : ''}
         </div>
         ${itemPhotos.length > 0
           ? buildItemGallery(customerId)
           : `<div style="display:flex;align-items:center;justify-content:center;height:180px;flex-direction:column;gap:8px;background:#f8fafc;border-radius:10px;border:1px dashed #cbd5e1;">
-               <div style="font-size:32px;opacity:.3;">📦</div>
+               <div style="margin-bottom:8px;opacity:.35;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
                <div style="font-size:12px;color:#94a3b8;">Belum ada foto barang</div>
              </div>`}
       </div>
@@ -3318,7 +3318,7 @@ function renderItemPhotoStrip() {
       <img src="${src}" alt="Foto barang ${i+1}"
            onclick="openLightbox('${src}','Foto Barang ${i+1}')">
       <button type="button" class="item-thumb-remove"
-              onclick="event.stopPropagation();removeItemPhoto(${i})" title="Hapus foto ini">✕</button>
+              onclick="event.stopPropagation();removeItemPhoto(${i})" title="Hapus foto ini"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg</button>
       <div class="item-thumb-num">${i+1}</div>
     </div>`).join('');
 }
