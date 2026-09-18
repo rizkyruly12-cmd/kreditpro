@@ -135,7 +135,8 @@ function navTo(page) {
   const titles = {
     dashboard:'Dashboard', pelanggan:'Data Pelanggan',
     pembayaran:'Riwayat Pembayaran', laporan:'Laporan Profit',
-    kartu:'Kartu Angsuran', whatsapp:'WhatsApp — Kirim Pesan'
+    kartu:'Kartu Angsuran', whatsapp:'WhatsApp — Kirim Pesan',
+    audit: 'Activity Log'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
 
@@ -151,6 +152,7 @@ function navTo(page) {
     if (page === 'pembayaran') { PG.pay = 1; renderPaymentTable(); }
     if (page === 'laporan') { renderLaporan(); switchLapTab('ringkasan'); }
     if (page === 'kartu') { PG.kartu = 1; renderKartuList(); }
+    if (page === 'audit') { auditPage = 1; renderAuditLog(); }
     if (page === 'whatsapp') renderWhatsAppPage();
   })();
   closeSidebar();
@@ -320,7 +322,7 @@ function renderMonthlyChart() {
       datasets: [{
         label: 'Profit (Rp)',
         data,
-        backgroundColor: 'rgba(59,130,246,.75)',
+        backgroundColor: 'rgba(99,102,241,.8)',
         borderRadius: 6,
         borderSkipped: false,
       }]
@@ -347,7 +349,7 @@ function renderStatusChart(aktif, lunas, menunggak) {
       labels: ['Aktif','Lunas','Menunggak'],
       datasets: [{
         data: [aktif, lunas, menunggak],
-        backgroundColor: ['#3b82f6','#16a34a','#dc2626'],
+        backgroundColor: ['#6366f1','#059669','#dc2626'],
         borderWidth: 2, borderColor: '#fff'
       }]
     },
@@ -736,6 +738,8 @@ async function saveCustomer() {
 
   // Save to Supabase
   showPageLoader('Menyimpan data...');
+  const isEdit = document.getElementById('cust-edit-id').value;
+  await logActivity(isEdit ? 'UPDATE' : 'CREATE', 'customer', obj.id, { nama: obj.nama });
   const res = await saveCustomer_db(obj);
   if (!res?.ok) { hidePageLoader(); toast('Gagal menyimpan: ' + (res?.error || ''), 'danger'); return; }
 
@@ -745,7 +749,7 @@ async function saveCustomer() {
 
   hidePageLoader();
   closeModal('custModal');
-  toast(document.getElementById('cust-edit-id').value ? 'Data pelanggan diperbarui' : 'Pelanggan baru ditambahkan', 'success');
+  toast(isEdit ? 'Data pelanggan diperbarui' : 'Pelanggan baru ditambahkan', 'success');
   renderCustomerTable();
   if (currentPage === 'dashboard') renderDashboard();
 }
@@ -773,6 +777,7 @@ function confirmDeleteCustomer(id) {
   document.getElementById('confirmOkBtn').onclick = async () => {
     closeModal('confirmModal');
     showPageLoader('Menghapus data...');
+    await logActivity('DELETE', 'customer', id, { nama: c.nama, data: c });
     await DB.customers.delete(id); // cascade deletes payments & photos via FK
     await DB.getCustomers(true);
     await DB.getPayments(true);
@@ -1556,7 +1561,7 @@ function renderLaporan() {
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nama}</div>
         <div class="progress-bar" style="margin-top:4px;">
-          <div class="progress-fill" style="width:${(profit/maxProfit*100).toFixed(1)}%;background:#3b82f6;"></div>
+          <div class="progress-fill" style="width:${(profit/maxProfit*100).toFixed(1)}%;background:#6366f1;"></div>
         </div>
       </div>
       <div style="font-size:12px;font-weight:700;color:#0891b2;white-space:nowrap;">${formatRupiah(profit)}</div>
@@ -1661,7 +1666,7 @@ function renderPiutang() {
       <td style="min-width:120px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <div style="flex:1;background:#f1f5f9;border-radius:4px;height:6px;">
-            <div style="width:${progress.toFixed(0)}%;background:${status==='lunas'?'#16a34a':status==='menunggak'?'#dc2626':'#3b82f6'};height:6px;border-radius:4px;"></div>
+            <div style="width:${progress.toFixed(0)}%;background:${status==='lunas'?'#059669':status==='menunggak'?'#dc2626':'#6366f1'};height:6px;border-radius:4px;"></div>
           </div>
           <span style="font-size:11px;color:#64748b;white-space:nowrap;">${progress.toFixed(0)}%</span>
         </div>
@@ -1875,7 +1880,7 @@ function renderArusKas() {
   aruskasChartInst = new Chart(ctx, {
     type:'line',
     data:{ labels, datasets:[
-      { label:'Uang Masuk', data:uangData, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.1)', tension:.3, fill:true, pointRadius:4 },
+      { label:'Uang Masuk', data:uangData, borderColor:'#6366f1', backgroundColor:'rgba(99,102,241,.1)', tension:.3, fill:true, pointRadius:4 },
       { label:'Profit', data:profitData, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,.1)', tension:.3, fill:true, pointRadius:4 }
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -1943,7 +1948,7 @@ function renderModal() {
     type:'doughnut',
     data:{ labels:['Modal Kembali','Modal di Pelanggan','Profit Diterima'],
       datasets:[{ data:[modalKembali, totalPiutang - (totalPiutang - Math.max(0,totalModal-modalKembali)), totalProfit].map(v=>Math.max(0,v)),
-        backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderWidth:2 }]},
+        backgroundColor:['#6366f1','#f59e0b','#10b981'], borderWidth:2 }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>`${c.label}: ${formatRupiah(c.parsed)}`}}}
     }
@@ -2036,7 +2041,7 @@ function renderBarang() {
       </div>
       <div style="padding-left:28px;">
         <div style="background:#f1f5f9;border-radius:4px;height:5px;margin-bottom:4px;">
-          <div style="width:${(b.count/maxCount*100).toFixed(0)}%;background:#3b82f6;height:5px;border-radius:4px;"></div>
+          <div style="width:${(b.count/maxCount*100).toFixed(0)}%;background:#6366f1;height:5px;border-radius:4px;"></div>
         </div>
         <div style="display:flex;gap:12px;font-size:11px;color:#64748b;">
           <span>Kredit: <strong>${formatRupiah(b.totalKredit)}</strong></span>
@@ -2063,7 +2068,7 @@ function renderBarang() {
     type:'pie',
     data:{ labels:Object.keys(rangeMap), datasets:[{
       data:Object.values(rangeMap),
-      backgroundColor:['#6366f1','#3b82f6','#10b981','#f59e0b','#f97316','#dc2626'], borderWidth:2
+      backgroundColor:['#6366f1','#8b5cf6','#059669','#f59e0b','#f97316','#dc2626'], borderWidth:2
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'bottom',labels:{font:{size:11}}},
@@ -2491,7 +2496,7 @@ async function renderUsersTab() {
     <div style="font-size:13px;font-weight:600;color:#334155;margin-bottom:10px;">Daftar Pengguna (${users.length})</div>
     ${users.map(u => `
     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;margin-bottom:8px;border:1px solid #e2e8f0;">
-      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#0ea5e9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;">${u.displayName}</div>
         <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
@@ -3428,4 +3433,423 @@ function galleryRender(customerId) {
     const t = document.getElementById(`gallery-thumb-${customerId}-${i}`);
     if (t) t.classList.toggle('active', i === _galleryIndex);
   });
+}
+
+
+// ============================================================
+//  SORTING & ENHANCED FILTERING
+// ============================================================
+let sortConfig = { field: 'tgl', direction: 'desc' };
+
+function setSortColumn(field) {
+  if (sortConfig.field === field) {
+    sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortConfig.field = field;
+    sortConfig.direction = 'desc';
+  }
+  renderCustomerTable();
+}
+
+function applySorting(items, field, direction) {
+  const sorted = [...items];
+  sorted.sort((a, b) => {
+    let aVal = a[field];
+    let bVal = b[field];
+    
+    // Convert to number if it's a numeric field
+    if (['kreditPokok', 'tenor'].includes(field)) {
+      aVal = Number(aVal) || 0;
+      bVal = Number(bVal) || 0;
+    }
+    
+    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return sorted;
+}
+
+// ============================================================
+//  IMAGE COMPRESSION
+// ============================================================
+function compressImageAsync(file, maxWidth = 800, maxHeight = 800, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================================
+//  AUDIT LOG
+// ============================================================
+async function logActivity(action, entityType, entityId, details = {}) {
+  try {
+    const log = {
+      timestamp: new Date().toISOString(),
+      action,           // 'CREATE', 'UPDATE', 'DELETE', 'VIEW'
+      entityType,       // 'customer', 'payment', 'photo'
+      entityId,
+      userId: localStorage.getItem('userId') || 'unknown',
+      ipAddress: 'browser',
+      details: JSON.stringify(details)
+    };
+    
+    // Save to localStorage for client-side, sync to backend via Supabase when online
+    const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+    logs.push(log);
+    if (logs.length > 1000) logs.shift(); // Keep last 1000 logs
+    localStorage.setItem('activityLogs', JSON.stringify(logs));
+    
+    // TODO: Sync to Supabase audit_logs table when backend is ready
+  } catch (e) {
+    console.warn('Audit log failed:', e);
+  }
+}
+
+// ============================================================
+//  EXPORT EXCEL
+// ============================================================
+function exportToExcel(data, filename = 'export.xlsx') {
+  // Simple CSV export (Excel can open CSV)
+  let csv = '';
+  
+  // Headers
+  const headers = Object.keys(data[0] || {});
+  csv += headers.map(h => `"${h}"`).join(',') + '\n';
+  
+  // Data rows
+  data.forEach(row => {
+    csv += headers.map(h => {
+      let val = row[h] || '';
+      if (typeof val === 'string' && val.includes(',')) {
+        val = `"${val.replace(/"/g, '""')}"`;
+      }
+      return val;
+    }).join(',') + '\n';
+  });
+  
+  // Trigger download
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.setAttribute('href', URL.createObjectURL(blob));
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function exportLaporanExcel() {
+  const data = [];
+  const customers = getCustomers();
+  
+  customers.forEach(c => {
+    const { angsuranPerBulan, totalBayar, totalProfit } = hitungAngsuran(c);
+    const payments = getPaymentsByCustomer(c.id);
+    const totalDibayar = payments.reduce((s, p) => s + (p.jumlahAngsuran || 0), 0);
+    const sisaTagihan = Math.max(0, totalBayar - totalDibayar);
+    
+    data.push({
+      'ID': c.id,
+      'Nama': c.nama,
+      'Barang': c.barang,
+      'Tgl Kredit': c.tgl,
+      'Kredit Pokok': c.kreditPokok,
+      'Tenor': c.tenor,
+      'Angsuran/Bln': angsuranPerBulan,
+      'Total Bayar': totalBayar,
+      'Sudah Bayar': totalDibayar,
+      'Sisa Tagihan': sisaTagihan,
+      'Status': getStatusKredit(c),
+      'Profit': totalProfit
+    });
+  });
+  
+  exportToExcel(data, `laporan_kredit_${new Date().toISOString().split('T')[0]}.csv`);
+  toast('Laporan diexport sebagai CSV', 'success');
+}
+
+// ============================================================
+//  DESKTOP NOTIFICATIONS
+// ============================================================
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showNotification(title, options = {}) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, {
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%236366f1"/></svg>',
+      ...options
+    });
+  }
+}
+
+function checkDueDatesAndNotify() {
+  const customers = getCustomers();
+  const today = new Date();
+  
+  customers.forEach(c => {
+    const tglKredit = new Date(c.tgl);
+    let dueDate = new Date(tglKredit);
+    dueDate.setMonth(dueDate.getMonth() + c.tenor);
+    
+    const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    
+    // Notify 3 days before due
+    if (daysUntilDue === 3) {
+      showNotification(`⏰ Kredit ${c.nama} akan jatuh tempo dalam 3 hari`, {
+        body: `Barang: ${c.barang}\nAngsuran: Rp ${Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID')}`
+      });
+      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_in_3_days' });
+    }
+    
+    // Notify on due date
+    if (daysUntilDue === 0) {
+      showNotification(`📌 Kredit ${c.nama} jatuh tempo hari ini!`, {
+        body: `Barang: ${c.barang}`
+      });
+      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_today' });
+    }
+    
+    // Notify 1 day after due
+    if (daysUntilDue === -1) {
+      showNotification(`⚠️ Kredit ${c.nama} telah 1 hari telat!`, {
+        body: `Barang: ${c.barang}`
+      });
+      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
+    }
+  });
+}
+
+function updateSortableHeaders() {
+  const row = document.getElementById('cust-thead-row');
+  if (!row) return;
+  
+  const headers = [
+    { text: 'Pelanggan', field: 'nama' },
+    { text: 'Barang', field: 'barang' },
+    { text: 'Tgl Kredit', field: 'tgl' },
+    { text: 'Kredit Pokok', field: 'kreditPokok' },
+    { text: 'Tenor', field: 'tenor' },
+    { text: 'Angsuran/Bln', field: null },
+    { text: 'Status', field: null },
+    { text: 'Aksi', field: null }
+  ];
+  
+  row.innerHTML = headers.map(h => {
+    if (!h.field) return `<th>${h.text}</th>`;
+    const isActive = sortConfig.field === h.field;
+    const arrow = isActive ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : '';
+    return `<th onclick="setSortColumn('${h.field}')" style="cursor:pointer;user-select:none;position:relative;">
+      ${h.text}${arrow}
+    </th>`;
+  }).join('');
+}
+
+// ============================================================
+//  IMPROVED CUSTOMER TABLE WITH SORTING & EMPTY STATE
+// ============================================================
+// This overrides the original renderCustomerTable function
+const originalRenderCustomerTable = renderCustomerTable;
+async function renderCustomerTableEnhanced() {
+  updateSortableHeaders();
+  
+  const search = document.getElementById('cust-search').value.toLowerCase();
+  const filterStatus = document.getElementById('cust-filter-status').value;
+  const filterYear = document.getElementById('cust-filter-year').value;
+
+  let customers = getCustomers().filter(c => {
+    const matchSearch = !search || c.nama.toLowerCase().includes(search) ||
+      c.id.toLowerCase().includes(search) || c.barang.toLowerCase().includes(search) ||
+      (c.noHp||'').includes(search) ||
+      (c.nik||'').includes(search) ||
+      (c.alamat||'').toLowerCase().includes(search) ||
+      (c.noSeri||'').toLowerCase().includes(search);
+    const matchStatus = !filterStatus || getStatusKredit(c) === filterStatus;
+    const matchYear = !filterYear || c.tgl?.startsWith(filterYear);
+    return matchSearch && matchStatus && matchYear;
+  });
+
+  // Apply sorting
+  customers = applySorting(customers, sortConfig.field, sortConfig.direction);
+
+  const total = customers.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const start = (PG.cust - 1) * PAGE_SIZE;
+  const paged = customers.slice(start, start + PAGE_SIZE);
+
+  await preloadPhotos(paged.map(c => c.id));
+
+  const tbody = document.getElementById('cust-tbody');
+  if (!paged.length) {
+    const emptyIcon = `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div style="padding:48px 24px;text-align:center;color:#cbd5e1;">
+      <div style="margin-bottom:16px;">${emptyIcon}</div>
+      <p style="font-size:15px;font-weight:600;margin-bottom:8px;">Tidak ada pelanggan</p>
+      <p style="font-size:13px;color:#94a3b8;margin-bottom:16px;">Mulai dengan menambahkan pelanggan baru atau ubah filter pencarian</p>
+      <button class="btn btn-primary" onclick="openCustModal()" style="gap:6px;">
+        <svg width="14" height="14"><use href="#ic-plus"/></svg>
+        Tambah Pelanggan
+      </button>
+    </div></td></tr>`;
+  } else {
+    tbody.innerHTML = paged.map(c => {
+      const { angsuranPerBulan } = hitungAngsuran(c);
+      const status = getStatusKredit(c);
+      const badgeClass = status==='lunas'?'badge-green':status==='menunggak'?'badge-red':'badge-blue';
+      return `<tr>
+        <td>
+          <div class="customer-cell">
+            ${getCustPhotoSync(c.id)
+              ? `<img src="${getCustPhotoSync(c.id)}" class="avatar-photo" alt="${c.nama}">`
+              : `<div class="avatar">${c.nama[0]}</div>`}
+            <div>
+              <div class="cust-name">${c.nama}</div>
+              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
+              ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
+              ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
+            </div>
+          </div>
+        </td>
+        <td style="font-size:12px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.barang}</td>
+        <td style="font-size:12px;white-space:nowrap;">${formatTgl(c.tgl)}</td>
+        <td style="font-size:12px;font-weight:600;">${formatRupiah(c.kreditPokok)}</td>
+        <td style="text-align:center;">${c.tenor} bln</td>
+        <td style="font-size:12px;font-weight:600;color:#059669;">${formatRupiah(angsuranPerBulan)}</td>
+        <td><span class="badge ${badgeClass}">${status}</span></td>
+        <td>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-outline btn-xs" onclick="viewCustomer('${c.id}')" title="Detail">
+              <svg width="13" height="13"><use href="#ic-eye"/></svg>
+            </button>
+            <button class="btn btn-outline btn-xs" onclick="editCustomer('${c.id}')" title="Edit">
+              <svg width="13" height="13"><use href="#ic-edit"/></svg>
+            </button>
+            <button class="btn btn-success btn-xs" onclick="waQuickSendCustomer('${c.id}')" title="Kirim WA">
+              <svg width="13" height="13"><use href="#ic-whatsapp"/></svg>
+            </button>
+            <button class="btn btn-danger btn-xs" onclick="confirmDeleteCustomer('${c.id}')" title="Hapus">
+              <svg width="13" height="13"><use href="#ic-trash"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  renderPagination('cust-pagination', PG.cust, totalPages, page => {
+    PG.cust = page; renderCustomerTableEnhanced();
+  });
+}
+
+// Override the original function
+renderCustomerTable = renderCustomerTableEnhanced;
+
+// Auto-check for due dates every 5 minutes
+setInterval(checkDueDatesAndNotify, 5 * 60 * 1000);
+requestNotificationPermission();
+
+
+// ============================================================
+//  AUDIT LOG PAGE
+// ============================================================
+const AUDIT_PAGE_SIZE = 30;
+let auditPage = 1;
+
+async function renderAuditLog() {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  // Sort by timestamp descending
+  logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  const total = logs.length;
+  const totalPages = Math.ceil(total / AUDIT_PAGE_SIZE);
+  const start = (auditPage - 1) * AUDIT_PAGE_SIZE;
+  const paged = logs.slice(start, start + AUDIT_PAGE_SIZE);
+  
+  const tbody = document.getElementById('audit-tbody');
+  if (!paged.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;">
+      <div style="color:#cbd5e1;font-size:13px;">Belum ada log aktivitas</div>
+    </td></tr>`;
+  } else {
+    tbody.innerHTML = paged.map(log => {
+      const ts = new Date(log.timestamp);
+      const timeStr = ts.toLocaleString('id-ID', { 
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const details = JSON.parse(log.details || '{}');
+      const detailStr = Object.entries(details)
+        .filter(([k]) => k !== 'data')
+        .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+        .join(', ') || '-';
+      
+      const actionColor = log.action === 'DELETE' ? '#dc2626' : 
+                          log.action === 'UPDATE' ? '#f59e0b' :
+                          log.action === 'CREATE' ? '#059669' : '#0284c7';
+      
+      return `<tr>
+        <td style="font-size:12px;white-space:nowrap;">${timeStr}</td>
+        <td style="font-size:12px;font-weight:600;"><span style="background:${actionColor}20;color:${actionColor};padding:3px 8px;border-radius:4px;font-size:11px;">${log.action}</span></td>
+        <td style="font-size:12px;">${log.userId}</td>
+        <td style="font-size:12px;"><code style="background:#f1f5f9;padding:2px 6px;border-radius:3px;font-size:11px;">${log.entityType}</code></td>
+        <td style="font-size:12px;font-family:monospace;">${log.entityId}</td>
+        <td style="font-size:11px;color:#64748b;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${detailStr}">${detailStr}</td>
+      </tr>`;
+    }).join('');
+  }
+  
+  renderPagination('audit-pagination', auditPage, totalPages, page => {
+    auditPage = page;
+    renderAuditLog();
+  });
+}
+
+function exportAuditLogExcel() {
+  const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+  
+  const data = logs.map(log => ({
+    'Waktu': log.timestamp,
+    'Aksi': log.action,
+    'User': log.userId,
+    'Entity Type': log.entityType,
+    'Entity ID': log.entityId,
+    'Detail': log.details
+  }));
+  
+  exportToExcel(data, `audit_log_${new Date().toISOString().split('T')[0]}.csv`);
+  toast('Audit log diexport sebagai CSV', 'success');
 }
