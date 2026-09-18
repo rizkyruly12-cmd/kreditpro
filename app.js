@@ -3626,28 +3626,47 @@ function checkDueDatesAndNotify() {
     dueDate.setMonth(dueDate.getMonth() + c.tenor);
     
     const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
     
     // Notify 3 days before due
     if (daysUntilDue === 3) {
+      // Desktop notification
       showNotification(`⏰ Kredit ${c.nama} akan jatuh tempo dalam 3 hari`, {
-        body: `Barang: ${c.barang}\nAngsuran: Rp ${Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID')}`
+        body: `Barang: ${c.barang}\nAngsuran: Rp ${angsuran}`
       });
+      // In-app notification
+      addNotification('warning', '⏰ Jatuh Tempo 3 Hari', 
+        `Kredit ${c.nama} (${c.barang}) akan jatuh tempo dalam 3 hari. Angsuran: Rp ${angsuran}`,
+        { customerId: c.id, daysUntilDue: 3 }
+      );
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_in_3_days' });
     }
     
     // Notify on due date
     if (daysUntilDue === 0) {
+      // Desktop notification
       showNotification(`📌 Kredit ${c.nama} jatuh tempo hari ini!`, {
         body: `Barang: ${c.barang}`
       });
+      // In-app notification
+      addNotification('alert', '📌 Jatuh Tempo Hari Ini', 
+        `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI!`,
+        { customerId: c.id, daysUntilDue: 0 }
+      );
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_today' });
     }
     
     // Notify 1 day after due
     if (daysUntilDue === -1) {
+      // Desktop notification
       showNotification(`⚠️ Kredit ${c.nama} telah 1 hari telat!`, {
         body: `Barang: ${c.barang}`
       });
+      // In-app notification
+      addNotification('alert', '⚠️ Overdue 1 Hari', 
+        `Kredit ${c.nama} (${c.barang}) telah 1 hari TELAT bayar!`,
+        { customerId: c.id, daysUntilDue: -1 }
+      );
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
     }
   });
@@ -3853,3 +3872,131 @@ function exportAuditLogExcel() {
   exportToExcel(data, `audit_log_${new Date().toISOString().split('T')[0]}.csv`);
   toast('Audit log diexport sebagai CSV', 'success');
 }
+
+
+// ============================================================
+//  IN-APP NOTIFICATION CENTER
+// ============================================================
+let notifications = JSON.parse(localStorage.getItem('inAppNotifications') || '[]');
+
+function addNotification(type = 'info', title, message, data = {}) {
+  const notif = {
+    id: Date.now(),
+    type,        // 'info', 'warning', 'alert', 'success'
+    title,
+    message,
+    timestamp: new Date().toISOString(),
+    read: false,
+    data
+  };
+  
+  notifications.unshift(notif);
+  if (notifications.length > 50) notifications.pop(); // Keep last 50
+  localStorage.setItem('inAppNotifications', JSON.stringify(notifications));
+  
+  updateNotificationBadge();
+  renderNotificationList();
+  
+  return notif;
+}
+
+function updateNotificationBadge() {
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const badge = document.getElementById('notif-badge');
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function toggleNotificationCenter() {
+  const dropdown = document.getElementById('notification-dropdown');
+  dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  
+  // Mark all as read when opened
+  if (dropdown.style.display === 'block') {
+    notifications.forEach(n => n.read = true);
+    localStorage.setItem('inAppNotifications', JSON.stringify(notifications));
+    updateNotificationBadge();
+    renderNotificationList();
+  }
+}
+
+function renderNotificationList() {
+  const listEl = document.getElementById('notification-list');
+  
+  if (!notifications.length) {
+    listEl.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
+    return;
+  }
+  
+  listEl.innerHTML = notifications.map(n => {
+    const ts = new Date(n.timestamp);
+    const timeStr = getTimeAgo(ts);
+    
+    const iconMap = {
+      'warning': { icon: '⏰', class: 'warning' },
+      'alert': { icon: '⚠️', class: 'alert' },
+      'success': { icon: '✓', class: 'success' },
+      'info': { icon: 'ℹ️', class: 'info' }
+    };
+    
+    const iconData = iconMap[n.type] || iconMap['info'];
+    
+    return `
+      <div class="notification-item" onclick="markNotificationAsRead(${n.id})">
+        <div class="notification-item-icon ${iconData.class}">${iconData.icon}</div>
+        <div class="notification-item-content">
+          <div class="notification-item-title">${n.title}</div>
+          <div class="notification-item-message">${n.message}</div>
+          <div class="notification-item-time">${timeStr}</div>
+        </div>
+        ${!n.read ? '<div class="notification-item-unread"></div>' : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function markNotificationAsRead(id) {
+  const notif = notifications.find(n => n.id === id);
+  if (notif) {
+    notif.read = true;
+    localStorage.setItem('inAppNotifications', JSON.stringify(notifications));
+    updateNotificationBadge();
+    renderNotificationList();
+  }
+}
+
+function clearAllNotifications() {
+  notifications = [];
+  localStorage.setItem('inAppNotifications', '[]');
+  updateNotificationBadge();
+  renderNotificationList();
+  toast('Semua notifikasi dihapus', 'info');
+}
+
+function getTimeAgo(date) {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  
+  if (seconds < 60) return 'Baru saja';
+  if (seconds < 3600) return Math.floor(seconds / 60) + 'm yang lalu';
+  if (seconds < 86400) return Math.floor(seconds / 3600) + 'h yang lalu';
+  if (seconds < 604800) return Math.floor(seconds / 86400) + 'd yang lalu';
+  
+  return date.toLocaleDateString('id-ID');
+}
+
+// Close dropdown when click outside
+document.addEventListener('click', (e) => {
+  const bellBtn = document.getElementById('notif-bell-btn');
+  const dropdown = document.getElementById('notification-dropdown');
+  
+  if (dropdown && !dropdown.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+
+// Initialize on load
+updateNotificationBadge();
