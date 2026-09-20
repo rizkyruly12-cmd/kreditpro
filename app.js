@@ -115,6 +115,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   );
 
   hidePageLoader();
+  
+  // Initialize notification center
+  updateNotificationBadge();
+  renderNotificationList();
+  
   navTo('dashboard');
 });
 
@@ -3997,6 +4002,3 @@ document.addEventListener('click', (e) => {
     dropdown.style.display = 'none';
   }
 });
-
-// Initialize on load
-updateNotificationBadge();
