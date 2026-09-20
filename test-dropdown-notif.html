@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Notification Dropdown</title>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      padding: 20px;
+      background: #f0f1f8;
+    }
+    .topbar-right {
+      position: relative;
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn:hover {
+      background: #f8fafc;
+    }
+    #notif-bell-btn {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Test: Notification Dropdown</h1>
+<p>Klik tombol bell untuk membuka dropdown notifikasi</p>
+
+<div class="topbar-right" style="z-index: 999; position: relative;">
+  <button id="notif-bell-btn" class="btn" style="position: relative; cursor: pointer;" title="Notifikasi">
+    🔔
+    <span id="notif-badge" style="position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; display: none; align-items: center; justify-content: center;">0</span>
+  </button>
+</div>
+
+<hr style="margin: 20px 0;">
+
+<h2>Test Cases:</h2>
+<button onclick="testAddNotifications()">Tambah 5 Notifikasi Test</button>
+<button onclick="testOverdueNotif()">Tambah Notif Overdue</button>
+<button onclick="testDueTodayNotif()">Tambah Notif Jatuh Tempo Hari Ini</button>
+<button onclick="testClearAll()">Hapus Semua</button>
+
+<script src="notifications.js"></script>
+<script>
+  function testAddNotifications() {
+    window.NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 'Kredit Budi (Sepeda Motor) akan jatuh tempo dalam 3 hari. Angsuran: Rp 1.200.000', { customerId: 1, daysUntilDue: 3 });
+    window.NotificationModule.add('DUE_TODAY', '📌 Jatuh Tempo Hari Ini', 'Kredit Andi (Barang Elektronik) jatuh tempo HARI INI!', { customerId: 2, daysUntilDue: 0 });
+    window.NotificationModule.add('OVERDUE', '⚠️ Overdue 1 Hari', 'Kredit Siti (Furniture) telah 1 hari TELAT bayar!', { customerId: 3, daysUntilDue: -1 });
+    window.NotificationModule.add('DUE_TODAY', '⏰ Reminder Pembayaran', 'Kredit Ahmad (Kendaraan) - Jangan lupa untuk membayar angsuran bulan ini', { customerId: 4, daysUntilDue: 7 });
+    window.NotificationModule.add('OVERDUE', '⚠️ Overdue 5 Hari', 'Kredit Rini (Barang Rumah Tangga) telah 5 hari TELAT bayar!', { customerId: 5, daysUntilDue: -5 });
+    alert('✅ 5 notifikasi telah ditambahkan! Cek bell icon (badge seharusnya menunjukkan 5)');
+  }
+
+  function testOverdueNotif() {
+    window.NotificationModule.add('OVERDUE', '⚠️ Overdue 3 Hari', 'Kredit Hendra (Sepeda) telah 3 hari TELAT bayar!', { customerId: 6, daysUntilDue: -3 });
+    alert('✅ Notif overdue ditambahkan!');
+  }
+
+  function testDueTodayNotif() {
+    window.NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 'Kredit Dina (Perhiasan) jatuh tempo HARI INI!', { customerId: 7, daysUntilDue: 0 });
+    alert('✅ Notif jatuh tempo hari ini ditambahkan!');
+  }
+
+  function testClearAll() {
+    window.NotificationModule.clearAll();
+    alert('✅ Semua notifikasi dihapus!');
+  }
+</script>
+
+</body>
+</html>
