@@ -3688,26 +3688,61 @@ function checkDueDatesAndNotify() {
   });
 }
 
-// TEST: Trigger demo notifications for testing (remove in production)
+// TEST: Trigger REAL notifications based on actual customer due dates
 function triggerTestNotifications() {
   if (window.NotificationModule) {
-    // Add sample notifications for demo
-    NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
-      'Kredit Budi Hartono (Sepeda Motor Honda) akan jatuh tempo dalam 3 hari. Angsuran: Rp 1.200.000',
-      { customerId: 'demo-001', daysUntilDue: 3 }
-    );
+    const today = new Date();
+    const customers = getCustomers();
     
-    NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
-      'Kredit Andi Wijaya (TV 55" + Speaker) jatuh tempo HARI INI!',
-      { customerId: 'demo-002', daysUntilDue: 0 }
-    );
+    // Generate notifications for customers with due dates near today (±3 days, today, and +1 day overdue)
+    customers.forEach(c => {
+      try {
+        const tglKredit = new Date(c.tgl);
+        let dueDate = new Date(tglKredit);
+        dueDate.setMonth(dueDate.getMonth() + c.tenor);
+        
+        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        const angsuran = Math.round((Number(c.kreditPokok) * (1 + Number(c.totalBunga) / 100)) / c.tenor).toLocaleString('id-ID');
+        
+        // Notify 3 days before due
+        if (daysUntilDue === 3) {
+          NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
+            `Kredit ${c.nama} (${c.barang}) akan jatuh tempo pada ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
+            { customerId: c.id, daysUntilDue: 3, dueDate: dueDate.toISOString() }
+          );
+        }
+        
+        // Notify on due date
+        if (daysUntilDue === 0) {
+          NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
+            `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${dueDate.toLocaleDateString('id-ID')})! Angsuran: Rp ${angsuran}`,
+            { customerId: c.id, daysUntilDue: 0, dueDate: dueDate.toISOString() }
+          );
+        }
+        
+        // Notify 1 day overdue
+        if (daysUntilDue === -1) {
+          NotificationModule.add('OVERDUE', '⚠️ Overdue 1 Hari', 
+            `Kredit ${c.nama} (${c.barang}) telah JATUH TEMPO sejak ${dueDate.toLocaleDateString('id-ID')} dan belum dibayar! Angsuran: Rp ${angsuran}`,
+            { customerId: c.id, daysUntilDue: -1, dueDate: dueDate.toISOString() }
+          );
+        }
+        
+        // Notify 2-5 days overdue
+        if (daysUntilDue >= -5 && daysUntilDue <= -2) {
+          const hariTelat = Math.abs(daysUntilDue);
+          NotificationModule.add('OVERDUE', `⚠️ Overdue ${hariTelat} Hari`, 
+            `Kredit ${c.nama} (${c.barang}) telah ${hariTelat} hari TELAT bayar! Due: ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
+            { customerId: c.id, daysUntilDue: daysUntilDue, dueDate: dueDate.toISOString() }
+          );
+        }
+      } catch (err) {
+        // Skip if error
+      }
+    });
     
-    NotificationModule.add('OVERDUE', '⚠️ Overdue 2 Hari', 
-      'Kredit Siti Nurhaliza (Meja Makan + 6 Kursi) telah 2 hari TELAT bayar!',
-      { customerId: 'demo-003', daysUntilDue: -2 }
-    );
-    
-    console.log('✅ Test notifications added! Check the bell icon (🔔)');
+    const notifCount = JSON.parse(localStorage.getItem('inAppNotifications') || '[]').length;
+    console.log(`✅ Notifikasi real-time generated! Total: ${notifCount} notifikasi berdasarkan jatuh tempo pelanggan`);
   }
 }
 
