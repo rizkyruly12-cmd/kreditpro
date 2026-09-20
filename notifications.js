@@ -130,6 +130,10 @@
         
         // Render notifications
         this.renderDropdownContent();
+
+        // Update count label
+        const label = document.getElementById('notif-count-label');
+        if (label) label.textContent = this.notifications.length + ' notifikasi';
       }
     },
     
@@ -166,109 +170,81 @@
       `;
       
       dropdown.innerHTML = `
-        <div style="padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px 8px 0 0; flex-shrink: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #1e293b;">Notifikasi Jatuh Tempo</h3>
-            <button onclick="window.NotificationModule.closeDropdown()" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 20px; padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; pointer-events: all;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">✕</button>
+        <div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">Jatuh Tempo</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:1px;">Angsuran mendekati batas waktu</div>
           </div>
+          <button onclick="window.NotificationModule.closeDropdown()" style="background:none;border:none;color:#94a3b8;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px;" onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='none';this.style.color='#94a3b8'">✕</button>
         </div>
-        <div id="notif-dropdown-content" style="overflow-y: auto; overflow-x: hidden; flex: 1; padding: 8px; max-height: 400px; pointer-events: all; -webkit-overflow-scrolling: touch;"></div>
-        <div style="padding: 10px; border-top: 1px solid #e2e8f0; text-align: center; flex-shrink: 0; border-radius: 0 0 8px 8px; background: #fafafa;">
-          <button onclick="window.NotificationModule.clearAll()" style="background: none; border: none; color: #6366f1; cursor: pointer; font-size: 12px; text-decoration: underline; pointer-events: all;">Hapus Semua</button>
+        <div id="notif-dropdown-content" style="overflow-y:auto;overflow-x:hidden;flex:1;padding:4px 12px;max-height:400px;pointer-events:all;-webkit-overflow-scrolling:touch;"></div>
+        <div style="padding:10px 16px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:#94a3b8;" id="notif-count-label"></span>
+          <button onclick="window.NotificationModule.clearAll()" style="background:none;border:none;color:#6366f1;cursor:pointer;font-size:11.5px;font-weight:600;padding:4px 8px;border-radius:6px;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='none'">Hapus Semua</button>
         </div>
       `;
       
       document.body.appendChild(dropdown);
     },
     
-    // Render dropdown content - IMPROVED WITH CLEAR CUSTOMER NAMES
+    // Render dropdown content — minimal & clean
     renderDropdownContent() {
       const content = document.getElementById('notif-dropdown-content');
       if (!content) return;
-      
+
       if (this.notifications.length === 0) {
         content.innerHTML = `
-          <div style="padding: 40px 20px; text-align: center; color: #94a3b8;">
-            <svg width="40" height="40" style="margin: 0 auto 12px; opacity: 0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          <div style="padding:40px 20px;text-align:center;color:#94a3b8;">
+            <svg width="36" height="36" style="margin:0 auto 10px;display:block;opacity:.4;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            <p style="margin: 0; font-size: 13px;">Tidak ada notifikasi</p>
-          </div>
-        `;
+            <p style="margin:0;font-size:13px;">Tidak ada notifikasi</p>
+          </div>`;
         return;
       }
-      
-      content.innerHTML = this.notifications.map((notif, idx) => {
+
+      content.innerHTML = this.notifications.map(notif => {
         const date = new Date(notif.timestamp);
         const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const dateStr = date.toLocaleDateString('id-ID', { month: 'short', day: 'numeric' });
-        
-        let bgColor = '#f0f9ff'; // blue
-        let borderColor = '#0ea5e9';
-        let icon = '⏰';
-        let statusLabel = '';
-        let statusColor = '#0891b2';
-        
-        if (notif.type === 'OVERDUE') {
-          bgColor = '#fef2f2';
-          borderColor = '#dc2626';
-          icon = '⚠️';
-          statusLabel = '⚠️ OVERDUE';
-          statusColor = '#dc2626';
-        } else if (notif.type === 'DUE_TODAY') {
-          bgColor = '#fef3c7';
-          borderColor = '#d97706';
-          icon = '📅';
-          statusLabel = '📅 JATUH TEMPO HARI INI';
-          statusColor = '#d97706';
-        } else {
-          statusLabel = '⏰ JATUH TEMPO DEKAT';
-          statusColor = '#0891b2';
-        }
-        
-        // Parse message untuk extract nama pelanggan
-        const namaPelangganMatch = notif.message.match(/Kredit ([^(]+)/);
-        const namaPelanggan = namaPelangganMatch ? namaPelangganMatch[1].trim() : 'Pelanggan';
-        
+        const dateStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+        // Extract nama & barang dari pesan
+        const namaMatch  = notif.message.match(/Kredit ([^(]+)\(/);
         const barangMatch = notif.message.match(/\(([^)]+)\)/);
-        const barang = barangMatch ? barangMatch[1] : '';
-        
+        const nama   = namaMatch  ? namaMatch[1].trim()  : '';
+        const barang = barangMatch ? barangMatch[1].trim() : '';
+
+        // Ambil keterangan utama (angsuran / telat)
+        const angsuranMatch = notif.message.match(/Angsuran: (Rp[\d.,]+)/);
+        const angsuran = angsuranMatch ? angsuranMatch[1] : '';
+
+        const isOverdue   = notif.type === 'OVERDUE';
+        const isDueToday  = notif.type === 'DUE_TODAY' && notif.data?.daysUntilDue === 0;
+
+        const accentColor = isOverdue ? '#dc2626' : isDueToday ? '#d97706' : '#6366f1';
+        const dotColor    = isOverdue ? '#fca5a5' : isDueToday ? '#fde68a' : '#c7d2fe';
+
         return `
-          <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 14px; margin-bottom: 10px; border-radius: 6px; font-size: 13px;">
-            <div style="display: flex; gap: 10px;">
-              <!-- Icon -->
-              <div style="font-size: 24px; flex-shrink: 0; padding-top: 2px;">
-                ${icon}
+          <div style="display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid #f1f5f9;">
+            <!-- Dot indicator -->
+            <div style="flex-shrink:0;padding-top:5px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:${accentColor};"></div>
+            </div>
+            <!-- Content -->
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:2px;">
+                <span style="font-size:13px;font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${nama || notif.title}</span>
+                <span style="font-size:10px;color:#94a3b8;flex-shrink:0;">${dateStr} ${timeStr}</span>
               </div>
-              <!-- Content -->
-              <div style="flex: 1; min-width: 0;">
-                <!-- Status Badge -->
-                <div style="display: inline-block; background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-bottom: 6px;">
-                  ${statusLabel}
-                </div>
-                
-                <!-- NAMA PELANGGAN - BESAR & JELAS -->
-                <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 4px; word-break: break-word;">
-                  ${namaPelanggan}
-                </div>
-                
-                <!-- BARANG -->
-                ${barang ? `<div style="font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 500;">📦 ${barang}</div>` : ''}
-                
-                <!-- MESSAGE -->
-                <div style="color: #64748b; margin-bottom: 6px; line-height: 1.5; font-size: 12px;">
-                  ${notif.message}
-                </div>
-                
-                <!-- TIMESTAMP -->
-                <div style="font-size: 10px; color: #94a3b8; text-align: right; margin-top: 6px;">
-                  ${dateStr} • ${timeStr}
-                </div>
+              ${barang ? `<div style="font-size:11.5px;color:#64748b;margin-bottom:4px;">📦 ${barang}</div>` : ''}
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <span style="font-size:11px;color:${accentColor};font-weight:600;background:${accentColor}15;padding:2px 8px;border-radius:20px;">
+                  ${isOverdue ? '⚠ Overdue' : isDueToday ? '● Hari Ini' : '○ 3 Hari Lagi'}
+                </span>
+                ${angsuran ? `<span style="font-size:11px;color:#475569;font-weight:600;">${angsuran}</span>` : ''}
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
     },
     
