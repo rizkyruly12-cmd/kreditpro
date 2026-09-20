@@ -114,6 +114,13 @@ const CUSTOMERS_DATA = [
   { id:"N109", nama:"Yunita", tgl:"2026-07-18", barang:"Oppo A6t pro 8/128", harga:3270000, dp:0, kreditPokok:3270000, tenor:6, totalBunga:38, bungaPct:6.3333, noHp:"81213875347" },
   { id:"N110", nama:"Mursid", tgl:"2026-07-20", barang:"Realme C100i", harga:2200000, dp:0, kreditPokok:2200000, tenor:10, totalBunga:59, bungaPct:5.9, noHp:"85378750378" },
   { id:"N111", nama:"Yunita", tgl:"2026-08-10", barang:"Poco C81 4/128", harga:1800000, dp:0, kreditPokok:1800000, tenor:6, totalBunga:39, bungaPct:6.5, noHp:"81213875347" },
+  
+  // ===== TEST DATA (Due dates yang dekat untuk demo) =====
+  { id:"N112", nama:"Budi Hartono", tgl:"2024-06-20", barang:"Sepeda Motor Honda", harga:12000000, dp:5000000, kreditPokok:7000000, tenor:10, totalBunga:70, bungaPct:7, noHp:"081234567890" },
+  { id:"N113", nama:"Andi Wijaya", tgl:"2024-03-20", barang:"TV 55\" + Speaker", harga:5500000, dp:1000000, kreditPokok:4500000, tenor:10, totalBunga:50, bungaPct:5, noHp:"082345678901" },
+  { id:"N114", nama:"Siti Nurhaliza", tgl:"2023-12-20", barang:"Meja Makan + 6 Kursi", harga:3500000, dp:500000, kreditPokok:3000000, tenor:12, totalBunga:84, bungaPct:7, noHp:"083456789012" },
+  { id:"N115", nama:"Ahmad Riyadi", tgl:"2024-08-20", barang:"Laptop Dell 15\"", harga:8000000, dp:2000000, kreditPokok:6000000, tenor:10, totalBunga:60, bungaPct:6, noHp:"084567890123" },
+  { id:"N116", nama:"Rini Susanti", tgl:"2024-07-20", barang:"Mesin Cuci Polytron 8Kg", harga:2500000, dp:500000, kreditPokok:2000000, tenor:10, totalBunga:70, bungaPct:7, noHp:"085678901234" },
 ];
 
 // ============================================================
