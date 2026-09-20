@@ -3640,10 +3640,12 @@ function checkDueDatesAndNotify() {
         body: `Barang: ${c.barang}\nAngsuran: Rp ${angsuran}`
       });
       // In-app notification
-      addNotification('warning', '⏰ Jatuh Tempo 3 Hari', 
-        `Kredit ${c.nama} (${c.barang}) akan jatuh tempo dalam 3 hari. Angsuran: Rp ${angsuran}`,
-        { customerId: c.id, daysUntilDue: 3 }
-      );
+      if (window.NotificationModule) {
+        NotificationModule.add('warning', '⏰ Jatuh Tempo 3 Hari', 
+          `Kredit ${c.nama} (${c.barang}) akan jatuh tempo dalam 3 hari. Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: 3 }
+        );
+      }
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_in_3_days' });
     }
     
@@ -3654,10 +3656,12 @@ function checkDueDatesAndNotify() {
         body: `Barang: ${c.barang}`
       });
       // In-app notification
-      addNotification('alert', '📌 Jatuh Tempo Hari Ini', 
-        `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI!`,
-        { customerId: c.id, daysUntilDue: 0 }
-      );
+      if (window.NotificationModule) {
+        NotificationModule.add('alert', '📌 Jatuh Tempo Hari Ini', 
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI!`,
+          { customerId: c.id, daysUntilDue: 0 }
+        );
+      }
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_today' });
     }
     
@@ -3668,10 +3672,12 @@ function checkDueDatesAndNotify() {
         body: `Barang: ${c.barang}`
       });
       // In-app notification
-      addNotification('alert', '⚠️ Overdue 1 Hari', 
-        `Kredit ${c.nama} (${c.barang}) telah 1 hari TELAT bayar!`,
-        { customerId: c.id, daysUntilDue: -1 }
-      );
+      if (window.NotificationModule) {
+        NotificationModule.add('alert', '⚠️ Overdue 1 Hari', 
+          `Kredit ${c.nama} (${c.barang}) telah 1 hari TELAT bayar!`,
+          { customerId: c.id, daysUntilDue: -1 }
+        );
+      }
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
     }
   });
