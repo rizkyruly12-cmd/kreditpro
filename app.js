@@ -3626,145 +3626,152 @@ function showNotification(title, options = {}) {
   }
 }
 
-function checkDueDatesAndNotify() {
-  const customers = getCustomers();  // Use current cached data
+// ============================================================
+// NOTIFIKASI ANGSURAN BULANAN
+// Logika: setiap pelanggan aktif punya jatuh tempo SETIAP BULAN
+// pada tanggal yang SAMA dengan tanggal kredit mereka.
+// Contoh: kredit tgl 20 Juli 2026, tenor 10 bln
+//   → jatuh tempo: 20 Agt, 20 Sep, 20 Okt, ..., 20 Mei 2027
+// ============================================================
+function getNextMonthlyDueDate(c) {
   const today = new Date();
-  
+  today.setHours(0, 0, 0, 0);
+
+  const tglKredit = new Date(c.tgl);
+  tglKredit.setHours(0, 0, 0, 0);
+
+  // Kredit belum mulai (tanggal kredit masih di masa depan) → skip
+  if (tglKredit > today) return null;
+
+  // Sudah lunas → skip
+  const payments = getPaymentsByCustomer(c.id);
+  const totalDibayar = payments.reduce((s, p) => s + (Number(p.jumlahAngsuran) || 0), 0);
+  const { totalBayar } = hitungAngsuran(c);
+  if (totalDibayar >= totalBayar - 1) return null;
+
+  // Tanggal angsuran = tanggal yang sama dengan tgl kredit setiap bulan
+  const tanggal = tglKredit.getDate();
+
+  // Cek: apakah tanggal angsuran bulan ini masih dalam window -5 s/d +3 hari?
+  const dueBulanIni = new Date(today.getFullYear(), today.getMonth(), tanggal);
+  const diffBulanIni = Math.ceil((dueBulanIni - today) / (1000 * 60 * 60 * 24));
+
+  let dueDate = null;
+  if (diffBulanIni >= -5 && diffBulanIni <= 3) {
+    dueDate = dueBulanIni;
+  } else {
+    // Cek bulan depan juga (untuk window H-3 di awal bulan)
+    const dueBulanDepan = new Date(today.getFullYear(), today.getMonth() + 1, tanggal);
+    const diffBulanDepan = Math.ceil((dueBulanDepan - today) / (1000 * 60 * 60 * 24));
+    if (diffBulanDepan >= 0 && diffBulanDepan <= 3) {
+      dueDate = dueBulanDepan;
+    }
+  }
+
+  if (!dueDate) return null;
+
+  // Pastikan masih dalam rentang tenor (belum melewati angsuran terakhir)
+  const tglAkhir = new Date(tglKredit);
+  tglAkhir.setMonth(tglAkhir.getMonth() + c.tenor);
+  if (dueDate > tglAkhir) return null;
+
+  // Pastikan kredit sudah berjalan (bulan ini bukan sebelum angsuran pertama)
+  const angsuranPertama = new Date(tglKredit);
+  angsuranPertama.setMonth(angsuranPertama.getMonth() + 1);
+  if (dueDate < angsuranPertama) return null;
+
+  return dueDate;
+}
+
+function checkDueDatesAndNotify() {
+  const customers = getCustomers();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   customers.forEach(c => {
-    const tglKredit = new Date(c.tgl);
-    let dueDate = new Date(tglKredit);
-    dueDate.setMonth(dueDate.getMonth() + c.tenor);
-    
-    const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-    const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
-    
-    // Notify 3 days before due
-    if (daysUntilDue === 3) {
-      // Desktop notification
-      showNotification(`⏰ Kredit ${c.nama} akan jatuh tempo dalam 3 hari`, {
-        body: `Barang: ${c.barang}\nAngsuran: Rp ${angsuran}`
-      });
-      // In-app notification
-      if (window.NotificationModule) {
-        NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
-          `Kredit ${c.nama} (${c.barang}) akan jatuh tempo dalam 3 hari. Angsuran: Rp ${angsuran}`,
-          { customerId: c.id, daysUntilDue: 3 }
-        );
+    try {
+      const dueDate = getNextMonthlyDueDate(c);
+      if (!dueDate) return;
+
+      const diff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+      const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
+      const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (diff === 3) {
+        showNotification(`⏰ ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} • Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
       }
-      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_in_3_days' });
-    }
-    
-    // Notify on due date
-    if (daysUntilDue === 0) {
-      // Desktop notification
-      showNotification(`📌 Kredit ${c.nama} jatuh tempo hari ini!`, {
-        body: `Barang: ${c.barang}`
-      });
-      // In-app notification
-      if (window.NotificationModule) {
-        NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
-          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI!`,
-          { customerId: c.id, daysUntilDue: 0 }
-        );
+      if (diff === 0) {
+        showNotification(`📅 ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} • Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
       }
-      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'due_today' });
-    }
-    
-    // Notify 1 day after due
-    if (daysUntilDue === -1) {
-      // Desktop notification
-      showNotification(`⚠️ Kredit ${c.nama} telah 1 hari telat!`, {
-        body: `Barang: ${c.barang}`
-      });
-      // In-app notification
-      if (window.NotificationModule) {
-        NotificationModule.add('OVERDUE', '⚠️ Overdue 1 Hari', 
-          `Kredit ${c.nama} (${c.barang}) telah 1 hari TELAT bayar!`,
-          { customerId: c.id, daysUntilDue: -1 }
-        );
+      if (diff < 0 && diff >= -5) {
+        const hari = Math.abs(diff);
+        showNotification(`⚠️ ${c.nama} telat ${hari} hari!`, { body: `${c.barang} • Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('OVERDUE', `⚠️ Overdue ${hari} Hari`,
+          `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
       }
-      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
-    }
-    
-    // Notify 2-5 days overdue
-    if (daysUntilDue >= -5 && daysUntilDue <= -2) {
-      const hariTelat = Math.abs(daysUntilDue);
-      if (window.NotificationModule) {
-        NotificationModule.add('OVERDUE', `⚠️ Overdue ${hariTelat} Hari`, 
-          `Kredit ${c.nama} (${c.barang}) telah ${hariTelat} hari TELAT bayar!`,
-          { customerId: c.id, daysUntilDue: daysUntilDue }
-        );
-      }
-      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue', days: hariTelat });
-    }
+    } catch (e) { /* skip */ }
   });
 }
 
-// TEST: Trigger REAL notifications based on actual customer due dates FROM SUPABASE
+// Jalankan saat app load — baca data langsung dari Supabase
 async function triggerTestNotifications() {
-  if (window.NotificationModule) {
-    // Force fetch from Supabase (not cached data)
-    const customers = await DB.getCustomers(true);
-    const today = new Date();
-    
-    console.log(`[Notif] Checking ${customers.length} customers from Supabase for due dates...`);
-    
-    let notifCount = 0;
-    
-    // Generate notifications for customers with due dates near today (±3 days, today, and +1 day overdue)
-    customers.forEach(c => {
-      try {
-        const tglKredit = new Date(c.tgl);
-        let dueDate = new Date(tglKredit);
-        dueDate.setMonth(dueDate.getMonth() + c.tenor);
-        
-        const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-        const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
-        
-        // Notify 3 days before due
-        if (daysUntilDue === 3) {
-          NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
-            `Kredit ${c.nama} (${c.barang}) akan jatuh tempo pada ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
-            { customerId: c.id, daysUntilDue: 3, dueDate: dueDate.toISOString() }
-          );
-          notifCount++;
-        }
-        
-        // Notify on due date
-        if (daysUntilDue === 0) {
-          NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
-            `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${dueDate.toLocaleDateString('id-ID')})! Angsuran: Rp ${angsuran}`,
-            { customerId: c.id, daysUntilDue: 0, dueDate: dueDate.toISOString() }
-          );
-          notifCount++;
-        }
-        
-        // Notify 1 day overdue
-        if (daysUntilDue === -1) {
-          NotificationModule.add('OVERDUE', '⚠️ Overdue 1 Hari', 
-            `Kredit ${c.nama} (${c.barang}) telah JATUH TEMPO sejak ${dueDate.toLocaleDateString('id-ID')} dan belum dibayar! Angsuran: Rp ${angsuran}`,
-            { customerId: c.id, daysUntilDue: -1, dueDate: dueDate.toISOString() }
-          );
-          notifCount++;
-        }
-        
-        // Notify 2-5 days overdue
-        if (daysUntilDue >= -5 && daysUntilDue <= -2) {
-          const hariTelat = Math.abs(daysUntilDue);
-          NotificationModule.add('OVERDUE', `⚠️ Overdue ${hariTelat} Hari`, 
-            `Kredit ${c.nama} (${c.barang}) telah ${hariTelat} hari TELAT bayar! Due: ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
-            { customerId: c.id, daysUntilDue: daysUntilDue, dueDate: dueDate.toISOString() }
-          );
-          notifCount++;
-        }
-      } catch (err) {
-        console.warn('[Notif Error]', err.message);
+  if (!window.NotificationModule) return;
+
+  // Bersihkan notifikasi lama > 1 hari supaya tidak duplikat
+  const stored = JSON.parse(localStorage.getItem('inAppNotifications') || '[]');
+  const cutoff = Date.now() - 86400000; // 24 jam lalu
+  const fresh = stored.filter(n => new Date(n.timestamp).getTime() > cutoff);
+  localStorage.setItem('inAppNotifications', JSON.stringify(fresh));
+  NotificationModule.loadFromStorage();
+  NotificationModule.updateBadge();
+
+  // Force-fetch langsung dari Supabase (bukan cache)
+  const customers = await DB.getCustomers(true);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  console.log(`[Notif] Memeriksa ${customers.length} pelanggan — tanggal hari ini: ${today.toLocaleDateString('id-ID')}`);
+  let count = 0;
+
+  customers.forEach(c => {
+    try {
+      const dueDate = getNextMonthlyDueDate(c);
+      if (!dueDate) return;
+
+      const diff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+      const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
+      const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (diff === 3) {
+        NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
+        count++;
       }
-    });
-    
-    const storedNotifs = JSON.parse(localStorage.getItem('inAppNotifications') || '[]');
-    console.log(`✅ Notifikasi real-time generated! Total: ${storedNotifs.length} notifikasi dari database Supabase`);
-  }
+      if (diff === 0) {
+        NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
+        count++;
+      }
+      if (diff < 0 && diff >= -5) {
+        const hari = Math.abs(diff);
+        NotificationModule.add('OVERDUE', `⚠️ Overdue ${hari} Hari`,
+          `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
+          { customerId: c.id, daysUntilDue: diff });
+        count++;
+      }
+    } catch (e) { console.warn('[Notif]', c?.nama, e.message); }
+  });
+
+  console.log(`✅ Selesai. ${count} notifikasi jatuh tempo dari ${customers.length} pelanggan.`);
 }
 
 function updateSortableHeaders() {
