@@ -143,10 +143,14 @@
     
     // Setup event listeners
     setupEventListeners() {
-      // Toggle dropdown
+      // Toggle dropdown - make sure button is always clickable
       const btn = document.getElementById('notif-bell-btn');
       if (btn) {
-        btn.addEventListener('click', () => this.toggle());
+        btn.style.zIndex = '1001';  // Make sure it's on top
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();  // Prevent event bubbling
+          this.toggle();
+        });
       }
       
       // Close on outside click

@@ -290,7 +290,7 @@ button { font-family: var(--font); }
   font-weight: 400;
 }
 
-.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; z-index: 500; position: relative; }
 
 .btn-menu-toggle {
   display: none;
