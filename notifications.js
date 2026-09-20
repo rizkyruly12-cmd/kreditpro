@@ -180,7 +180,7 @@
       document.body.appendChild(dropdown);
     },
     
-    // Render dropdown content
+    // Render dropdown content - IMPROVED WITH CLEAR CUSTOMER NAMES
     renderDropdownContent() {
       const content = document.getElementById('notif-dropdown-content');
       if (!content) return;
@@ -201,29 +201,69 @@
       content.innerHTML = this.notifications.map((notif, idx) => {
         const date = new Date(notif.timestamp);
         const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('id-ID', { month: 'short', day: 'numeric' });
         
         let bgColor = '#f0f9ff'; // blue
         let borderColor = '#0ea5e9';
         let icon = '⏰';
+        let statusLabel = '';
+        let statusColor = '#0891b2';
         
         if (notif.type === 'OVERDUE') {
           bgColor = '#fef2f2';
           borderColor = '#dc2626';
           icon = '⚠️';
+          statusLabel = '⚠️ OVERDUE';
+          statusColor = '#dc2626';
         } else if (notif.type === 'DUE_TODAY') {
           bgColor = '#fef3c7';
           borderColor = '#d97706';
           icon = '📅';
+          statusLabel = '📅 JATUH TEMPO HARI INI';
+          statusColor = '#d97706';
+        } else {
+          statusLabel = '⏰ JATUH TEMPO DEKAT';
+          statusColor = '#0891b2';
         }
         
+        // Parse message untuk extract nama pelanggan
+        const namaPelangganMatch = notif.message.match(/Kredit ([^(]+)/);
+        const namaPelanggan = namaPelangganMatch ? namaPelangganMatch[1].trim() : 'Pelanggan';
+        
+        const barangMatch = notif.message.match(/\(([^)]+)\)/);
+        const barang = barangMatch ? barangMatch[1] : '';
+        
         return `
-          <div style="background: ${bgColor}; border-left: 3px solid ${borderColor}; padding: 12px; margin-bottom: 8px; border-radius: 4px; font-size: 13px; line-height: 1.4;">
-            <div style="display: flex; align-items: flex-start; gap: 8px;">
-              <span style="font-size: 16px; margin-top: 2px;">${icon}</span>
-              <div style="flex: 1;">
-                <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">${notif.title}</div>
-                <div style="color: #475569; margin-bottom: 4px;">${notif.message}</div>
-                <div style="font-size: 11px; color: #94a3b8;">${timeStr}</div>
+          <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 14px; margin-bottom: 10px; border-radius: 6px; font-size: 13px;">
+            <div style="display: flex; gap: 10px;">
+              <!-- Icon -->
+              <div style="font-size: 24px; flex-shrink: 0; padding-top: 2px;">
+                ${icon}
+              </div>
+              <!-- Content -->
+              <div style="flex: 1; min-width: 0;">
+                <!-- Status Badge -->
+                <div style="display: inline-block; background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-bottom: 6px;">
+                  ${statusLabel}
+                </div>
+                
+                <!-- NAMA PELANGGAN - BESAR & JELAS -->
+                <div style="font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 4px; word-break: break-word;">
+                  ${namaPelanggan}
+                </div>
+                
+                <!-- BARANG -->
+                ${barang ? `<div style="font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 500;">📦 ${barang}</div>` : ''}
+                
+                <!-- MESSAGE -->
+                <div style="color: #64748b; margin-bottom: 6px; line-height: 1.5; font-size: 12px;">
+                  ${notif.message}
+                </div>
+                
+                <!-- TIMESTAMP -->
+                <div style="font-size: 10px; color: #94a3b8; text-align: right; margin-top: 6px;">
+                  ${dateStr} • ${timeStr}
+                </div>
               </div>
             </div>
           </div>
