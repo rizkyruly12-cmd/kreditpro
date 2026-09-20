@@ -1200,10 +1200,11 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
   background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
   color: var(--gray-400);
   font-size: 13px;
-  margin-top: 60px;
+  margin-top: 0;
   border-top: 1px solid rgba(99,102,241,.2);
   width: calc(100% - var(--sidebar-w));
   position: relative;
+  clear: both;
 }
 
 .footer-inner {
