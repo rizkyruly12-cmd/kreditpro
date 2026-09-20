@@ -120,7 +120,7 @@
       
       const dd = document.getElementById('notification-dropdown');
       if (dd) {
-        dd.style.display = 'block';
+        dd.style.display = 'flex';
         this.isDropdownOpen = true;
         
         // Mark all as read
@@ -156,24 +156,25 @@
         width: 380px;
         background: white;
         border-radius: 8px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        z-index: 10000;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        z-index: 99999;
         display: none;
         flex-direction: column;
-        max-height: 500px;
+        max-height: 520px;
         overflow: hidden;
+        pointer-events: all;
       `;
       
       dropdown.innerHTML = `
-        <div style="padding: 16px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+        <div style="padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px 8px 0 0; flex-shrink: 0;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1e293b;">Notifikasi Jatuh Tempo</h3>
-            <button onclick="window.NotificationModule.closeDropdown()" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">✕</button>
+            <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #1e293b;">Notifikasi Jatuh Tempo</h3>
+            <button onclick="window.NotificationModule.closeDropdown()" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 20px; padding: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; pointer-events: all;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">✕</button>
           </div>
         </div>
-        <div id="notif-dropdown-content" style="overflow-y: auto; flex: 1; padding: 8px;"></div>
-        <div style="padding: 12px; border-top: 1px solid #e2e8f0; text-align: center;">
-          <button onclick="window.NotificationModule.clearAll()" style="background: none; border: none; color: #6366f1; cursor: pointer; font-size: 12px; text-decoration: underline;">Hapus Semua</button>
+        <div id="notif-dropdown-content" style="overflow-y: auto; overflow-x: hidden; flex: 1; padding: 8px; max-height: 400px; pointer-events: all; -webkit-overflow-scrolling: touch;"></div>
+        <div style="padding: 10px; border-top: 1px solid #e2e8f0; text-align: center; flex-shrink: 0; border-radius: 0 0 8px 8px; background: #fafafa;">
+          <button onclick="window.NotificationModule.clearAll()" style="background: none; border: none; color: #6366f1; cursor: pointer; font-size: 12px; text-decoration: underline; pointer-events: all;">Hapus Semua</button>
         </div>
       `;
       
