@@ -1192,15 +1192,14 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
    FOOTER
    ============================================================ */
 #app-footer {
-  margin-left: var(--sidebar-w);
+  margin-left: 0;
+  margin-top: 40px;
   background: var(--gray-900);
   color: var(--gray-400);
   font-size: 13px;
-  margin-top: 0;
   border-top: 1px solid rgba(99,102,241,.15);
-  width: calc(100% - var(--sidebar-w));
+  width: 100%;
   position: relative;
-  z-index: 1;
 }
 
 .footer-inner {
@@ -1369,7 +1368,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 
 @media (max-width: 768px) {
-  #app-footer { margin-left: 0; }
   .footer-inner {
     grid-template-columns: 1fr;
     gap: 24px;
