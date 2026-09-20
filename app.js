@@ -3627,7 +3627,7 @@ function showNotification(title, options = {}) {
 }
 
 function checkDueDatesAndNotify() {
-  const customers = getCustomers();
+  const customers = getCustomers();  // Use current cached data
   const today = new Date();
   
   customers.forEach(c => {
@@ -3685,14 +3685,31 @@ function checkDueDatesAndNotify() {
       }
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
     }
+    
+    // Notify 2-5 days overdue
+    if (daysUntilDue >= -5 && daysUntilDue <= -2) {
+      const hariTelat = Math.abs(daysUntilDue);
+      if (window.NotificationModule) {
+        NotificationModule.add('OVERDUE', `⚠️ Overdue ${hariTelat} Hari`, 
+          `Kredit ${c.nama} (${c.barang}) telah ${hariTelat} hari TELAT bayar!`,
+          { customerId: c.id, daysUntilDue: daysUntilDue }
+        );
+      }
+      logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue', days: hariTelat });
+    }
   });
 }
 
-// TEST: Trigger REAL notifications based on actual customer due dates
-function triggerTestNotifications() {
+// TEST: Trigger REAL notifications based on actual customer due dates FROM SUPABASE
+async function triggerTestNotifications() {
   if (window.NotificationModule) {
+    // Force fetch from Supabase (not cached data)
+    const customers = await DB.getCustomers(true);
     const today = new Date();
-    const customers = getCustomers();
+    
+    console.log(`[Notif] Checking ${customers.length} customers from Supabase for due dates...`);
+    
+    let notifCount = 0;
     
     // Generate notifications for customers with due dates near today (±3 days, today, and +1 day overdue)
     customers.forEach(c => {
@@ -3702,7 +3719,7 @@ function triggerTestNotifications() {
         dueDate.setMonth(dueDate.getMonth() + c.tenor);
         
         const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-        const angsuran = Math.round((Number(c.kreditPokok) * (1 + Number(c.totalBunga) / 100)) / c.tenor).toLocaleString('id-ID');
+        const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
         
         // Notify 3 days before due
         if (daysUntilDue === 3) {
@@ -3710,6 +3727,7 @@ function triggerTestNotifications() {
             `Kredit ${c.nama} (${c.barang}) akan jatuh tempo pada ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
             { customerId: c.id, daysUntilDue: 3, dueDate: dueDate.toISOString() }
           );
+          notifCount++;
         }
         
         // Notify on due date
@@ -3718,6 +3736,7 @@ function triggerTestNotifications() {
             `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${dueDate.toLocaleDateString('id-ID')})! Angsuran: Rp ${angsuran}`,
             { customerId: c.id, daysUntilDue: 0, dueDate: dueDate.toISOString() }
           );
+          notifCount++;
         }
         
         // Notify 1 day overdue
@@ -3726,6 +3745,7 @@ function triggerTestNotifications() {
             `Kredit ${c.nama} (${c.barang}) telah JATUH TEMPO sejak ${dueDate.toLocaleDateString('id-ID')} dan belum dibayar! Angsuran: Rp ${angsuran}`,
             { customerId: c.id, daysUntilDue: -1, dueDate: dueDate.toISOString() }
           );
+          notifCount++;
         }
         
         // Notify 2-5 days overdue
@@ -3735,14 +3755,15 @@ function triggerTestNotifications() {
             `Kredit ${c.nama} (${c.barang}) telah ${hariTelat} hari TELAT bayar! Due: ${dueDate.toLocaleDateString('id-ID')}. Angsuran: Rp ${angsuran}`,
             { customerId: c.id, daysUntilDue: daysUntilDue, dueDate: dueDate.toISOString() }
           );
+          notifCount++;
         }
       } catch (err) {
-        // Skip if error
+        console.warn('[Notif Error]', err.message);
       }
     });
     
-    const notifCount = JSON.parse(localStorage.getItem('inAppNotifications') || '[]').length;
-    console.log(`✅ Notifikasi real-time generated! Total: ${notifCount} notifikasi berdasarkan jatuh tempo pelanggan`);
+    const storedNotifs = JSON.parse(localStorage.getItem('inAppNotifications') || '[]');
+    console.log(`✅ Notifikasi real-time generated! Total: ${storedNotifs.length} notifikasi dari database Supabase`);
   }
 }
 
