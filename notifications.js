@@ -15,7 +15,7 @@
       this.loadFromStorage();
       this.updateBadge();
       this.setupBellButton();
-      this.setupClickOutside();
+      // setupClickOutside handled via document.addEventListener below
       console.log('✓ Notification module initialized');
     },
     

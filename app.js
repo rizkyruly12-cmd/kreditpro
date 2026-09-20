@@ -4027,37 +4027,25 @@ function toggleNotificationCenter() {
 }
 
 function renderNotificationList() {
+  // Fungsi ini sudah digantikan oleh NotificationModule.renderDropdownContent()
+  // Tetap ada agar tidak error jika masih dipanggil di tempat lain
   const listEl = document.getElementById('notification-list');
-  
-  if (!notifications.length) {
+  if (!listEl) return;
+  if (!notifications || !notifications.length) {
     listEl.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
     return;
   }
-  
   listEl.innerHTML = notifications.map(n => {
     const ts = new Date(n.timestamp);
     const timeStr = getTimeAgo(ts);
-    
-    const iconMap = {
-      'warning': { icon: '⏰', class: 'warning' },
-      'alert': { icon: '⚠️', class: 'alert' },
-      'success': { icon: '✓', class: 'success' },
-      'info': { icon: 'ℹ️', class: 'info' }
-    };
-    
-    const iconData = iconMap[n.type] || iconMap['info'];
-    
     return `
       <div class="notification-item" onclick="markNotificationAsRead(${n.id})">
-        <div class="notification-item-icon ${iconData.class}">${iconData.icon}</div>
         <div class="notification-item-content">
           <div class="notification-item-title">${n.title}</div>
           <div class="notification-item-message">${n.message}</div>
           <div class="notification-item-time">${timeStr}</div>
         </div>
-        ${!n.read ? '<div class="notification-item-unread"></div>' : ''}
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
