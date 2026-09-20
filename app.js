@@ -98,6 +98,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   showPageLoader('Memuat data...');
   await initDB();
+  
+  // Auto-trigger test notifications for demo (remove in production)
+  setTimeout(() => {
+    triggerTestNotifications();
+  }, 2000);
   // Data sudah di-cache saat login via bootstrap, pakai cache dulu
   await Promise.all([
     DB.getCustomers(false),
@@ -3641,7 +3646,7 @@ function checkDueDatesAndNotify() {
       });
       // In-app notification
       if (window.NotificationModule) {
-        NotificationModule.add('warning', '⏰ Jatuh Tempo 3 Hari', 
+        NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
           `Kredit ${c.nama} (${c.barang}) akan jatuh tempo dalam 3 hari. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: 3 }
         );
@@ -3657,7 +3662,7 @@ function checkDueDatesAndNotify() {
       });
       // In-app notification
       if (window.NotificationModule) {
-        NotificationModule.add('alert', '📌 Jatuh Tempo Hari Ini', 
+        NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI!`,
           { customerId: c.id, daysUntilDue: 0 }
         );
@@ -3673,7 +3678,7 @@ function checkDueDatesAndNotify() {
       });
       // In-app notification
       if (window.NotificationModule) {
-        NotificationModule.add('alert', '⚠️ Overdue 1 Hari', 
+        NotificationModule.add('OVERDUE', '⚠️ Overdue 1 Hari', 
           `Kredit ${c.nama} (${c.barang}) telah 1 hari TELAT bayar!`,
           { customerId: c.id, daysUntilDue: -1 }
         );
@@ -3681,6 +3686,29 @@ function checkDueDatesAndNotify() {
       logActivity('NOTIFICATION', 'customer', c.id, { reason: 'overdue_1_day' });
     }
   });
+}
+
+// TEST: Trigger demo notifications for testing (remove in production)
+function triggerTestNotifications() {
+  if (window.NotificationModule) {
+    // Add sample notifications for demo
+    NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari', 
+      'Kredit Budi Hartono (Sepeda Motor Honda) akan jatuh tempo dalam 3 hari. Angsuran: Rp 1.200.000',
+      { customerId: 'demo-001', daysUntilDue: 3 }
+    );
+    
+    NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini', 
+      'Kredit Andi Wijaya (TV 55" + Speaker) jatuh tempo HARI INI!',
+      { customerId: 'demo-002', daysUntilDue: 0 }
+    );
+    
+    NotificationModule.add('OVERDUE', '⚠️ Overdue 2 Hari', 
+      'Kredit Siti Nurhaliza (Meja Makan + 6 Kursi) telah 2 hari TELAT bayar!',
+      { customerId: 'demo-003', daysUntilDue: -2 }
+    );
+    
+    console.log('✅ Test notifications added! Check the bell icon (🔔)');
+  }
 }
 
 function updateSortableHeaders() {
