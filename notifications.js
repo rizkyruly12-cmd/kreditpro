@@ -47,7 +47,8 @@
         message,
         timestamp: new Date().toISOString(),
         read: false,
-        data
+        data,
+        dedupeKey: data.dedupeKey || null
       };
       
       this.notifications.unshift(notif);
@@ -62,17 +63,22 @@
       return notif;
     },
     
-    // Show browser notification
+    // Show browser notification (hanya sekali per sesi per judul)
     showBrowserNotification(title, message) {
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification(title, {
-            body: message,
-            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%236366f1"/></svg>'
-          });
-        } catch (e) {
-          console.warn('Notification failed:', e);
-        }
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      // Guard: notifikasi yang sama hanya muncul SEKALI per sesi browser (tab)
+      const key = 'bnotif_' + btoa(unescape(encodeURIComponent(title))).slice(0, 40);
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+
+      try {
+        new Notification(title, {
+          body: message,
+          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%236366f1"/></svg>'
+        });
+      } catch (e) {
+        console.warn('Notification failed:', e);
       }
     },
     

@@ -99,10 +99,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   showPageLoader('Memuat data...');
   await initDB();
   
-  // Auto-trigger test notifications for demo (remove in production)
-  setTimeout(() => {
-    triggerTestNotifications();
-  }, 2000);
+  // Cek notifikasi jatuh tempo — hanya SEKALI per sesi browser
+  if (!sessionStorage.getItem('notifChecked')) {
+    sessionStorage.setItem('notifChecked', '1');
+    setTimeout(() => {
+      triggerTestNotifications();
+    }, 2000);
+  }
   // Data sudah di-cache saat login via bootstrap, pakai cache dulu
   await Promise.all([
     DB.getCustomers(false),
@@ -3618,12 +3621,17 @@ function requestNotificationPermission() {
 }
 
 function showNotification(title, options = {}) {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, {
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%236366f1"/></svg>',
-      ...options
-    });
-  }
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  // Guard: notifikasi yang sama hanya boleh muncul SEKALI per sesi browser
+  const key = 'shown_' + btoa(unescape(encodeURIComponent(title))).slice(0, 32);
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+
+  new Notification(title, {
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%236366f1"/></svg>',
+    ...options
+  });
 }
 
 // ============================================================
@@ -3732,6 +3740,12 @@ async function triggerTestNotifications() {
   NotificationModule.loadFromStorage();
   NotificationModule.updateBadge();
 
+  // Kumpulkan key notif yang sudah ada hari ini agar tidak duplikat
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const existingKeys = new Set(
+    fresh.map(n => n.dedupeKey).filter(Boolean)
+  );
+
   // Force-fetch langsung dari Supabase (bukan cache)
   const customers = await DB.getCustomers(true);
   const today = new Date();
@@ -3749,29 +3763,31 @@ async function triggerTestNotifications() {
       const angsuran = Math.round(hitungAngsuran(c).angsuranPerBulan).toLocaleString('id-ID');
       const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-      if (diff === 3) {
-        NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
-          `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
-          { customerId: c.id, daysUntilDue: diff });
+      const addOnce = (type, title, body) => {
+        const key = `${c.id}_${type}_${todayStr}`;
+        if (existingKeys.has(key)) return; // sudah ada hari ini, skip
+        existingKeys.add(key);
+        NotificationModule.add(type, title, body, { customerId: c.id, daysUntilDue: diff, dedupeKey: key });
         count++;
+      };
+
+      if (diff === 3) {
+        addOnce('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
       if (diff === 0) {
-        NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
-          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
-          { customerId: c.id, daysUntilDue: diff });
-        count++;
+        addOnce('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
+          `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`);
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        NotificationModule.add('OVERDUE', `⚠️ Overdue ${hari} Hari`,
-          `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
-          { customerId: c.id, daysUntilDue: diff });
-        count++;
+        addOnce('OVERDUE', `⚠️ Overdue ${hari} Hari`,
+          `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
     } catch (e) { console.warn('[Notif]', c?.nama, e.message); }
   });
 
-  console.log(`✅ Selesai. ${count} notifikasi jatuh tempo dari ${customers.length} pelanggan.`);
+  console.log(`✅ Selesai. ${count} notifikasi baru dari ${customers.length} pelanggan.`);
 }
 
 function updateSortableHeaders() {
