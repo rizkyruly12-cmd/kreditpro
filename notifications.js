@@ -186,7 +186,7 @@
         <div id="notif-dropdown-content" style="overflow-y:auto;overflow-x:hidden;flex:1;padding:4px 12px;max-height:400px;pointer-events:all;-webkit-overflow-scrolling:touch;"></div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
           <span style="font-size:11px;color:#94a3b8;" id="notif-count-label"></span>
-          <button onclick="window.NotificationModule.clearAll()" style="background:none;border:none;color:#6366f1;cursor:pointer;font-size:11.5px;font-weight:600;padding:4px 8px;border-radius:6px;" onmouseover="this.style.background='#eef2ff'" onmouseout="this.style.background='none'">Hapus Semua</button>
+          <button onclick="window.NotificationModule.clearAll()" style="background:none;border:none;color:#1d4ed8;cursor:pointer;font-size:11.5px;font-weight:600;padding:4px 8px;border-radius:6px;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='none'">Hapus Semua</button>
         </div>
       `;
       
@@ -227,7 +227,7 @@
         const isOverdue   = notif.type === 'OVERDUE';
         const isDueToday  = notif.type === 'DUE_TODAY' && notif.data?.daysUntilDue === 0;
 
-        const accentColor = isOverdue ? '#dc2626' : isDueToday ? '#d97706' : '#6366f1';
+        const accentColor = isOverdue ? '#dc2626' : isDueToday ? '#d97706' : '#1d4ed8';
         const dotColor    = isOverdue ? '#fca5a5' : isDueToday ? '#fde68a' : '#c7d2fe';
 
         return `

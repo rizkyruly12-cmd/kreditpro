@@ -1,5 +1,5 @@
-﻿// ============================================================
-// Kredit Ruli — Main Application (Supabase version)
+// ============================================================
+// Kredit Ruli � Main Application (Supabase version)
 // ============================================================
 
 let currentPage = 'dashboard';
@@ -99,7 +99,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   showPageLoader('Memuat data...');
   await initDB();
   
-  // Cek notifikasi jatuh tempo — hanya SEKALI per sesi browser
+  // Cek notifikasi jatuh tempo � hanya SEKALI per sesi browser
   if (!sessionStorage.getItem('notifChecked')) {
     sessionStorage.setItem('notifChecked', '1');
     setTimeout(() => {
@@ -148,12 +148,12 @@ function navTo(page) {
   const titles = {
     dashboard:'Dashboard', pelanggan:'Data Pelanggan',
     pembayaran:'Riwayat Pembayaran', laporan:'Laporan Profit',
-    kartu:'Kartu Angsuran', whatsapp:'WhatsApp — Kirim Pesan',
+    kartu:'Kartu Angsuran', whatsapp:'WhatsApp � Kirim Pesan',
     audit: 'Activity Log'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
 
-  // async render — hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
+  // async render � hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
   (async () => {
     showPageLoader('Memuat data...');
     // Gunakan cache kecuali belum ada data sama sekali
@@ -274,7 +274,7 @@ function renderDashboard() {
       <div class="stat-info">
         <div class="stat-label">Total Pelanggan</div>
         <div class="stat-value">${customers.length}</div>
-        <div class="stat-sub">${aktif} aktif · ${lunas} lunas · ${menunggak} menunggak</div>
+        <div class="stat-sub">${aktif} aktif � ${lunas} lunas � ${menunggak} menunggak</div>
       </div>
     </div>
     <div class="stat-card green">
@@ -335,7 +335,7 @@ function renderMonthlyChart() {
       datasets: [{
         label: 'Profit (Rp)',
         data,
-        backgroundColor: 'rgba(99,102,241,.8)',
+        backgroundColor: 'rgba(29,78,216,.85)',
         borderRadius: 6,
         borderSkipped: false,
       }]
@@ -362,7 +362,7 @@ function renderStatusChart(aktif, lunas, menunggak) {
       labels: ['Aktif','Lunas','Menunggak'],
       datasets: [{
         data: [aktif, lunas, menunggak],
-        backgroundColor: ['#6366f1','#059669','#dc2626'],
+        backgroundColor: ['#1d4ed8','#059669','#dc2626'],
         borderWidth: 2, borderColor: '#fff'
       }]
     },
@@ -451,7 +451,7 @@ function renderDueList() {
   const top = dueCustomers.slice(0,8);
 
   if (!top.length) {
-    document.getElementById('due-list').innerHTML = '<div class="empty-state"><div style="font-size:40px;opacity:.5;margin-bottom:10px;">✓</div><p>Semua pembayaran lancar!</p></div>';
+    document.getElementById('due-list').innerHTML = '<div class="empty-state"><div style="font-size:40px;opacity:.5;margin-bottom:10px;">?</div><p>Semua pembayaran lancar!</p></div>';
     return;
   }
 
@@ -522,7 +522,7 @@ function openDueModal() {
             ${photo ? `<img src="${photo}" class="avatar-photo" alt="${c.nama}">` : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div style="font-weight:600;font-size:13px;">${c.nama}</div>
-              <div style="font-size:11px;color:#94a3b8;">${c.id} · ${c.c?.noHp||c.noHp||'-'}</div>
+              <div style="font-size:11px;color:#94a3b8;">${c.id} � ${c.c?.noHp||c.noHp||'-'}</div>
               <div style="font-size:11px;color:#64748b;">${c.barang}</div>
             </div>
           </div>
@@ -589,7 +589,7 @@ async function renderCustomerTable() {
               : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div class="cust-name">${c.nama}</div>
-              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
+              <div class="cust-id">${c.id} � ${c.noHp||'-'}</div>
               ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
             </div>
@@ -711,7 +711,7 @@ function calcPreview() {
   const totalBungaPct = bungaPct * tenor;
   document.getElementById('cust-total-bunga').value = totalBungaPct;
 
-  // Gunakan totalBunga (%) untuk kalkulasi — sama persis dengan hitungAngsuran()
+  // Gunakan totalBunga (%) untuk kalkulasi � sama persis dengan hitungAngsuran()
   const totalBunga  = kreditPokok * (totalBungaPct / 100);
   const totalBayar  = kreditPokok + totalBunga;
   const angsuran    = totalBayar / tenor;
@@ -861,7 +861,7 @@ async function viewCustomer(id) {
     <div id="detail-tabs">
       <!-- INFO -->
       <div id="tab-info" class="tab-pane active">
-        <div style="background:linear-gradient(135deg,#4338ca,#0ea5e9);color:white;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:white;border-radius:10px;padding:16px;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
             <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);
               display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;overflow:hidden;flex-shrink:0;">
@@ -871,7 +871,7 @@ async function viewCustomer(id) {
             </div>
             <div>
               <div style="font-size:18px;font-weight:700;">${c.nama}</div>
-              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} · ${c.noHp||'-'}</div>
+              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} � ${c.noHp||'-'}</div>
               ${c.nik    ? `<div style="opacity:.7;font-size:11px;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="opacity:.7;font-size:11px;">${c.alamat}</div>` : ''}
             </div>
@@ -892,10 +892,10 @@ async function viewCustomer(id) {
         <div class="detail-grid">
           <div class="detail-item"><label>Barang</label><span>${c.barang}</span></div>
           <div class="detail-item"><label>Tanggal Kredit</label><span>${formatTgl(c.tgl)}</span></div>
-          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">—</span>'}</span></div>
-          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">—</span>'}</span></div>
+          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">�</span>'}</span></div>
+          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">�</span>'}</span></div>
+          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">�</span>'}</span></div>
+          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">�</span>'}</span></div>
           <div class="detail-item"><label>Harga Barang</label><span>${formatRupiah(c.harga)}</span></div>
           <div class="detail-item"><label>Uang Muka (DP)</label><span>${formatRupiah(c.dp)}</span></div>
           <div class="detail-item"><label>Kredit Pokok</label><span>${formatRupiah(c.kreditPokok)}</span></div>
@@ -1013,12 +1013,12 @@ function exportKartuPDF(customerId) {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Kartu Angsuran — ${c.nama}</title>
+  <title>Kartu Angsuran � ${c.nama}</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
-    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #4338ca; padding-bottom:14px; }
-    .header h1 { font-size:18px; color:#4338ca; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1d4ed8; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#1d4ed8; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .info { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-bottom:20px; padding:14px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; }
     .info-item .label { font-size:10px; color:#64748b; text-transform:uppercase; font-weight:600; }
@@ -1026,9 +1026,9 @@ function exportKartuPDF(customerId) {
     .stats { display:flex; gap:12px; margin-bottom:20px; }
     .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center; }
     .stat .label { font-size:10px; color:#64748b; }
-    .stat .value { font-size:15px; font-weight:700; color:#4338ca; margin-top:3px; }
+    .stat .value { font-size:15px; font-weight:700; color:#1d4ed8; margin-top:3px; }
     table { width:100%; border-collapse:collapse; }
-    th { background:#4338ca; color:white; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; }
+    th { background:#1d4ed8; color:white; padding:8px 10px; text-align:left; font-size:11px; text-transform:uppercase; }
     td { padding:7px 10px; border-bottom:1px solid #f1f5f9; font-size:11px; }
     tr:nth-child(even) td { background:#f8fafc; }
     .num { text-align:right; }
@@ -1041,7 +1041,7 @@ function exportKartuPDF(customerId) {
   </style></head><body>
   <div class="header">
     <h1>Kartu Angsuran</h1>
-    <p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="info">
     <div class="info-item"><div class="label">Nama Pelanggan</div><div class="value">${c.nama}</div></div>
@@ -1066,7 +1066,7 @@ function exportKartuPDF(customerId) {
     <thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">Jumlah</th><th style="text-align:right">Profit</th><th>Metode</th><th>Keterangan</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">Belum ada pembayaran</td></tr>'}</tbody>
   </table>
-  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} — Sistem Manajemen Kredit Barang</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} � Sistem Manajemen Kredit Barang</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -1107,19 +1107,19 @@ function exportPelangganPDF() {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Data Pelanggan — Kredit Ruli</title>
+  <title>Data Pelanggan � Kredit Ruli</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:11px; color:#1e293b; padding:24px; }
-    .header { text-align:center; margin-bottom:18px; border-bottom:2px solid #4338ca; padding-bottom:12px; }
-    .header h1 { font-size:18px; color:#4338ca; }
+    .header { text-align:center; margin-bottom:18px; border-bottom:2px solid #1d4ed8; padding-bottom:12px; }
+    .header h1 { font-size:18px; color:#1d4ed8; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .stats { display:flex; gap:12px; margin-bottom:18px; }
     .stat { flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
     .stat .label { font-size:10px; color:#64748b; }
-    .stat .value { font-size:16px; font-weight:700; color:#4338ca; margin-top:2px; }
+    .stat .value { font-size:16px; font-weight:700; color:#1d4ed8; margin-top:2px; }
     table { width:100%; border-collapse:collapse; }
-    th { background:#4338ca; color:white; padding:7px 8px; text-align:left; font-size:10px; text-transform:uppercase; white-space:nowrap; }
+    th { background:#1d4ed8; color:white; padding:7px 8px; text-align:left; font-size:10px; text-transform:uppercase; white-space:nowrap; }
     td { padding:6px 8px; border-bottom:1px solid #f1f5f9; vertical-align:top; }
     tr:nth-child(even) td { background:#f8fafc; }
     .num { text-align:right; white-space:nowrap; }
@@ -1128,7 +1128,7 @@ function exportPelangganPDF() {
   </style></head><body>
   <div class="header">
     <h1>Data Seluruh Pelanggan</h1>
-    <p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="stats">
     <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
@@ -1140,7 +1140,7 @@ function exportPelangganPDF() {
     <thead><tr><th>#</th><th>Nama / ID</th><th>Barang</th><th style="text-align:right">Kredit</th><th style="text-align:right">Angsuran</th><th style="text-align:center">Tenor</th><th style="text-align:right">Terbayar</th><th style="text-align:right">Sisa</th><th style="text-align:center">Status</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} — Total ${customers.length} pelanggan</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} � Total ${customers.length} pelanggan</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=1100,height=700');
@@ -1175,7 +1175,7 @@ function renderPaymentTable() {
   const totalProfit   = payments.reduce((s,p)=>s+(p.cicilan||0),0);
 
   document.getElementById('pay-summary').textContent =
-    `${payments.length} transaksi · Total: ${formatRupiah(totalFiltered)} · Profit: ${formatRupiah(totalProfit)}`;
+    `${payments.length} transaksi � Total: ${formatRupiah(totalFiltered)} � Profit: ${formatRupiah(totalProfit)}`;
 
   const total = payments.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -1574,7 +1574,7 @@ function renderLaporan() {
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nama}</div>
         <div class="progress-bar" style="margin-top:4px;">
-          <div class="progress-fill" style="width:${(profit/maxProfit*100).toFixed(1)}%;background:#6366f1;"></div>
+          <div class="progress-fill" style="width:${(profit/maxProfit*100).toFixed(1)}%;background:#1d4ed8;"></div>
         </div>
       </div>
       <div style="font-size:12px;font-weight:700;color:#0891b2;white-space:nowrap;">${formatRupiah(profit)}</div>
@@ -1641,7 +1641,7 @@ function switchLapTab(tab) {
 }
 
 // ============================================================
-// TAB PIUTANG — total uang di pelanggan
+// TAB PIUTANG � total uang di pelanggan
 // ============================================================
 function renderPiutang() {
   const customers = getCustomers();
@@ -1679,7 +1679,7 @@ function renderPiutang() {
       <td style="min-width:120px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <div style="flex:1;background:#f1f5f9;border-radius:4px;height:6px;">
-            <div style="width:${progress.toFixed(0)}%;background:${status==='lunas'?'#059669':status==='menunggak'?'#dc2626':'#6366f1'};height:6px;border-radius:4px;"></div>
+            <div style="width:${progress.toFixed(0)}%;background:${status==='lunas'?'#059669':status==='menunggak'?'#dc2626':'#1d4ed8'};height:6px;border-radius:4px;"></div>
           </div>
           <span style="font-size:11px;color:#64748b;white-space:nowrap;">${progress.toFixed(0)}%</span>
         </div>
@@ -1843,7 +1843,7 @@ function renderArusKas() {
       <div class="stat-icon"><svg width="18" height="18"><use href="#ic-calendar"/></svg></div>
       <div class="stat-info"><div class="stat-label">Uang Masuk Bulan Ini</div>
       <div class="stat-value">${formatRupiah(thisUang)}</div>
-      <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'▲':'▼'} ${Math.abs(growth)}% vs bulan lalu</div></div>
+      <div class="stat-sub" style="color:${growth>=0?'#16a34a':'#dc2626'}">${growth>=0?'?':'?'} ${Math.abs(growth)}% vs bulan lalu</div></div>
     </div>
     <div class="stat-card green">
       <div class="stat-icon"><svg width="18" height="18"><use href="#ic-money"/></svg></div>
@@ -1881,7 +1881,7 @@ function renderArusKas() {
       <td class="text-right">${mp.length}</td>
       <td class="text-right" style="color:#0891b2;font-weight:600;">${formatRupiah(u)}</td>
       <td class="text-right" style="color:#16a34a;font-weight:600;">${formatRupiah(pr)}</td>
-      <td class="text-right" style="${vsStyle}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td>
+      <td class="text-right" style="${vsStyle}">${vs==='-'?'-':(Number(vs)>=0?'?':'?')+Math.abs(vs)+'%'}</td>
     </tr>`;
     labels.push(label); uangData.push(u); profitData.push(pr);
     prevUang = u;
@@ -1893,7 +1893,7 @@ function renderArusKas() {
   aruskasChartInst = new Chart(ctx, {
     type:'line',
     data:{ labels, datasets:[
-      { label:'Uang Masuk', data:uangData, borderColor:'#6366f1', backgroundColor:'rgba(99,102,241,.1)', tension:.3, fill:true, pointRadius:4 },
+      { label:'Uang Masuk', data:uangData, borderColor:'#2563eb', backgroundColor:'rgba(59,130,246,.1)', tension:.3, fill:true, pointRadius:4 },
       { label:'Profit', data:profitData, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,.1)', tension:.3, fill:true, pointRadius:4 }
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -1961,7 +1961,7 @@ function renderModal() {
     type:'doughnut',
     data:{ labels:['Modal Kembali','Modal di Pelanggan','Profit Diterima'],
       datasets:[{ data:[modalKembali, totalPiutang - (totalPiutang - Math.max(0,totalModal-modalKembali)), totalProfit].map(v=>Math.max(0,v)),
-        backgroundColor:['#6366f1','#f59e0b','#10b981'], borderWidth:2 }]},
+        backgroundColor:['#1d4ed8','#f59e0b','#10b981'], borderWidth:2 }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:c=>`${c.label}: ${formatRupiah(c.parsed)}`}}}
     }
@@ -2054,7 +2054,7 @@ function renderBarang() {
       </div>
       <div style="padding-left:28px;">
         <div style="background:#f1f5f9;border-radius:4px;height:5px;margin-bottom:4px;">
-          <div style="width:${(b.count/maxCount*100).toFixed(0)}%;background:#6366f1;height:5px;border-radius:4px;"></div>
+          <div style="width:${(b.count/maxCount*100).toFixed(0)}%;background:#1d4ed8;height:5px;border-radius:4px;"></div>
         </div>
         <div style="display:flex;gap:12px;font-size:11px;color:#64748b;">
           <span>Kredit: <strong>${formatRupiah(b.totalKredit)}</strong></span>
@@ -2081,7 +2081,7 @@ function renderBarang() {
     type:'pie',
     data:{ labels:Object.keys(rangeMap), datasets:[{
       data:Object.values(rangeMap),
-      backgroundColor:['#6366f1','#8b5cf6','#059669','#f59e0b','#f97316','#dc2626'], borderWidth:2
+      backgroundColor:['#1d4ed8','#0ea5e9','#059669','#f59e0b','#f97316','#dc2626'], borderWidth:2
     }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'bottom',labels:{font:{size:11}}},
@@ -2103,19 +2103,19 @@ function printLaporanAktif() {
 function _openPrintWindow(title, bodyHtml) {
   const baseStyle = `* { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:28px; }
-    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #4338ca; padding-bottom:14px; }
-    .header h1 { font-size:18px; color:#4338ca; }
+    .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #1d4ed8; padding-bottom:14px; }
+    .header h1 { font-size:18px; color:#1d4ed8; }
     .header p { font-size:11px; color:#64748b; margin-top:3px; }
     .stats { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
     .stat { flex:1; min-width:150px; border:1px solid #e2e8f0; border-radius:8px; padding:10px; text-align:center; }
-    .stat .lbl { font-size:10px; color:#64748b; } .stat .val { font-size:15px; font-weight:700; color:#4338ca; margin-top:2px; }
-    table { width:100%; border-collapse:collapse; } th { background:#4338ca; color:white; padding:7px 9px; text-align:left; font-size:10px; text-transform:uppercase; }
+    .stat .lbl { font-size:10px; color:#64748b; } .stat .val { font-size:15px; font-weight:700; color:#1d4ed8; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; } th { background:#1d4ed8; color:white; padding:7px 9px; text-align:left; font-size:10px; text-transform:uppercase; }
     td { padding:6px 9px; border-bottom:1px solid #f1f5f9; font-size:11px; } tr:nth-child(even) td { background:#f8fafc; }
-    .tr { text-align:right; } tfoot td { font-weight:700; background:#eff6ff !important; color:#4338ca; border-top:2px solid #4338ca; }
+    .tr { text-align:right; } tfoot td { font-weight:700; background:#eff6ff !important; color:#1d4ed8; border-top:2px solid #1d4ed8; }
     .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
     @media print { body { padding:15px; } @page { margin:15mm; } }`;
   const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title><style>${baseStyle}</style></head><body>
-    <div class="header"><h1>${title}</h1><p>Kredit Ruli — Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
+    <div class="header"><h1>${title}</h1><p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
     ${bodyHtml}
     <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()}</div></body></html>`;
   const w = window.open('','_blank','width=960,height=700');
@@ -2196,7 +2196,7 @@ function printLaporan_aruskas() {
     const pr=mp.reduce((s,p)=>s+(p.cicilan||0),0);
     const [y,mo]=m.split('-');
     const vs=prevU>0?((u-prevU)/prevU*100).toFixed(1):'-';
-    rows+=`<tr><td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(u)}</td><td class="tr">${formatRupiah(pr)}</td><td class="tr" style="color:${vs==='-'?'inherit':Number(vs)>=0?'#16a34a':'#dc2626'}">${vs==='-'?'-':(Number(vs)>=0?'▲':'▼')+Math.abs(vs)+'%'}</td></tr>`;
+    rows+=`<tr><td>${new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</td><td class="tr">${mp.length}</td><td class="tr">${formatRupiah(u)}</td><td class="tr">${formatRupiah(pr)}</td><td class="tr" style="color:${vs==='-'?'inherit':Number(vs)>=0?'#16a34a':'#dc2626'}">${vs==='-'?'-':(Number(vs)>=0?'?':'?')+Math.abs(vs)+'%'}</td></tr>`;
     prevU=u;
   });
   _openPrintWindow('Laporan Arus Kas (12 Bulan Terakhir)', `
@@ -2291,7 +2291,7 @@ function buildKartuCard(c) {
         ? `<div style="position:relative;"><img src="${getItemPhotosSync(c.id)[0]}" class="kartu-cust-photo" alt="${c.barang}">
            <div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">${getItemPhotosSync(c.id).length} foto</div></div>`
         : ''}
-    <div style="background:linear-gradient(135deg,#4338ca,#0891b2);color:white;padding:14px 16px;">
+    <div style="background:linear-gradient(135deg,#1d4ed8,#0284c7);color:white;padding:14px 16px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
         <div>
           <div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">KARTU ANGSURAN</div>
@@ -2392,15 +2392,15 @@ function renderPagination(containerId, current, total, onClick) {
     }
   }
 
-  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">‹</button>`;
+  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">�</button>`;
   range.forEach(p => {
     if (p === '...') {
-      html += `<span style="padding:0 4px;color:#94a3b8;">…</span>`;
+      html += `<span style="padding:0 4px;color:#94a3b8;">�</span>`;
     } else {
       html += `<button class="page-btn ${p===current?'active':''}" onclick="pgGo('${containerId}',${p})">${p}</button>`;
     }
   });
-  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">›</button>`;
+  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">�</button>`;
   el.innerHTML = html;
 }
 
@@ -2484,7 +2484,7 @@ async function renderProfileTab() {
   const expDate = new Date(s.expiresAt);
   document.getElementById('acc-session-exp').textContent =
     expDate.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) +
-    ' · ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+    ' � ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
 }
 
 async function renderUsersTab() {
@@ -2509,13 +2509,13 @@ async function renderUsersTab() {
     <div style="font-size:13px;font-weight:600;color:#334155;margin-bottom:10px;">Daftar Pengguna (${users.length})</div>
     ${users.map(u => `
     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;margin-bottom:8px;border:1px solid #e2e8f0;">
-      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;">${u.displayName}</div>
-        <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
+        <div style="font-size:11px;color:#94a3b8;">@${u.username} � ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
         <div style="font-size:11px;color:#94a3b8;">Login terakhir: ${u.lastLogin ? u.lastLogin.slice(0,10) : 'Belum pernah'}</div>
       </div>
-      ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">🗑 Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
+      ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">?? Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
     </div>`).join('')}`;
 }
 
@@ -2544,7 +2544,7 @@ async function submitAddUser() {
   const alertEl = document.getElementById('add-user-alert');
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '✗ ' + msg;
+    alertEl.innerHTML = '? ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2574,7 +2574,7 @@ function submitChangePassword() {
 
   const showErr = msg => {
     alertEl.className = 'alert alert-danger';
-    alertEl.innerHTML = '✗ ' + msg;
+    alertEl.innerHTML = '? ' + msg;
     alertEl.style.display = 'flex';
   };
 
@@ -2626,7 +2626,7 @@ async function renderLogTab() {
           <tr style="border-bottom:1px solid #f1f5f9;">
             <td style="padding:8px;color:#64748b;white-space:nowrap;">${new Date(l.timestamp).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
             <td style="padding:8px;font-weight:600;">@${l.username}</td>
-            <td style="padding:8px;">${actionLabels[l.action] || l.action} — <span style="color:#64748b;">${l.detail}</span></td>
+            <td style="padding:8px;">${actionLabels[l.action] || l.action} � <span style="color:#64748b;">${l.detail}</span></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -2692,17 +2692,17 @@ function buildMessage(templateKey, customer) {
   tglTempo.setMonth(tglTempo.getMonth() + angsuranKe);
   const tglTempoStr = tglTempo.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const header = `Assalamu'alaikum / Halo, *${customer.nama}* 🙏`;
-  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. 🙏\n\n_— Bisnis Kredit Ruli Rizki Ariyanto_`;
+  const header = `Assalamu'alaikum / Halo, *${customer.nama}* ??`;
+  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. ??\n\n_� Bisnis Kredit Ruli Rizki Ariyanto_`;
 
   const templates = {
-    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n📦 *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n💰 *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n📅 *Jatuh Tempo:* ${tglTempoStr}\n📊 *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
+    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n?? *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n?? *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n?? *Jatuh Tempo:* ${tglTempoStr}\n?? *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
 
-    jatuh_tempo: `${header}\n\n⏰ *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n📅 *${tglTempoStr}*\n\n📦 *Barang:* ${customer.barang}\n💰 *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ✅${footer}`,
+    jatuh_tempo: `${header}\n\n? *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n?? *${tglTempoStr}*\n\n?? *Barang:* ${customer.barang}\n?? *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ?${footer}`,
 
-    terlambat: `${header}\n\n*PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n📦 *Barang:* ${customer.barang}\n💰 *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n🔢 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. 🙏${footer}`,
+    terlambat: `${header}\n\n*PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n?? *Barang:* ${customer.barang}\n?? *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n?? *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. ??${footer}`,
 
-    lunas: `${header}\n\n🎉 *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n📦 *Barang:* ${customer.barang}\n✅ *Status:* LUNAS\n💰 *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! 😊${footer}`,
+    lunas: `${header}\n\n?? *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n?? *Barang:* ${customer.barang}\n? *Status:* LUNAS\n?? *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! ??${footer}`,
 
     custom: ''
   };
@@ -2785,7 +2785,7 @@ function waFillQuickInfo() {
   infoEl.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
       <div><strong>${c.barang}</strong></div>
-      <div>${c.noHp || '—'} ${phone ? '✓' : '✗ Tidak valid'}</div>
+      <div>${c.noHp || '�'} ${phone ? '?' : '? Tidak valid'}</div>
       <div>Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
       <div>Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
@@ -2833,7 +2833,7 @@ function waSendSingle() {
   // Show preview first
   waPreviewData = { phone: c.noHp, message, customerId: id, custName: c.nama };
   document.getElementById('wa-preview-bubble').textContent = message;
-  document.getElementById('wa-preview-phone').textContent = `${c.nama} · ${c.noHp}`;
+  document.getElementById('wa-preview-phone').textContent = `${c.nama} � ${c.noHp}`;
   openModal('waPreviewModal');
 }
 
@@ -3070,7 +3070,7 @@ function waClearLog() {
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
 
 function deletePhotosForCustomer(customerId) {
-  // Stub — actual delete via Supabase handled in data.js deleteCustomer()
+  // Stub � actual delete via Supabase handled in data.js deleteCustomer()
 }
 
 // ---- Upload handler ----
@@ -3203,7 +3203,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLightbox();
 });
 
-// Patch openCustModal to init drag-drop — handled directly in openCustModal above
+// Patch openCustModal to init drag-drop � handled directly in openCustModal above
 
 // ============================================================
 //  FOTO TAB BUILDER
@@ -3229,7 +3229,7 @@ function buildFotoTab(customerId) {
     <div class="cust-detail-photos">
       <!-- Foto Pelanggan -->
       <div>
-        <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">👤 Foto Pelanggan</div>
+        <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">?? Foto Pelanggan</div>
         ${custPhoto ? `
         <div class="cust-photo-box">
           <img src="${custPhoto}" alt="Foto Pelanggan"
@@ -3403,12 +3403,12 @@ function buildItemGallery(customerId) {
   return `
     <div class="item-gallery" id="item-gallery-${customerId}">
       <div class="item-gallery-main" style="position:relative;">
-        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">‹</button>
+        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">�</button>
         <img id="gallery-main-img-${customerId}"
              src="${photos[0]}"
              alt="Foto Barang 1"
              onclick="openLightbox(this.src, 'Foto Barang ' + (${customerId === '' ? 0 : `_galleryIndex`}+1) + ' / ${photos.length}')">
-        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">›</button>
+        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">�</button>
         ${photos.length > 1 ? `<div class="item-gallery-counter" id="gallery-counter-${customerId}">1 / ${photos.length}</div>` : ''}
       </div>
       ${photos.length > 1 ? `
@@ -3639,7 +3639,7 @@ function showNotification(title, options = {}) {
 // Logika: setiap pelanggan aktif punya jatuh tempo SETIAP BULAN
 // pada tanggal yang SAMA dengan tanggal kredit mereka.
 // Contoh: kredit tgl 20 Juli 2026, tenor 10 bln
-//   → jatuh tempo: 20 Agt, 20 Sep, 20 Okt, ..., 20 Mei 2027
+//   ? jatuh tempo: 20 Agt, 20 Sep, 20 Okt, ..., 20 Mei 2027
 // ============================================================
 function getNextMonthlyDueDate(c) {
   const today = new Date();
@@ -3648,10 +3648,10 @@ function getNextMonthlyDueDate(c) {
   const tglKredit = new Date(c.tgl);
   tglKredit.setHours(0, 0, 0, 0);
 
-  // Kredit belum mulai (tanggal kredit masih di masa depan) → skip
+  // Kredit belum mulai (tanggal kredit masih di masa depan) ? skip
   if (tglKredit > today) return null;
 
-  // Sudah lunas → skip
+  // Sudah lunas ? skip
   const payments = getPaymentsByCustomer(c.id);
   const totalDibayar = payments.reduce((s, p) => s + (Number(p.jumlahAngsuran) || 0), 0);
   const { totalBayar } = hitungAngsuran(c);
@@ -3706,21 +3706,21 @@ function checkDueDatesAndNotify() {
       const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
       if (diff === 3) {
-        showNotification(`⏰ ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} • Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
+        showNotification(`? ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} � Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '? Jatuh Tempo 3 Hari',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff === 0) {
-        showNotification(`📅 ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} • Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
+        showNotification(`?? ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} � Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '?? Jatuh Tempo Hari Ini',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        showNotification(`⚠️ ${c.nama} telat ${hari} hari!`, { body: `${c.barang} • Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('OVERDUE', `⚠️ Overdue ${hari} Hari`,
+        showNotification(`?? ${c.nama} telat ${hari} hari!`, { body: `${c.barang} � Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('OVERDUE', `?? Overdue ${hari} Hari`,
           `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
@@ -3728,7 +3728,7 @@ function checkDueDatesAndNotify() {
   });
 }
 
-// Jalankan saat app load — baca data langsung dari Supabase
+// Jalankan saat app load � baca data langsung dari Supabase
 async function triggerTestNotifications() {
   if (!window.NotificationModule) return;
 
@@ -3751,7 +3751,7 @@ async function triggerTestNotifications() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  console.log(`[Notif] Memeriksa ${customers.length} pelanggan — tanggal hari ini: ${today.toLocaleDateString('id-ID')}`);
+  console.log(`[Notif] Memeriksa ${customers.length} pelanggan � tanggal hari ini: ${today.toLocaleDateString('id-ID')}`);
   let count = 0;
 
   customers.forEach(c => {
@@ -3772,22 +3772,22 @@ async function triggerTestNotifications() {
       };
 
       if (diff === 3) {
-        addOnce('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
+        addOnce('DUE_TODAY', '? Jatuh Tempo 3 Hari',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
       if (diff === 0) {
-        addOnce('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
+        addOnce('DUE_TODAY', '?? Jatuh Tempo Hari Ini',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`);
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        addOnce('OVERDUE', `⚠️ Overdue ${hari} Hari`,
+        addOnce('OVERDUE', `?? Overdue ${hari} Hari`,
           `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
     } catch (e) { console.warn('[Notif]', c?.nama, e.message); }
   });
 
-  console.log(`✅ Selesai. ${count} notifikasi baru dari ${customers.length} pelanggan.`);
+  console.log(`? Selesai. ${count} notifikasi baru dari ${customers.length} pelanggan.`);
 }
 
 function updateSortableHeaders() {
@@ -3808,7 +3808,7 @@ function updateSortableHeaders() {
   row.innerHTML = headers.map(h => {
     if (!h.field) return `<th>${h.text}</th>`;
     const isActive = sortConfig.field === h.field;
-    const arrow = isActive ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : '';
+    const arrow = isActive ? (sortConfig.direction === 'asc' ? ' ?' : ' ?') : '';
     return `<th onclick="setSortColumn('${h.field}')" style="cursor:pointer;user-select:none;position:relative;">
       ${h.text}${arrow}
     </th>`;
@@ -3874,7 +3874,7 @@ async function renderCustomerTableEnhanced() {
               : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div class="cust-name">${c.nama}</div>
-              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
+              <div class="cust-id">${c.id} � ${c.noHp||'-'}</div>
               ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
             </div>
