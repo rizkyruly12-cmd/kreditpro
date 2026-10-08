@@ -1,5 +1,5 @@
-// ============================================================
-// Kredit Ruli � Main Application (Supabase version)
+﻿// ============================================================
+// Kredit Ruli · Main Application (Supabase version)
 // ============================================================
 
 let currentPage = 'dashboard';
@@ -99,7 +99,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   showPageLoader('Memuat data...');
   await initDB();
   
-  // Cek notifikasi jatuh tempo � hanya SEKALI per sesi browser
+  // Cek notifikasi jatuh tempo · hanya SEKALI per sesi browser
   if (!sessionStorage.getItem('notifChecked')) {
     sessionStorage.setItem('notifChecked', '1');
     setTimeout(() => {
@@ -148,12 +148,12 @@ function navTo(page) {
   const titles = {
     dashboard:'Dashboard', pelanggan:'Data Pelanggan',
     pembayaran:'Riwayat Pembayaran', laporan:'Laporan Profit',
-    kartu:'Kartu Angsuran', whatsapp:'WhatsApp � Kirim Pesan',
+    kartu:'Kartu Angsuran', whatsapp:'WhatsApp · Kirim Pesan',
     audit: 'Activity Log'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
 
-  // async render � hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
+  // async render · hanya refresh cache saat ada aksi tulis (bukan setiap navigasi)
   (async () => {
     showPageLoader('Memuat data...');
     // Gunakan cache kecuali belum ada data sama sekali
@@ -274,7 +274,7 @@ function renderDashboard() {
       <div class="stat-info">
         <div class="stat-label">Total Pelanggan</div>
         <div class="stat-value">${customers.length}</div>
-        <div class="stat-sub">${aktif} aktif � ${lunas} lunas � ${menunggak} menunggak</div>
+        <div class="stat-sub">${aktif} aktif · ${lunas} lunas · ${menunggak} menunggak</div>
       </div>
     </div>
     <div class="stat-card green">
@@ -522,7 +522,7 @@ function openDueModal() {
             ${photo ? `<img src="${photo}" class="avatar-photo" alt="${c.nama}">` : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div style="font-weight:600;font-size:13px;">${c.nama}</div>
-              <div style="font-size:11px;color:#94a3b8;">${c.id} � ${c.c?.noHp||c.noHp||'-'}</div>
+              <div style="font-size:11px;color:#94a3b8;">${c.id} · ${c.c?.noHp||c.noHp||'-'}</div>
               <div style="font-size:11px;color:#64748b;">${c.barang}</div>
             </div>
           </div>
@@ -589,7 +589,7 @@ async function renderCustomerTable() {
               : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div class="cust-name">${c.nama}</div>
-              <div class="cust-id">${c.id} � ${c.noHp||'-'}</div>
+              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
               ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
             </div>
@@ -711,7 +711,7 @@ function calcPreview() {
   const totalBungaPct = bungaPct * tenor;
   document.getElementById('cust-total-bunga').value = totalBungaPct;
 
-  // Gunakan totalBunga (%) untuk kalkulasi � sama persis dengan hitungAngsuran()
+  // Gunakan totalBunga (%) untuk kalkulasi · sama persis dengan hitungAngsuran()
   const totalBunga  = kreditPokok * (totalBungaPct / 100);
   const totalBayar  = kreditPokok + totalBunga;
   const angsuran    = totalBayar / tenor;
@@ -871,7 +871,7 @@ async function viewCustomer(id) {
             </div>
             <div>
               <div style="font-size:18px;font-weight:700;">${c.nama}</div>
-              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} � ${c.noHp||'-'}</div>
+              <div style="opacity:.8;font-size:12px;margin-top:2px;">${c.id} · ${c.noHp||'-'}</div>
               ${c.nik    ? `<div style="opacity:.7;font-size:11px;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="opacity:.7;font-size:11px;">${c.alamat}</div>` : ''}
             </div>
@@ -892,10 +892,10 @@ async function viewCustomer(id) {
         <div class="detail-grid">
           <div class="detail-item"><label>Barang</label><span>${c.barang}</span></div>
           <div class="detail-item"><label>Tanggal Kredit</label><span>${formatTgl(c.tgl)}</span></div>
-          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">�</span>'}</span></div>
-          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">�</span>'}</span></div>
-          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">�</span>'}</span></div>
-          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">�</span>'}</span></div>
+          <div class="detail-item"><label>NIK / No. KTP</label><span>${c.nik || '<span style="color:#94a3b8;">·</span>'}</span></div>
+          <div class="detail-item"><label>No. HP</label><span>${c.noHp || '<span style="color:#94a3b8;">·</span>'}</span></div>
+          <div class="detail-item" style="grid-column:1/-1;"><label>Alamat</label><span style="font-size:13px;font-weight:400;color:#334155;">${c.alamat || '<span style="color:#94a3b8;">·</span>'}</span></div>
+          <div class="detail-item"><label>No. Seri / IMEI</label><span style="font-family:monospace;font-size:13px;">${c.noSeri || '<span style="color:#94a3b8;">·</span>'}</span></div>
           <div class="detail-item"><label>Harga Barang</label><span>${formatRupiah(c.harga)}</span></div>
           <div class="detail-item"><label>Uang Muka (DP)</label><span>${formatRupiah(c.dp)}</span></div>
           <div class="detail-item"><label>Kredit Pokok</label><span>${formatRupiah(c.kreditPokok)}</span></div>
@@ -1013,7 +1013,7 @@ function exportKartuPDF(customerId) {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Kartu Angsuran � ${c.nama}</title>
+  <title>Kartu Angsuran · ${c.nama}</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:12px; color:#1e293b; padding:30px; }
@@ -1041,7 +1041,7 @@ function exportKartuPDF(customerId) {
   </style></head><body>
   <div class="header">
     <h1>Kartu Angsuran</h1>
-    <p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli · Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="info">
     <div class="info-item"><div class="label">Nama Pelanggan</div><div class="value">${c.nama}</div></div>
@@ -1066,7 +1066,7 @@ function exportKartuPDF(customerId) {
     <thead><tr><th>#</th><th>Tanggal</th><th style="text-align:right">Jumlah</th><th style="text-align:right">Profit</th><th>Metode</th><th>Keterangan</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">Belum ada pembayaran</td></tr>'}</tbody>
   </table>
-  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} � Sistem Manajemen Kredit Barang</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} · Sistem Manajemen Kredit Barang</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=900,height=700');
@@ -1107,7 +1107,7 @@ function exportPelangganPDF() {
 
   const html = `<!DOCTYPE html><html lang="id"><head>
   <meta charset="UTF-8">
-  <title>Data Pelanggan � Kredit Ruli</title>
+  <title>Data Pelanggan · Kredit Ruli</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'Segoe UI',Arial,sans-serif; font-size:11px; color:#1e293b; padding:24px; }
@@ -1128,7 +1128,7 @@ function exportPelangganPDF() {
   </style></head><body>
   <div class="header">
     <h1>Data Seluruh Pelanggan</h1>
-    <p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
+    <p>Kredit Ruli · Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>
   <div class="stats">
     <div class="stat"><div class="label">Total Pelanggan</div><div class="value">${customers.length}</div></div>
@@ -1140,7 +1140,7 @@ function exportPelangganPDF() {
     <thead><tr><th>#</th><th>Nama / ID</th><th>Barang</th><th style="text-align:right">Kredit</th><th style="text-align:right">Angsuran</th><th style="text-align:center">Tenor</th><th style="text-align:right">Terbayar</th><th style="text-align:right">Sisa</th><th style="text-align:center">Status</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} � Total ${customers.length} pelanggan</div>
+  <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()} · Total ${customers.length} pelanggan</div>
   </body></html>`;
 
   const w = window.open('','_blank','width=1100,height=700');
@@ -1175,7 +1175,7 @@ function renderPaymentTable() {
   const totalProfit   = payments.reduce((s,p)=>s+(p.cicilan||0),0);
 
   document.getElementById('pay-summary').textContent =
-    `${payments.length} transaksi � Total: ${formatRupiah(totalFiltered)} � Profit: ${formatRupiah(totalProfit)}`;
+    `${payments.length} transaksi · Total: ${formatRupiah(totalFiltered)} · Profit: ${formatRupiah(totalProfit)}`;
 
   const total = payments.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -1641,7 +1641,7 @@ function switchLapTab(tab) {
 }
 
 // ============================================================
-// TAB PIUTANG � total uang di pelanggan
+// TAB PIUTANG · total uang di pelanggan
 // ============================================================
 function renderPiutang() {
   const customers = getCustomers();
@@ -2115,7 +2115,7 @@ function _openPrintWindow(title, bodyHtml) {
     .footer { text-align:center; font-size:10px; color:#94a3b8; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:10px; }
     @media print { body { padding:15px; } @page { margin:15mm; } }`;
   const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title><style>${baseStyle}</style></head><body>
-    <div class="header"><h1>${title}</h1><p>Kredit Ruli � Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
+    <div class="header"><h1>${title}</h1><p>Kredit Ruli · Ruli Rizki Ariyanto &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</p></div>
     ${bodyHtml}
     <div class="footer">Kredit Ruli &copy; ${new Date().getFullYear()}</div></body></html>`;
   const w = window.open('','_blank','width=960,height=700');
@@ -2392,15 +2392,15 @@ function renderPagination(containerId, current, total, onClick) {
     }
   }
 
-  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">�</button>`;
+  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">·</button>`;
   range.forEach(p => {
     if (p === '...') {
-      html += `<span style="padding:0 4px;color:#94a3b8;">�</span>`;
+      html += `<span style="padding:0 4px;color:#94a3b8;">·</span>`;
     } else {
       html += `<button class="page-btn ${p===current?'active':''}" onclick="pgGo('${containerId}',${p})">${p}</button>`;
     }
   });
-  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">�</button>`;
+  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">·</button>`;
   el.innerHTML = html;
 }
 
@@ -2484,7 +2484,7 @@ async function renderProfileTab() {
   const expDate = new Date(s.expiresAt);
   document.getElementById('acc-session-exp').textContent =
     expDate.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) +
-    ' � ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+    ' · ' + expDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
 }
 
 async function renderUsersTab() {
@@ -2512,7 +2512,7 @@ async function renderUsersTab() {
       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0;">${u.avatar||u.displayName[0]}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;">${u.displayName}</div>
-        <div style="font-size:11px;color:#94a3b8;">@${u.username} � ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
+        <div style="font-size:11px;color:#94a3b8;">@${u.username} · ${u.role === 'owner' ? 'Owner' : 'Staff'}</div>
         <div style="font-size:11px;color:#94a3b8;">Login terakhir: ${u.lastLogin ? u.lastLogin.slice(0,10) : 'Belum pernah'}</div>
       </div>
       ${u.id !== s.userId ? `<button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.id}','${u.displayName}')">?? Hapus</button>` : '<span class="badge badge-green" style="font-size:10px;">Anda</span>'}
@@ -2626,7 +2626,7 @@ async function renderLogTab() {
           <tr style="border-bottom:1px solid #f1f5f9;">
             <td style="padding:8px;color:#64748b;white-space:nowrap;">${new Date(l.timestamp).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
             <td style="padding:8px;font-weight:600;">@${l.username}</td>
-            <td style="padding:8px;">${actionLabels[l.action] || l.action} � <span style="color:#64748b;">${l.detail}</span></td>
+            <td style="padding:8px;">${actionLabels[l.action] || l.action} · <span style="color:#64748b;">${l.detail}</span></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -2693,7 +2693,7 @@ function buildMessage(templateKey, customer) {
   const tglTempoStr = tglTempo.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const header = `Assalamu'alaikum / Halo, *${customer.nama}* ??`;
-  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. ??\n\n_� Bisnis Kredit Ruli Rizki Ariyanto_`;
+  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. ??\n\n_· Bisnis Kredit Ruli Rizki Ariyanto_`;
 
   const templates = {
     tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n?? *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n?? *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n?? *Jatuh Tempo:* ${tglTempoStr}\n?? *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
@@ -2785,7 +2785,7 @@ function waFillQuickInfo() {
   infoEl.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
       <div><strong>${c.barang}</strong></div>
-      <div>${c.noHp || '�'} ${phone ? '?' : '? Tidak valid'}</div>
+      <div>${c.noHp || '·'} ${phone ? '?' : '? Tidak valid'}</div>
       <div>Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
       <div>Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
@@ -2833,7 +2833,7 @@ function waSendSingle() {
   // Show preview first
   waPreviewData = { phone: c.noHp, message, customerId: id, custName: c.nama };
   document.getElementById('wa-preview-bubble').textContent = message;
-  document.getElementById('wa-preview-phone').textContent = `${c.nama} � ${c.noHp}`;
+  document.getElementById('wa-preview-phone').textContent = `${c.nama} · ${c.noHp}`;
   openModal('waPreviewModal');
 }
 
@@ -3070,7 +3070,7 @@ function waClearLog() {
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
 
 function deletePhotosForCustomer(customerId) {
-  // Stub � actual delete via Supabase handled in data.js deleteCustomer()
+  // Stub · actual delete via Supabase handled in data.js deleteCustomer()
 }
 
 // ---- Upload handler ----
@@ -3203,7 +3203,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLightbox();
 });
 
-// Patch openCustModal to init drag-drop � handled directly in openCustModal above
+// Patch openCustModal to init drag-drop · handled directly in openCustModal above
 
 // ============================================================
 //  FOTO TAB BUILDER
@@ -3403,12 +3403,12 @@ function buildItemGallery(customerId) {
   return `
     <div class="item-gallery" id="item-gallery-${customerId}">
       <div class="item-gallery-main" style="position:relative;">
-        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">�</button>
+        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">·</button>
         <img id="gallery-main-img-${customerId}"
              src="${photos[0]}"
              alt="Foto Barang 1"
              onclick="openLightbox(this.src, 'Foto Barang ' + (${customerId === '' ? 0 : `_galleryIndex`}+1) + ' / ${photos.length}')">
-        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">�</button>
+        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">·</button>
         ${photos.length > 1 ? `<div class="item-gallery-counter" id="gallery-counter-${customerId}">1 / ${photos.length}</div>` : ''}
       </div>
       ${photos.length > 1 ? `
@@ -3706,20 +3706,20 @@ function checkDueDatesAndNotify() {
       const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
       if (diff === 3) {
-        showNotification(`? ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} � Rp ${angsuran}` });
+        showNotification(`? ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} · Rp ${angsuran}` });
         if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '? Jatuh Tempo 3 Hari',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff === 0) {
-        showNotification(`?? ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} � Rp ${angsuran}` });
+        showNotification(`?? ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} · Rp ${angsuran}` });
         if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '?? Jatuh Tempo Hari Ini',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        showNotification(`?? ${c.nama} telat ${hari} hari!`, { body: `${c.barang} � Rp ${angsuran}` });
+        showNotification(`?? ${c.nama} telat ${hari} hari!`, { body: `${c.barang} · Rp ${angsuran}` });
         if (window.NotificationModule) NotificationModule.add('OVERDUE', `?? Overdue ${hari} Hari`,
           `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
@@ -3728,7 +3728,7 @@ function checkDueDatesAndNotify() {
   });
 }
 
-// Jalankan saat app load � baca data langsung dari Supabase
+// Jalankan saat app load · baca data langsung dari Supabase
 async function triggerTestNotifications() {
   if (!window.NotificationModule) return;
 
@@ -3751,7 +3751,7 @@ async function triggerTestNotifications() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  console.log(`[Notif] Memeriksa ${customers.length} pelanggan � tanggal hari ini: ${today.toLocaleDateString('id-ID')}`);
+  console.log(`[Notif] Memeriksa ${customers.length} pelanggan · tanggal hari ini: ${today.toLocaleDateString('id-ID')}`);
   let count = 0;
 
   customers.forEach(c => {
@@ -3874,7 +3874,7 @@ async function renderCustomerTableEnhanced() {
               : `<div class="avatar">${c.nama[0]}</div>`}
             <div>
               <div class="cust-name">${c.nama}</div>
-              <div class="cust-id">${c.id} � ${c.noHp||'-'}</div>
+              <div class="cust-id">${c.id} · ${c.noHp||'-'}</div>
               ${c.nik ? `<div style="font-size:10px;color:#94a3b8;">NIK: ${c.nik}</div>` : ''}
               ${c.alamat ? `<div style="font-size:10px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${c.alamat}">${c.alamat}</div>` : ''}
             </div>
