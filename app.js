@@ -2392,15 +2392,15 @@ function renderPagination(containerId, current, total, onClick) {
     }
   }
 
-  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">·</button>`;
+  let html = `<button class="page-btn" ${current===1?'disabled':''} onclick="pgGo('${containerId}',${current-1})">&#8249;</button>`;
   range.forEach(p => {
     if (p === '...') {
-      html += `<span style="padding:0 4px;color:#94a3b8;">·</span>`;
+      html += `<span style="padding:0 4px;color:#94a3b8;">…</span>`;
     } else {
       html += `<button class="page-btn ${p===current?'active':''}" onclick="pgGo('${containerId}',${p})">${p}</button>`;
     }
   });
-  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">·</button>`;
+  html += `<button class="page-btn" ${current===total?'disabled':''} onclick="pgGo('${containerId}',${current+1})">&#8250;</button>`;
   el.innerHTML = html;
 }
 
@@ -2692,17 +2692,17 @@ function buildMessage(templateKey, customer) {
   tglTempo.setMonth(tglTempo.getMonth() + angsuranKe);
   const tglTempoStr = tglTempo.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const header = `Assalamu'alaikum / Halo, *${customer.nama}* ??`;
-  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. ??\n\n_· Bisnis Kredit Ruli Rizki Ariyanto_`;
+  const header = `Assalamu'alaikum / Halo, *${customer.nama}* 🙏`;
+  const footer = `\n\nInfo lebih lanjut hubungi kami.\nTerima kasih atas kepercayaannya. 🙏\n\n_· Bisnis Kredit Ruli Rizki Ariyanto_`;
 
   const templates = {
-    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n?? *Barang:* ${customer.barang}\n *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n?? *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n?? *Jatuh Tempo:* ${tglTempoStr}\n?? *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
+    tagihan: `${header}\n\nBerikut info tagihan angsuran Anda:\n\n📦 *Barang:* ${customer.barang}\n📋 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n💰 *Jumlah Angsuran:* ${formatRupiah(angsuranPerBulan)}\n📅 *Jatuh Tempo:* ${tglTempoStr}\n📊 *Sisa Tagihan:* ${formatRupiah(sisa)}\n\nMohon untuk segera melakukan pembayaran tepat waktu.${footer}`,
 
-    jatuh_tempo: `${header}\n\n? *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n?? *${tglTempoStr}*\n\n?? *Barang:* ${customer.barang}\n?? *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ?${footer}`,
+    jatuh_tempo: `${header}\n\n⏰ *PENGINGAT JATUH TEMPO*\n\nAngsuran Anda akan jatuh tempo pada:\n📅 *${tglTempoStr}*\n\n📦 *Barang:* ${customer.barang}\n💰 *Angsuran ke-${angsuranKe}:* ${formatRupiah(angsuranPerBulan)}\n\nHarap lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari keterlambatan. ✅${footer}`,
 
-    terlambat: `${header}\n\n*PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n?? *Barang:* ${customer.barang}\n?? *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n?? *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. ??${footer}`,
+    terlambat: `${header}\n\n⚠️ *PEMBERITAHUAN KETERLAMBATAN*\n\nKami ingin mengingatkan bahwa angsuran Anda sudah melewati tanggal jatuh tempo.\n\n📦 *Barang:* ${customer.barang}\n💰 *Jumlah Tertunggak:* ${formatRupiah(sisa)}\n🔢 *Angsuran ke:* ${angsuranKe} dari ${customer.tenor}\n\nMohon segera lakukan pembayaran untuk menghindari penumpukan tunggakan.\n\nJika ada kendala, silakan hubungi kami untuk berkoordinasi. 🤝${footer}`,
 
-    lunas: `${header}\n\n?? *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n?? *Barang:* ${customer.barang}\n? *Status:* LUNAS\n?? *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! ??${footer}`,
+    lunas: `${header}\n\n🎉 *SELAMAT! ANGSURAN LUNAS!*\n\nKami dengan senang hati memberitahukan bahwa seluruh kewajiban angsuran Anda telah *LUNAS*.\n\n📦 *Barang:* ${customer.barang}\n✅ *Status:* LUNAS\n💰 *Total Dibayar:* ${formatRupiah(totalDibayar)}\n\nTerima kasih atas kepercayaan dan kedisiplinan Anda dalam membayar angsuran. Semoga barang yang dibeli bermanfaat! 😊${footer}`,
 
     custom: ''
   };
@@ -2785,7 +2785,7 @@ function waFillQuickInfo() {
   infoEl.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
       <div><strong>${c.barang}</strong></div>
-      <div>${c.noHp || '·'} ${phone ? '?' : '? Tidak valid'}</div>
+      <div>${c.noHp || '—'} ${phone ? '✓' : '✗ Tidak valid'}</div>
       <div>Angsuran: <strong>${formatRupiah(angsuranPerBulan)}</strong></div>
       <div>Sisa: <strong style="color:#dc2626;">${formatRupiah(sisa)}</strong></div>
       <div>Status: <span class="badge ${badgeClass}">${status}</span></div>
@@ -3403,12 +3403,12 @@ function buildItemGallery(customerId) {
   return `
     <div class="item-gallery" id="item-gallery-${customerId}">
       <div class="item-gallery-main" style="position:relative;">
-        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">·</button>
+        <button class="item-gallery-nav prev" onclick="galleryNav(${-1},'${customerId}')" style="${photos.length<2?'display:none':''}">&#8249;</button>
         <img id="gallery-main-img-${customerId}"
              src="${photos[0]}"
              alt="Foto Barang 1"
              onclick="openLightbox(this.src, 'Foto Barang ' + (${customerId === '' ? 0 : `_galleryIndex`}+1) + ' / ${photos.length}')">
-        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">·</button>
+        <button class="item-gallery-nav next" onclick="galleryNav(${1},'${customerId}')" style="${photos.length<2?'display:none':''}">&#8250;</button>
         ${photos.length > 1 ? `<div class="item-gallery-counter" id="gallery-counter-${customerId}">1 / ${photos.length}</div>` : ''}
       </div>
       ${photos.length > 1 ? `
@@ -3706,21 +3706,21 @@ function checkDueDatesAndNotify() {
       const tglStr = dueDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
       if (diff === 3) {
-        showNotification(`? ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} · Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '? Jatuh Tempo 3 Hari',
+        showNotification(`⏰ ${c.nama} jatuh tempo 3 hari lagi`, { body: `${c.barang} · Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff === 0) {
-        showNotification(`?? ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} · Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '?? Jatuh Tempo Hari Ini',
+        showNotification(`📅 ${c.nama} jatuh tempo HARI INI!`, { body: `${c.barang} · Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        showNotification(`?? ${c.nama} telat ${hari} hari!`, { body: `${c.barang} · Rp ${angsuran}` });
-        if (window.NotificationModule) NotificationModule.add('OVERDUE', `?? Overdue ${hari} Hari`,
+        showNotification(`⚠️ ${c.nama} telat ${hari} hari!`, { body: `${c.barang} · Rp ${angsuran}` });
+        if (window.NotificationModule) NotificationModule.add('OVERDUE', `⚠️ Overdue ${hari} Hari`,
           `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`,
           { customerId: c.id, daysUntilDue: diff });
       }
@@ -3772,22 +3772,22 @@ async function triggerTestNotifications() {
       };
 
       if (diff === 3) {
-        addOnce('DUE_TODAY', '? Jatuh Tempo 3 Hari',
+        addOnce('DUE_TODAY', '⏰ Jatuh Tempo 3 Hari',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo pada ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
       if (diff === 0) {
-        addOnce('DUE_TODAY', '?? Jatuh Tempo Hari Ini',
+        addOnce('DUE_TODAY', '📅 Jatuh Tempo Hari Ini',
           `Kredit ${c.nama} (${c.barang}) jatuh tempo HARI INI (${tglStr})! Angsuran: Rp ${angsuran}`);
       }
       if (diff < 0 && diff >= -5) {
         const hari = Math.abs(diff);
-        addOnce('OVERDUE', `?? Overdue ${hari} Hari`,
+        addOnce('OVERDUE', `⚠️ Overdue ${hari} Hari`,
           `Kredit ${c.nama} (${c.barang}) telah ${hari} hari TELAT bayar! Due: ${tglStr}. Angsuran: Rp ${angsuran}`);
       }
     } catch (e) { console.warn('[Notif]', c?.nama, e.message); }
   });
 
-  console.log(`? Selesai. ${count} notifikasi baru dari ${customers.length} pelanggan.`);
+  console.log(`✅ Selesai. ${count} notifikasi baru dari ${customers.length} pelanggan.`);
 }
 
 function updateSortableHeaders() {
@@ -3808,7 +3808,7 @@ function updateSortableHeaders() {
   row.innerHTML = headers.map(h => {
     if (!h.field) return `<th>${h.text}</th>`;
     const isActive = sortConfig.field === h.field;
-    const arrow = isActive ? (sortConfig.direction === 'asc' ? ' ?' : ' ?') : '';
+    const arrow = isActive ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : '';
     return `<th onclick="setSortColumn('${h.field}')" style="cursor:pointer;user-select:none;position:relative;">
       ${h.text}${arrow}
     </th>`;
